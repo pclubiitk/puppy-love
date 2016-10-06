@@ -12,7 +12,7 @@ function checkPassword() {
 }
 
 function loginCheck() {
-    setKey();
+    checkPassword();
 }
 
 $(document).ready(function() {
