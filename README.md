@@ -19,4 +19,21 @@ Implementation will be using the following platforms:
 * Sass
 * Bootstrap
 
+## Running
+For frontend:
+```
+gem install sass
+sudo npm install -g bower
+# Now add /home/saksham/.gem/ruby/<version>/bin to your path
+
+cd frontend
+bower install
+sass --watch css
+
+# Use either of these
+python3 -m http.server
+python2 -m SimpleHTTPServer
+```
+You can open the local website on [localhost:8000](localhost:8000)
+
 **Note**: Course project for CS252, by [Saksham Sharma](https://github.com/sakshamsharma/) and [Vinayak Tantia](https://github.com/vtantia).
