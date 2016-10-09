@@ -13,6 +13,8 @@
     "eslint": "*",
     "express": "4.12.4",
     "mongodb": "^2.2.10",
+    "mongoose": "^4.6.3",
+    "mongoose-long": "^0.1.0",
     "morgan": "~1.6.1",
     "require-dir": "*",
     "winston": "*"

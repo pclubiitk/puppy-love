@@ -7,31 +7,35 @@ var express    = require('express'),
 var __dirname = path.resolve(path.dirname()),
     app = express();
 
-var mongo  = require('./db.js'),
-    config = require('./config.js'),
-    Routes = require('./router.js');
+var dbControl = require('./db.js'),
+    config    = require('./config.js'),
+    Routes    = require('./router.js');
 
 app.use(logger('short'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Listen only when you could connect to DB
-mongo.connectAndRun(function(db) {
-    app.use('/api', new Routes(db));
+dbControl.connectAndRun(function(mongoose) {
+    // Since mongoose callback has to be a function
+    // without any arguments
+    return function() {
+        app.use('/api', new Routes(mongoose));
 
-    // Clean exit :)
-    process.on('SIGINT', function() {
-        console.log("Closing DB");
-        db.close();
-        console.log("Exiting");
-        process.exit();
-    });
+        // Clean exit :)
+        process.on('SIGINT', function() {
+            console.log("Closing DB");
+            mongoose.connection.close();
+            console.log("Exiting");
+            process.exit();
+        });
 
-    app.listen(config.web.port, config.web.host, function () {
-        winston.log('info', 'Puppy backend listening at http://%s:%s',
-                    config.web.host, config.web.port);
-    });
+        app.listen(config.web.port, config.web.host, function () {
+            winston.log('info', 'Puppy backend listening at http://%s:%s',
+                        config.web.host, config.web.port);
+        });
+    };
 });
 
 module.exports = app;
