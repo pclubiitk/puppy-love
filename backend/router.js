@@ -15,6 +15,7 @@ module.exports = function(db) {
     router.post('/register', controllers.genkey.register(db));
     router.post('/newUser', controllers.user.newUser(db));
     router.get('/findUser', controllers.user.findUser(db));
+    router.post('/submitUserInfo', controllers.user.submitUserInfo(db));
 
     return router;
 };

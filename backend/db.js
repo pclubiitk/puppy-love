@@ -3,6 +3,7 @@ var mongoose = require('mongoose'),
 
 exports.connectAndRun = function(callback) {
     mongoose.connect(config.mongo.url);
+    mongoose.Promise = global.Promise; // Prevent deprecation warn
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
 

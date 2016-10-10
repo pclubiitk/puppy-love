@@ -12,9 +12,8 @@ module.exports = function(mongoose) {
 
     // The basic model of User
     var userSchema = new Schema({
+        _id: SchemaTypes.Long,  // Roll number
         name: String,
-        email: String,
-        roll: SchemaTypes.Long,
         passHash: String,
         pubKey: String,
         privKey: String,
@@ -30,9 +29,16 @@ module.exports = function(mongoose) {
         return result;
     };
 
-    // Used to verify auth code
-    userSchema.methods.verifyAuthCode = function(suppliedCode) {
-        return (this.authCode === suppliedCode);
+    // The only functionality to be provided
+    userSchema.methods.updateInfo = function(suppliedCode, s_pass, s_pub, s_priv) {
+        if (this.authCode === suppliedCode) {
+            this.passHash = s_pass;
+            this.pubKey = s_pub;
+            this.privKey = s_priv;
+            return true;
+        } else {
+            return false;
+        }
     };
 
     // Return new model or create one
