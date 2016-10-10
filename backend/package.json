@@ -20,8 +20,8 @@
     "winston": "*"
   },
   "scripts": {
-    "start": "node ./app.js",
+    "start": "node ./server.js",
     "build:docker": "docker build -t $npm_package_name ."
   },
-  "main": "app.js"
+  "main": "server.js"
 }
