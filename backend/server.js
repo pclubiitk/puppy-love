@@ -3,16 +3,24 @@ var winston    = require('winston');
 var dbControl = require('./db.js'),
     config    = require('./config.js'),
     Routes    = require('./router.js'),
-    app       = require('./app.js');
+    app       = require('./app.js'),
+    passAuth  = require('./passAuth.js');
 
 // Main file for the code
 
+
 // Listen only when you could connect to DB
 dbControl.connectAndRun(function(mongoose) {
+
+    // Plug in passport
+    passAuth.handleAuth(app, mongoose.connection);
+
     // Since mongoose callback has to be a function
     // without any arguments
+    passport = passAuth.loginMethod(mongoose);
+
     return function() {
-        app.use('/api', new Routes(mongoose));
+        app.use(config.api, new Routes(mongoose, passport));
 
         // Clean exit :)
         process.on('SIGINT', function() {

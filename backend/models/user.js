@@ -20,6 +20,12 @@ module.exports = function(mongoose) {
         authCode: String
     });
 
+    // Match the hashes
+    // TODO: Can we do better, be safer?
+    userSchema.methods.validPassword = function(password) {
+        return (this.passHash === password);
+    };
+
     // Use some random data to prevent forging
     userSchema.methods.getAuthCode = function() {
         var token = crypto.randomBytes(16).toString('hex');
@@ -30,15 +36,20 @@ module.exports = function(mongoose) {
     };
 
     // The only functionality to be provided
-    userSchema.methods.updateInfo = function(suppliedCode, s_pass, s_pub, s_priv) {
-        if (this.authCode === suppliedCode) {
-            this.passHash = s_pass;
-            this.pubKey = s_pub;
-            this.privKey = s_priv;
-            return true;
-        } else {
+    userSchema.methods.updateInfo = function(s_code, s_pass, s_pub, s_priv) {
+        if (this.authCode === null) {
             return false;
-        }
+        } else {
+            if (this.authCode === s_code) {
+                this.passHash = s_pass;
+                this.pubKey = s_pub;
+                this.privKey = s_priv;
+                this.authCode = null; // We don't want it to be reused
+                return true;
+            } else {
+                return false;
+            }
+        };
     };
 
     // Return new model or create one
