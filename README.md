@@ -24,7 +24,7 @@ For frontend:
 ```
 gem install sass
 sudo npm install -g bower
-# Now add /home/saksham/.gem/ruby/<version>/bin to your path
+# Now add $HOME/.gem/ruby/<version>/bin to your path
 
 cd frontend
 bower install
@@ -35,5 +35,16 @@ python3 -m http.server
 python2 -m SimpleHTTPServer
 ```
 You can open the local website on [localhost:8000](localhost:8000)
+
+For backend:
+```
+cd backend
+npm install
+
+# Recommended
+sudo npm install -g nodemon
+nodemon
+```
+The backend will be listening on the printed port number.
 
 **Note**: Course project for CS252, by [Saksham Sharma](https://github.com/sakshamsharma/) and [Vinayak Tantia](https://github.com/vtantia).
