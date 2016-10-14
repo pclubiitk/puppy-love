@@ -7,24 +7,32 @@ var User = require('../models/user.js'),
 // roll="14588" ...
 exports.newUser = function(mongoose) {
     return function(req, res) {
-        var neuMann = new User(mongoose)({
-            _id: req.body.roll,
-            name: req.body.name,
-            passHash: req.body.passHash,
-            pubKey: "def",
-            privKey: "poi",
-            authCode: "asdasdas"
-        });
 
-        neuMann.save(function(err, man) {
-            if (err) {
-                console.error(err);
-                res.status(500);
-                res.send('An error occurred');
-            } else {
-                res.send('Added new user: ' + man.name);
-            };
-        });
+        // If the required fields have been sent
+        if (utils.reqBodyParse(req, ['roll', 'name',
+                                     'passHash'])) {
+            var neuMann = new User(mongoose)({
+                _id: req.body.roll,
+                name: req.body.name,
+                passHash: req.body.passHash,
+                pubKey: "def",
+                privKey: "poi",
+                authCode: "asdasdas"
+            });
+
+            neuMann.save(function(err, man) {
+                if (err) {
+                    console.error(err);
+                    res.status(500);
+                    res.send('An error occurred');
+                } else {
+                    res.send('Added new user: ' + man.name);
+                };
+            });
+        } else {
+            // Some field was missing
+            utils.response(res, "Missing fields", 400);
+        };
     };
 };
 
@@ -33,15 +41,24 @@ exports.newUser = function(mongoose) {
 // Usage: http get localhost:8091/api/findUser name="Saksham"
 exports.findUser = function(mongoose) {
     return function(req, res) {
-        User(mongoose).find({name: new RegExp(req.body.name)}, {},
-                            function(err, resp) {
-                                if (err) {
-                                    res.status(500);
-                                    res.send(err);
-                                } else {
-                                    res.send(resp);
-                                };
-                            });
+        // If the required fields have been sent
+        if (utils.reqBodyParse(req, ['name'])) {
+            // All fields present
+            User(mongoose).find({name: new RegExp(req.body.name)}, {},
+                                function(err, resp) {
+                                    if (err) {
+                                        res.status(500);
+                                        res.send(err);
+                                    } else {
+                                        // Too much information being sent
+                                        res.send(resp);
+                                    };
+                                });
+        } else {
+            // Some field was missing
+            utils.response(res, "Missing fields", 400);
+        };
+
     };
 };
 
@@ -80,6 +97,7 @@ exports.submitUserInfo = function(mongoose) {
 
     // The actual code called on submitUserInfo
     return function(req, res) {
+        // If the required fields have been sent
         if (utils.reqBodyParse(req, ['authCode', 'passHash',
                                      'pubKey', 'privKey', 'roll'])) {
             // All fields present
