@@ -81,8 +81,37 @@ exports.firstLogin = function(mongoose) {
                     p.save(function(err) {
                         if (err) {
                             console.error("Couldn't save for: " + req.body.roll);
+                            respond(messages.dbError);
+                        } else {
+                            respond(couldUpdate);
+                        };
+                    });
+                } else {
+                    // Some error
+                    respond(couldUpdate);
+                };
+            };
+        });
+    };
+};
 
-                            // Reassign error
+// Whenever user wants to update data stored
+exports.updateData = function(mongoose) {
+
+    return function(req, res) {
+        User(mongoose).findById(req.body.roll, function(err, p) {
+            if (!p) {
+                respond(messages.wrongUser);
+            } else {
+                // TODO: Extract roll number not from body
+                // But instead from the session cookie
+                // #security, #important
+                var couldUpdate = p.updateData(req.body.roll, req);
+                if (couldUpdate.success) {
+                    // Auth token was correct
+                    p.save(function(err) {
+                        if (err) {
+                            console.error("Couldn't save for: " + req.body.roll);
                             respond(messages.dbError);
                         } else {
                             respond(couldUpdate);
@@ -113,8 +142,6 @@ exports.changePassword = function(mongoose) {
                     p.save(function(err) {
                         if (err) {
                             console.error("Couldn't save for: " + req.body.roll);
-
-                            // Reassign error
                             respond(messages.dbError);
                         } else {
                             respond(couldUpdate);

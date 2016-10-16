@@ -86,7 +86,7 @@ module.exports = function(mongoose) {
         } else {
             // Verify fields needed
             if (!utils.reqBodyParse(req,
-                                    'passHash', 'pubKey', 'data')) {
+                                    ['passHash', 'pubKey', 'data'])) {
                 return messages.missingFields;
             } else {
                 // Request is well formed
@@ -110,6 +110,20 @@ module.exports = function(mongoose) {
                 data: this.data,
                 submitted: this.submitted
             });
+        };
+    };
+
+    // Update the info stored
+    userSchema.methods.updateData = function(roll, req) {
+        if (!this.authorized(roll)) {
+            return messages.unauthorized;
+        } else {
+            if (!utils.reqBodyParse(req, ['data'])) {
+                return messages.missingFields;
+            } else {
+                this.data = req.body.data;
+                return messages.allFine;
+            };
         };
     };
 

@@ -65,6 +65,7 @@ module.exports = function(db, passport) {
     router.get('/findUser2', controllers.user.findUser(db));
 
     addRoute('post', 'update/first', controllers.user.firstLogin(db));
+    addRoute('post', 'update/data', controllers.user.updateData(db));
     addRoute('post', 'update/pass', controllers.user.changePassword(db));
     addRoute('post', 'info/login', controllers.user.getInfoOnLogin(db));
 
