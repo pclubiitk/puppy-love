@@ -1,5 +1,7 @@
 var User = require('../models/user.js'),
-    utils = require('../controllers/utils.js');
+    utils = require('../controllers/utils.js'),
+    messages = utils.messages,
+    respond = utils.sendMessage;
 
 // Endpoint for creating user
 // TODO: Remove in production use
@@ -23,15 +25,14 @@ exports.newUser = function(mongoose) {
             neuMann.save(function(err, man) {
                 if (err) {
                     console.error(err);
-                    res.status(500);
-                    res.send('An error occurred');
+                    respond(res, messages.dbError);
                 } else {
-                    res.send('Added new user: ' + man.name);
+                    respond(res, allFine);
                 };
             });
         } else {
             // Some field was missing
-            utils.response(res, "Missing fields", 400);
+            respond(res, missingFields);
         };
     };
 };
@@ -39,6 +40,7 @@ exports.newUser = function(mongoose) {
 // Endpoint to get user information
 // TODO: Modify to only pass basic info in production
 // Usage: http get localhost:8091/api/findUser name="Saksham"
+// #security, #important
 exports.findUser = function(mongoose) {
     return function(req, res) {
         // If the required fields have been sent
@@ -63,58 +65,83 @@ exports.findUser = function(mongoose) {
 };
 
 // To be called on first attempt at logging in
-exports.submitUserInfo = function(mongoose) {
+exports.firstLogin = function(mongoose) {
 
-    // Helper function which does the heavy lifting
-    var updater = function(req, callback) {
+    return function(req, res) {
         User(mongoose).findById(req.body.roll, function(err, p) {
             if (!p) {
-                console.error("Bad id: " + req.body.roll);
-                callback(1);
+                respond(messages.wrongUser);
             } else {
-                var couldUpdate = p.updateInfo(req.body.authCode,
-                                               req.body.passHash,
-                                               req.body.pubKey,
-                                               req.body.privKey);
-                if (couldUpdate) {
+                // TODO: Extract roll number not from body
+                // But instead from the session cookie
+                // #security, #important
+                var couldUpdate = p.firstLogin(req.body.roll, req);
+                if (couldUpdate.success) {
                     // Auth token was correct
                     p.save(function(err) {
                         if (err) {
-                            console.error("Couldn't save");
-                            callback(-1);
+                            console.error("Couldn't save for: " + req.body.roll);
+
+                            // Reassign error
+                            respond(messages.dbError);
                         } else {
-                            callback(0);
+                            respond(couldUpdate);
                         };
                     });
                 } else {
-                    // Must've been a bad auth token
-                    console.error("Bad auth token");
-                    callback(2);
+                    // Some error
+                    respond(couldUpdate);
                 };
             };
         });
     };
+};
 
-    // The actual code called on submitUserInfo
+exports.changePassword = function(mongoose) {
+
     return function(req, res) {
-        // If the required fields have been sent
-        if (utils.reqBodyParse(req, ['authCode', 'passHash',
-                                     'pubKey', 'privKey', 'roll'])) {
-            // All fields present
-            updater(req, function(result) {
-                if (result == 0) {
-                    utils.response(res, "Updated information");
-                } else if (result == 1) {
-                    utils.response(res, "Bad roll number", 400);
-                } else if (result == 2) {
-                    utils.response(res, "Bad auth code", 400);
+        User(mongoose).findById(req.body.roll, function(err, p) {
+            if (!p) {
+                respond(messages.wrongUser);
+            } else {
+                // TODO: Extract roll number not from body
+                // But instead from the session cookie
+                // #security, #important
+                var couldUpdate = p.changePassword(req.body.roll, req);
+                if (couldUpdate.success) {
+                    // Auth token was correct
+                    p.save(function(err) {
+                        if (err) {
+                            console.error("Couldn't save for: " + req.body.roll);
+
+                            // Reassign error
+                            respond(messages.dbError);
+                        } else {
+                            respond(couldUpdate);
+                        };
+                    });
                 } else {
-                    utils.response(res, "Something failed", 500);
+                    // Some error
+                    respond(couldUpdate);
                 };
-            });
-        } else {
-            // Some field was missing
-            utils.response(res, "Missing fields", 400);
-        };
+            };
+        });
+    };
+};
+
+exports.getInfoOnLogin = function(mongoose) {
+
+    return function(req, res) {
+        User(mongoose).findById(req.body.roll, function(err, p) {
+            if (!p) {
+                respond(messages.wrongUser);
+            } else {
+                // TODO: Extract roll number not from body
+                // But instead from the session cookie
+                // #security, #important
+                // getInfoOnLogin will return a utils.messages message
+                return respond(p.getInfoOnLogin(req.body.roll, req));
+            };
+        });
     };
 };
