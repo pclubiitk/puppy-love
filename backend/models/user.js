@@ -70,8 +70,13 @@ module.exports = function(mongoose) {
                     this.pubKey = req.body.pubKey;
                     this.privKey = req.body.privKey;
 
+                    // TODO: Mention this on the frontend on call of
+                    // firstLogin
                     this.data = '';
-                    this.submitted = false;
+
+                    // This should not be done
+                    // this.submitted = false;
+
                     return messages.allFine;
                 };
             };
@@ -86,13 +91,13 @@ module.exports = function(mongoose) {
         } else {
             // Verify fields needed
             if (!utils.reqBodyParse(req,
-                                    ['passHash', 'pubKey', 'data'])) {
+                                    ['passHash', 'privKey'])) {
                 return messages.missingFields;
             } else {
                 // Request is well formed
                 this.passHash = req.body.passHash;
                 this.privKey = req.body.privKey;
-                this.data = req.body.data;
+
                 return messages.allFine;
             };
         };
