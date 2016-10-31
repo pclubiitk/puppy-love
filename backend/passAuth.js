@@ -55,7 +55,7 @@ exports.loginMethod = function(mongoose) {
 
 
     passport.serializeUser(function(user, done) {
-        done(null, user);
+        done(null, {name: user.name, roll: user._id});
     });
 
     passport.deserializeUser(function(user, done) {

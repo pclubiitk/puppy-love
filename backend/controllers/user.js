@@ -72,10 +72,7 @@ exports.firstLogin = function(mongoose) {
             if (!p) {
                 respond(res, messages.wrongUser);
             } else {
-                // TODO: Extract roll number not from body
-                // But instead from the session cookie
-                // #security, #important
-                var couldUpdate = p.firstLogin(req.body.roll, req);
+                var couldUpdate = p.firstLogin(req.user.roll, req);
                 if (couldUpdate.success) {
                     // Auth token was correct
                     p.save(function(err) {
@@ -103,10 +100,7 @@ exports.updateData = function(mongoose) {
             if (!p) {
                 respond(res, messages.wrongUser);
             } else {
-                // TODO: Extract roll number not from body
-                // But instead from the session cookie
-                // #security, #important
-                var couldUpdate = p.updateData(req.body.roll, req);
+                var couldUpdate = p.updateData(req.user.roll, req);
                 if (couldUpdate.success) {
                     // Auth token was correct
                     p.save(function(err) {
@@ -133,10 +127,7 @@ exports.changePassword = function(mongoose) {
             if (!p) {
                 respond(res, messages.wrongUser);
             } else {
-                // TODO: Extract roll number not from body
-                // But instead from the session cookie
-                // #security, #important
-                var couldUpdate = p.changePassword(req.body.roll, req);
+                var couldUpdate = p.changePassword(req.user.roll, req);
                 if (couldUpdate.success) {
                     // Auth token was correct
                     p.save(function(err) {
@@ -163,11 +154,7 @@ exports.getInfoOnLogin = function(mongoose) {
             if (!p) {
                 respond(res, messages.wrongUser);
             } else {
-                // TODO: Extract roll number not from body
-                // But instead from the session cookie
-                // #security, #important
-                // getInfoOnLogin will return a utils.messages message
-                return respond(res, p.getInfoOnLogin(req.body.roll, req));
+                return respond(res, p.getInfoOnLogin(req.user.roll, req));
             };
         });
     };

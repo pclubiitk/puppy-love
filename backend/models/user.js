@@ -25,7 +25,7 @@ module.exports = function(mongoose) {
     //       Never can be decrypted outside the user's own browser
     //       Contains choices of user prior to submitting
     var userSchema = new Schema({
-        _id: SchemaTypes.Long,  // Roll number
+        _id: Number,  // Roll number
         name: String,
         passHash: String,
         pubKey: String,

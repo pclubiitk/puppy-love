@@ -6,6 +6,7 @@ exports.reqBodyParse = function(req, fields) {
     for (var i=0; i<fields.length; i++) {
         if (req.body[fields[i]] === undefined) {
             result = false;
+            console.error('Missing: ' + fields[i]);
             break;
         };
     };
