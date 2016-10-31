@@ -27,12 +27,12 @@ exports.newUser = function(mongoose) {
                     console.error(err);
                     respond(res, messages.dbError);
                 } else {
-                    respond(res, allFine);
+                    respond(res, messages.allFine);
                 };
             });
         } else {
             // Some field was missing
-            respond(res, missingFields);
+            respond(res, messages.missingFields);
         };
     };
 };
@@ -70,7 +70,7 @@ exports.firstLogin = function(mongoose) {
     return function(req, res) {
         User(mongoose).findById(req.body.roll, function(err, p) {
             if (!p) {
-                respond(messages.wrongUser);
+                respond(res, messages.wrongUser);
             } else {
                 // TODO: Extract roll number not from body
                 // But instead from the session cookie
@@ -81,14 +81,14 @@ exports.firstLogin = function(mongoose) {
                     p.save(function(err) {
                         if (err) {
                             console.error("Couldn't save for: " + req.body.roll);
-                            respond(messages.dbError);
+                            respond(res, messages.dbError);
                         } else {
-                            respond(couldUpdate);
+                            respond(res, messages.couldUpdate);
                         };
                     });
                 } else {
                     // Some error
-                    respond(couldUpdate);
+                    respond(res, messages.couldUpdate);
                 };
             };
         });
@@ -101,7 +101,7 @@ exports.updateData = function(mongoose) {
     return function(req, res) {
         User(mongoose).findById(req.body.roll, function(err, p) {
             if (!p) {
-                respond(messages.wrongUser);
+                respond(res, messages.wrongUser);
             } else {
                 // TODO: Extract roll number not from body
                 // But instead from the session cookie
@@ -112,14 +112,14 @@ exports.updateData = function(mongoose) {
                     p.save(function(err) {
                         if (err) {
                             console.error("Couldn't save for: " + req.body.roll);
-                            respond(messages.dbError);
+                            respond(res, messages.dbError);
                         } else {
-                            respond(couldUpdate);
+                            respond(res, messages.couldUpdate);
                         };
                     });
                 } else {
                     // Some error
-                    respond(couldUpdate);
+                    respond(res, messages.couldUpdate);
                 };
             };
         });
@@ -131,7 +131,7 @@ exports.changePassword = function(mongoose) {
     return function(req, res) {
         User(mongoose).findById(req.body.roll, function(err, p) {
             if (!p) {
-                respond(messages.wrongUser);
+                respond(res, messages.wrongUser);
             } else {
                 // TODO: Extract roll number not from body
                 // But instead from the session cookie
@@ -142,14 +142,14 @@ exports.changePassword = function(mongoose) {
                     p.save(function(err) {
                         if (err) {
                             console.error("Couldn't save for: " + req.body.roll);
-                            respond(messages.dbError);
+                            respond(res, messages.dbError);
                         } else {
-                            respond(couldUpdate);
+                            respond(res, messages.couldUpdate);
                         };
                     });
                 } else {
                     // Some error
-                    respond(couldUpdate);
+                    respond(res, messages.couldUpdate);
                 };
             };
         });
@@ -161,13 +161,13 @@ exports.getInfoOnLogin = function(mongoose) {
     return function(req, res) {
         User(mongoose).findById(req.body.roll, function(err, p) {
             if (!p) {
-                respond(messages.wrongUser);
+                respond(res, messages.wrongUser);
             } else {
                 // TODO: Extract roll number not from body
                 // But instead from the session cookie
                 // #security, #important
                 // getInfoOnLogin will return a utils.messages message
-                return respond(p.getInfoOnLogin(req.body.roll, req));
+                return respond(res, p.getInfoOnLogin(req.body.roll, req));
             };
         });
     };
