@@ -5,8 +5,8 @@ var User = require('../models/user.js'),
 
 // Endpoint for creating user
 // TODO: Remove in production use
-// Usage: http get localhost:8091/api/newUser name="saksham" \
-// roll="14588" ...
+// Usage: http post localhost:8091/api/update/new name="vinayak" \
+// roll="14805" passHash="abcd"
 exports.newUser = function(mongoose) {
     return function(req, res) {
 
@@ -19,7 +19,9 @@ exports.newUser = function(mongoose) {
                 passHash: req.body.passHash,
                 pubKey: "def",
                 privKey: "poi",
-                authCode: "asdasdas"
+                authCode: "asdasdas",
+                data: "some initial data",
+                submitted: false
             });
 
             neuMann.save(function(err, man) {

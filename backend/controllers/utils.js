@@ -31,7 +31,7 @@ exports.messages = {
     },
     dbError: {
         success: false,
-        code: 501,
+        code: 500,
         data: 'Database error'
     },
     wrongUser: {
