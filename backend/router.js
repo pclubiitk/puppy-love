@@ -20,7 +20,7 @@ module.exports = function(db, passport) {
 
     // Wrapper for adding all function calls
     var addRoute = function(method, route, handler) {
-        router[method]('/' + route,
+        router[method](route,
                checkAuth,
                handler);
     };
@@ -54,20 +54,20 @@ module.exports = function(db, passport) {
     // ==============
     // All the routes
     // ==============
-    addRoute('get', '', function(req, res) {
+    addRoute('get', '/', function(req, res) {
         res.send('Hello from the other side');
     });
 
-    addRoute('get',  'findUser', controllers.user.findUser(db));
+    addRoute('get',  '/findUser', controllers.user.findUser(db));
 
     // TODO: Only for testing passport.js
     // Needs to be removed in production
     // #security, #important
     router.get('/findUser2', controllers.user.findUser(db));
 
-    addRoute('post', 'update/data', controllers.user.updateData(db));
-    addRoute('post', 'update/pass', controllers.user.changePassword(db));
-    addRoute('post', 'info/login', controllers.user.getInfoOnLogin(db));
+    addRoute('post', '/update/data', controllers.user.updateData(db));
+    addRoute('post', '/update/pass', controllers.user.changePassword(db));
+    addRoute('post', '/info/login', controllers.user.getInfoOnLogin(db));
 
     return router;
 };
