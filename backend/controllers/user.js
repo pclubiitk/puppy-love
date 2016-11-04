@@ -12,8 +12,9 @@ exports.newUser = function(mongoose) {
 
         // If the required fields have been sent
         if (utils.reqBodyParse(req, ['roll', 'name',
+                                     'image', 'gender',
                                      'email', 'passHash'])) {
-            if (req.body.parse === "1") {
+            if (req.body.gender === "1") {
                 gender = true;
             } else {
                 gender = false;
@@ -23,6 +24,7 @@ exports.newUser = function(mongoose) {
                 name: req.body.name,
                 email: req.body.email,
                 gender: gender,
+                image: req.body.image,
                 passHash: req.body.passHash,
                 pubKey: 'def',
                 privKey: 'poi',

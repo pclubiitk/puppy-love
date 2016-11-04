@@ -48,7 +48,7 @@ exports.newEntry = function(mongoose) {
                     if (err) {
                         console.error(err);
                         respond(res, messages.dbError);
-                    } else {
+z                    } else {
                         respond(res, messages.allFine);
                     };
                 });

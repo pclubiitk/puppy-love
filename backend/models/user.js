@@ -32,6 +32,7 @@ module.exports = function(mongoose) {
         name: String,
         email: String,
         gender: Boolean,
+        image: String,
         passHash: String,
         pubKey: String,
         privKey: String,
