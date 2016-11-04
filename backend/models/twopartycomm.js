@@ -9,44 +9,116 @@ var SchemaTypes = mongoose.Schema.Types;
 module.exports = function(mongoose) {
     var Schema = mongoose.Schema;
 
-    // There shall be (no of men * no of women * 2) entries in this type
+    // There shall be (no of males * no of females) entries in this type
     // Each entry will signify the message from sender to target
     // TODO: Are queries like (all entries from/to person A) fast enough?
 
     // Schema for containing the secret
     // communication between parties
     var twoParty = new Schema({
-        _id: SchemaTypes.Long,  // Roll number of (sender++target)
-        sender: SchemaTypes.Long, // Roll number of sender
-        target: SchemaTypes.Long, // Roll number of target person
-        secret1: String,
-        secret2: String,        // 3 of these for
-        secret3: String         // possible future use
+        _id: Number,  // Roll numbers appended (in alphabetical order)
+        sender: Number, // Roll number of garbler (sender)
+        receiver: Number, // Roll number of evaluator (receiver)
+
+        // The state/step of computation between these two people
+        state: Number,
+        senderSubmitted: Boolean,
+        receiverSubmitted: Boolean,
+
+        // Step 1 information
+        // Happens whenever one of the two people
+        // logs in for the first time.
+        privateServerMap: Object,
+        privateSenderInfo: String,
+        infoForReceiver: String,
+
+        // Step 2 information
+        // Only happens after receiver submits
+        oblivTransferV: String,
+        oblivTransferKB: String, // Encrypted k value
+
+        // Step 2-2 information
+        // Sender has submitted.
+        // Does not stop step 3
+        senderChoice: String,
+
+        // Step 3 information
+        // Only happens after step 2
+        oblivTransferPrime: String,
+
+        // Step 4 information
+        // Once string from receiver is known
+        // the answer is found.
+        // Requires step 3 and step 2-2
+        valueFromReceiver: String,
+
+        // Step 5
+        // Send only at the last moment
+        matched: Boolean
     });
 
-    // This is safe from race conditions, since only one person
-    // is allowed to write values to this entry in the DB, that
-    // is, the sender
-    // TODO: Enforce access restrictions to this call
-    twoParty.methods.setSecret = function(_secret1, _secret2, _secret3) {
-        if (_secret1 !== undefined && this.secret1 !== null) {
-            this.secret1 = _secret1;
+    // Receiver has chosen, and sends a V, K, B.
+    // Sender should NOT know K, B
+    twoParty.methods.recvStep2 = function(req) {
+        // First verify all fields are present
+        if (!utils.reqBodyParse(req, 'v', 'kb')) {
+            return messages.missingFields;
+        } else {
+            // Request is well formed
+            if (this.receiverSubmitted !== false) {
+                this.receiverSubmitted = true;
+                this.oblivTransferV = req.body.v;
+                this.oblivTransferKB = req.body.kb;
+            } else {
+                return messages.aleadyExists;
+            }
         };
-
-        if (_secret2 !== undefined && this.secret2 !== null) {
-            this.secret2 = _secret2;
-        };
-
-        if (_secret3 !== undefined && this.secret3 !== null) {
-            this.secret1 = _secret3;
-        };
-
-        return (this.secret1, this.secret2, this.secret3);
     };
 
+    // Sender sends its choice
+    twoParty.methods.senderStep2 = function(req) {
+        if (!utils.reqBodyParse(req, 'senderChoice')) {
+            return messages.missingFields;
+        } else {
+            if (this.senderSubmitted !== false) {
+                this.senderSubmitted = true;
+                this.senderChoice = req.body.senderChoice;
+            } else {
+                return messages.alreadyExists;
+            }
+        }
+    }
+
+    // Receiver has computed the result
+    twoParty.methods.recvStep4 = function(req) {
+        if (!utils.reqBodyParse(req, 'value')) {
+            return messages.missingFields;
+        } else {
+            if (this.senderSubmitted !== true ||
+                this.receiverSubmitted !== true) {
+
+                return messages.badRequest;
+            } else {
+                // The moment of truth
+                if (this.privateServerMap.hasOwnProperty(req.value)) {
+                    // A valid result was computed
+                    result = this.privateServerMap[req.value];
+                    if (result) {
+                        this.matched = true;
+                    } else {
+                        this.matched = false;
+                    }
+                    // Do not inform of the result just yet.
+                    return messages.allFine;
+                } else {
+                    return messages.badRequest;
+                }
+            }
+        }
+    }
 
     // Return new model or create one
-    if (mongoose.models.User) {
+    if (mongoose.models.TwoPartyComm) {
         return mongoose.model('TwoPartyComm');
     } else {
         return mongoose.model('TwoPartyComm', twoParty);
