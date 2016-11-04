@@ -67,7 +67,13 @@ module.exports = function(db, passport) {
 
     addRoute('post', '/update/data', controllers.user.updateData(db));
     addRoute('post', '/update/pass', controllers.user.changePassword(db));
-    addRoute('post', '/info/login', controllers.user.getInfoOnLogin(db));
+    addRoute('post', '/info/login',  controllers.user.getInfoOnLogin(db));
 
+    addRoute('post', '/twoparty/new',    controllers.twoparty.newEntry(db));
+    addRoute('post', '/twoparty/rStep2', controllers.twoparty.rStep2(db));
+    addRoute('post', '/twoparty/sStep2', controllers.twoparty.sStep2(db));
+    addRoute('post', '/twoparty/sStep3', controllers.twoparty.sStep3(db));
+    addRoute('post', '/twoparty/rStep4', controllers.twoparty.rStep4(db));
+    addRoute('post', '/twoparty/disp',   controllers.twoparty.displayAll(db));
     return router;
 };

@@ -69,6 +69,7 @@ module.exports = function(mongoose) {
                 this.receiverSubmitted = true;
                 this.oblivTransferV = req.body.v;
                 this.oblivTransferKB = req.body.kb;
+                return messages.allFine;
             } else {
                 return messages.aleadyExists;
             }
@@ -81,8 +82,25 @@ module.exports = function(mongoose) {
             return messages.missingFields;
         } else {
             if (this.senderSubmitted !== false) {
+
                 this.senderSubmitted = true;
                 this.senderChoice = req.body.senderChoice;
+                return messages.allFine;
+            } else {
+                return messages.alreadyExists;
+            }
+        }
+    }
+
+    // Sender responds to oblivious computation request
+    twoParty.methods.senderStep3 = function(req) {
+        if (!utils.reqBodyParse(req, 'oblivPrime')) {
+            return messages.missingFields;
+        } else {
+
+            if (this.oblivTransferPrime !== '') {
+                this.oblivTransferPrime = req.body.oblivPrime;
+                return messages.allFine;
             } else {
                 return messages.alreadyExists;
             }
