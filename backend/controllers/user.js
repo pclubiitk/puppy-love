@@ -6,22 +6,30 @@ var User = require('../models/user.js'),
 // Endpoint for creating user
 // TODO: Remove in production use
 // Usage: http post localhost:8091/api/update/new name="vinayak" \
-// roll="14805" passHash="abcd"
+// roll="14805" passHash="abcd" email="vtantia" gender="1"
 exports.newUser = function(mongoose) {
     return function(req, res) {
 
         // If the required fields have been sent
         if (utils.reqBodyParse(req, ['roll', 'name',
-                                     'passHash'])) {
+                                     'email', 'passHash'])) {
+            if (req.body.parse === "1") {
+                gender = true;
+            } else {
+                gender = false;
+            }
             var neuMann = new User(mongoose)({
                 _id: req.body.roll,
                 name: req.body.name,
+                email: req.body.email,
+                gender: gender,
                 passHash: req.body.passHash,
-                pubKey: "def",
-                privKey: "poi",
-                authCode: "asdasdas",
-                data: "some initial data",
-                submitted: false
+                pubKey: 'def',
+                privKey: 'poi',
+                authCode: 'asdasdas',
+                data: '',
+                submitted: false,
+                matches: ''
             });
 
             neuMann.save(function(err, man) {

@@ -16,6 +16,8 @@ module.exports = function(mongoose) {
     // Description of each field:
     // _id: Roll number as integer
     // name: Name of the user
+    // email: The IITK user id (WITHOUT the @iitk.ac.in part)
+    // gender: True for males, no reason. Please.
     // passHash: A non-invertible hash of the password and user's roll
     //           Adding user's roll number prevents rainbow table attacks
     // pubKey: Public key, accessible to all
@@ -24,15 +26,19 @@ module.exports = function(mongoose) {
     // data: Personal temporary data encrypted by private key
     //       Never can be decrypted outside the user's own browser
     //       Contains choices of user prior to submitting
+    // matches: Data kept by server in your profile
     var userSchema = new Schema({
-        _id: Number,  // Roll number
+        _id: Number,
         name: String,
+        email: String,
+        gender: Boolean,
         passHash: String,
         pubKey: String,
         privKey: String,
         authCode: String,
         data: String,
-        submitted: Boolean
+        submitted: Boolean,
+        matches: String
     });
 
     // Match the hashes
@@ -73,6 +79,7 @@ module.exports = function(mongoose) {
                     // TODO: Mention this on the frontend on call of
                     // firstLogin
                     this.data = '';
+                    this.matches = '';
 
                     // This should not be done
                     // this.submitted = false;
@@ -111,9 +118,12 @@ module.exports = function(mongoose) {
         } else {
             return messages.allFineWithData({
                 name: this.name,
+                email: this.email,
+                gender: this.gender,
                 privKey: this.privKey,
                 data: this.data,
-                submitted: this.submitted
+                submitted: this.submitted,
+                matches: this.matches
             });
         };
     };

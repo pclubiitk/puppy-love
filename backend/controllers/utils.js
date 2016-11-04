@@ -29,6 +29,11 @@ exports.messages = {
         code: 400,
         data: 'Wrong authentication code'
     },
+    badRequest: {
+        success: false,
+        code: 400,
+        data: 'Bad request'
+    },
     dbError: {
         success: false,
         code: 500,
@@ -43,6 +48,11 @@ exports.messages = {
         success: true,
         code: 200,
         data: 'Success'
+    },
+    alreadyExists: {
+        success: false,
+        code: 409,
+        data: 'Entry already exists'
     },
     allFineWithData: function(_data) {
         return {
