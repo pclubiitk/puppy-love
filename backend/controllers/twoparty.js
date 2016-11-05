@@ -20,10 +20,12 @@ exports.newEntry = function(mongoose) {
 
             // What actually creates the table entry
             var createEntry = function() {
+
+                // Fix an ordering of people
                 if (parseInt(req.body.sender) > parseInt(req.body.receiver)) {
-                    id = parseInt(req.body.sender + req.body.receiver);
+                    id = (req.body.sender + req.body.receiver);
                 } else {
-                    id = parseInt(req.body.receiver + req.body.sender);
+                    id = (req.body.receiver + req.body.sender);
                 }
 
                 var neuerEntrag = new TwoPartyComm(mongoose)({
@@ -47,46 +49,22 @@ exports.newEntry = function(mongoose) {
                 neuerEntrag.save(function(err, entry) {
                     if (err) {
                         console.error(err);
-                        respond(res, messages.dbError);
-z                    } else {
-                        respond(res, messages.allFine);
+                        return messages.dbError;
+                    } else {
+                        return messages.allFine;
                     };
                 });
-            }
-
-            // Check if the gender of receiver and sender is same
-            var findReceiver = function(senderGender) {
-                User(mongoose).find(req.body.receiver,
-                                    function(err, resp) {
-                                        if (err) {
-                                            respond(messages.wrongUser);
-                                        } else {
-                                            if (senderGender != resp.gender) {
-                                                createEntry();
-                                            } else {
-                                                respond(res, messages.badRequest);
-                                            }
-                                        };
-                                    });
-            }
-
-            // Find gender of sender
-            var findSender = function() {
-                User(mongoose).findById(req.body.sender,
-                                        function(err, resp) {
-                                            if (err) {
-                                                respond(messages.wrongUser);
-                                            } else {
-                                                findReceiver(resp.gender);
-                                            };
-                                        });
-            }
+            };
 
             // Authorize and call above functions bottom to top
             if (req.body.sender == req.user.roll) {
-                findSender();
+                // verifyGender calls createEntry after verifying
+                // that the genders are different.
+                // Either of those functions will return a message for response
+                respond(utils.verifyGender(res.body.sender, res.body.receiver,
+                                           mongoose, createEntry()));
             } else {
-                respond(messages.unauthorized);
+                respond(res, messages.unauthorized);
             }
         } else {
             // Some field was missing
@@ -94,6 +72,11 @@ z                    } else {
         };
     };
 };
+
+// Naming convention to be followed for crypto functions:
+// Functions like rStepX mean the step X, which expects an action
+// from receiver.
+// Similarly, sStepX expects an action from sender
 
 exports.rStep2 = function(mongoose) {
     return function(req, res) {

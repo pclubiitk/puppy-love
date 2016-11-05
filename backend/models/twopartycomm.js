@@ -16,7 +16,7 @@ module.exports = function(mongoose) {
     // Schema for containing the secret
     // communication between parties
     var twoParty = new Schema({
-        _id: Number,  // Roll numbers appended (in alphabetical order)
+        _id: String,  // Roll numbers appended (in alphabetical order)
         sender: Number, // Roll number of garbler (sender)
         receiver: Number, // Roll number of evaluator (receiver)
 
@@ -65,13 +65,24 @@ module.exports = function(mongoose) {
             return messages.missingFields;
         } else {
             // Request is well formed
-            if (this.receiverSubmitted !== false) {
+            if (this.receiverSubmitted !== false &&
+                this.state == 1) {
+
                 this.receiverSubmitted = true;
                 this.oblivTransferV = req.body.v;
                 this.oblivTransferKB = req.body.kb;
+
+                this.state = 2;
+
                 return messages.allFine;
+
             } else {
-                return messages.aleadyExists;
+
+                if (this.receiverSubmitted === true) {
+                    return messages.aleadyExists;
+                } else {
+                    return messages.badRequestWithData('Wrong state');
+                }
             }
         };
     };
@@ -81,13 +92,14 @@ module.exports = function(mongoose) {
         if (!utils.reqBodyParse(req, 'senderChoice')) {
             return messages.missingFields;
         } else {
+            // No state checks needed here
             if (this.senderSubmitted !== false) {
 
                 this.senderSubmitted = true;
                 this.senderChoice = req.body.senderChoice;
                 return messages.allFine;
             } else {
-                return messages.alreadyExists;
+                return messages.badRequestWithData('Sender already submitted');
             }
         }
     }
@@ -98,11 +110,16 @@ module.exports = function(mongoose) {
             return messages.missingFields;
         } else {
 
-            if (this.oblivTransferPrime !== '') {
+            if (this.oblivTransferPrime !== '' &&
+                this.state == 2) {
+
                 this.oblivTransferPrime = req.body.oblivPrime;
+
+                this.state = 3;
+
                 return messages.allFine;
             } else {
-                return messages.alreadyExists;
+                return messages.badRequestWithData('Wrong state');
             }
         }
     }
@@ -113,9 +130,10 @@ module.exports = function(mongoose) {
             return messages.missingFields;
         } else {
             if (this.senderSubmitted !== true ||
-                this.receiverSubmitted !== true) {
+                this.receiverSubmitted !== true ||
+                this.state !== 3) {
 
-                return messages.badRequest;
+                return messages.badRequestWithData('Wrong state');
             } else {
                 // The moment of truth
                 if (this.privateServerMap.hasOwnProperty(req.value)) {
@@ -126,10 +144,13 @@ module.exports = function(mongoose) {
                     } else {
                         this.matched = false;
                     }
+
+                    this.state = 4;
+
                     // Do not inform of the result just yet.
                     return messages.allFine;
                 } else {
-                    return messages.badRequest;
+                    return messages.badRequestWithData('Missing key in server');
                 }
             }
         }
