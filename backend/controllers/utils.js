@@ -1,12 +1,16 @@
-var User = require('../models/user.js'),
+var User = require('../models/user.js');
 
 // Provides functions of global utility
 
 // See if the request body has the given fields
 exports.reqBodyParse = function(req, fields) {
+    return objParse(req.body, fields);
+};
+
+exports.objParse = function(req, fields) {
     var result = true;
     for (var i=0; i<fields.length; i++) {
-        if (req.body[fields[i]] === undefined) {
+        if (req[fields[i]] === undefined) {
             result = false;
             console.error('Missing: ' + fields[i]);
             break;

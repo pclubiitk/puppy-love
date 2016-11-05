@@ -6,12 +6,13 @@ var TwoPartyComm = require('../models/twopartycomm.js'),
 
 // Endpoint for creating an entry for twopartycomm
 // Usage: http post localhost:8091/api/twoparty/new
-// id="14588-14900" sender="14588" receiver="14900"
+// sender="14588" receiver="14900" serverMap="abcd"
+// senderInfo="efgh" recvInfo="ijkl"
 exports.newEntry = function(mongoose) {
     return function(req, res) {
 
         // If the required fields have been sent
-        if (utils.reqBodyParse(req, ['id', 'sender',
+        if (utils.reqBodyParse(req, ['sender',
                                      'receiver',
                                      'serverMap',
                                      'senderInfo',
@@ -72,6 +73,88 @@ exports.newEntry = function(mongoose) {
         };
     };
 };
+
+// Create objects in bulk
+exports.newBulk = function(mongoose) {
+    return function(req, res) {
+
+        var looper = function(obj) {
+            // If the required fields have been sent
+            if (utils.objParse(obj, ['id', 'sender',
+                                     'receiver',
+                                     'serverMap',
+                                     'senderInfo',
+                                     'recvInfo']) &&
+                obj.receiver !== obj.sender) {
+
+                // What actually creates the table entry
+                var createEntry = function() {
+
+                    // Fix an ordering of people
+                    if (parseInt(obj.sender) > parseInt(obj.receiver)) {
+                        id = (obj.sender + obj.receiver);
+                    } else {
+                        id = (obj.receiver + obj.sender);
+                    }
+
+                    var neuerEntrag = new TwoPartyComm(mongoose)({
+                        _id: id,
+                        sender: parseInt(obj.sender),
+                        receiver: parseInt(obj.receiver),
+                        state: 1,
+                        senderSubmitted: false,
+                        receiverSubmitted: false,
+                        privateServerMap: obj.serverMap,
+                        privateSenderInfo: obj.senderInfo,
+                        infoForReceiver: obj.recvInfo,
+                        oblivTransferV: '',
+                        oblivTransferKB: '',
+                        senderChoice: '',
+                        oblivTransferPrime: '',
+                        valueFromReceiver: '',
+                        matched: undefined
+                    });
+
+                    neuerEntrag.save(function(err, entry) {
+                        if (err) {
+                            console.error(err);
+                            return messages.dbError;
+                        } else {
+                            return messages.allFine;
+                        };
+                    });
+                };
+
+                // Authorize and call above functions bottom to top
+                if (obj.sender == req.user.roll) {
+                    // verifyGender calls createEntry after verifying
+                    // that the genders are different.
+                    // Either of those functions will return a message for response
+                    return (utils.verifyGender(res.body.sender, res.body.receiver,
+                                               mongoose, createEntry()));
+                } else {
+                    return (res, messages.unauthorized);
+                }
+            } else {
+                // Some field was missing
+                return (res, messages.missingFields);
+            };
+        };
+
+
+        // Loop over provided items
+        for (var person in req.body.people) {
+            if (req.body.people.hasOwnProperty(person)) {
+                looper(req.body.people[person]);
+            };
+        };
+
+        // TODO: Does this work fine?
+        // Will the loop still run?
+        respond(messages.allFine);
+    };
+};
+
 
 // Naming convention to be followed for crypto functions:
 // Functions like rStepX mean the step X, which expects an action
