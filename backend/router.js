@@ -40,7 +40,7 @@ module.exports = function(db, passport) {
                 });
             };
         })(req, res, next);
-    }
+    };
 
     // Log In, Log Out status
     router.post('/login', isLocalAuthenticated);

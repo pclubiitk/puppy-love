@@ -29,6 +29,7 @@ exports.newEntry = function(mongoose) {
                     id = (req.body.receiver + req.body.sender);
                 }
 
+                // neuerEntrag means new-entry :P
                 var neuerEntrag = new TwoPartyComm(mongoose)({
                     _id: id,
                     sender: parseInt(req.body.sender),
@@ -170,7 +171,7 @@ exports.rStep2 = function(mongoose) {
 
             var runRecv = function(resp) {
                 respond(res, resp.recvStep2(req));
-            }
+            };
 
             // Authorize and call above function
             if (req.body.receiver == req.user.roll) {
@@ -202,7 +203,7 @@ exports.sStep2 = function(mongoose) {
 
             var runSender = function(resp) {
                 respond(res, resp.senderStep2(req));
-            }
+            };
 
             // Authorize and call above function
             if (req.body.sender == req.user.roll) {
@@ -234,7 +235,7 @@ exports.sStep3 = function(mongoose) {
 
             var runSender = function(resp) {
                 respond(res, resp.senderStep3(req));
-            }
+            };
 
             // Authorize and call above function
             if (req.body.sender == req.user.roll) {
@@ -266,7 +267,7 @@ exports.rStep4 = function(mongoose) {
 
             var runRecv = function(resp) {
                 respond(res, resp.recvStep4(req));
-            }
+            };
 
             // Authorize and call above function
             if (req.body.receiver == req.user.roll) {
@@ -298,7 +299,7 @@ exports.displayAll = function(mongoose) {
 
             var runRecv = function(resp) {
                 respond(res, messages.allFineWithData(resp));
-            }
+            };
 
             // Authorize and call above function
             TwoPartyComm(mongoose).find({sender: req.body.sender,

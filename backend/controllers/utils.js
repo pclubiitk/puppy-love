@@ -4,7 +4,7 @@ var User = require('../models/user.js');
 
 // See if the request body has the given fields
 exports.reqBodyParse = function(req, fields) {
-    return objParse(req.body, fields);
+    return exports.objParse(req.body, fields);
 };
 
 exports.objParse = function(req, fields) {

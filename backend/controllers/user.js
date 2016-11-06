@@ -6,7 +6,7 @@ var User = require('../models/user.js'),
 // Endpoint for creating user
 // TODO: Remove in production use
 // Usage: http post localhost:8091/api/update/new name="vinayak" \
-// roll="14805" passHash="abcd" email="vtantia" gender="1"
+// roll="14805" passHash="abcd" email="vtantia" gender="1" image="url"
 exports.newUser = function(mongoose) {
     return function(req, res) {
 
