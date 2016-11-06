@@ -16,6 +16,6 @@ var allowCrossDomain = function(req, res, next) {
     next();
 }
 app.use(allowCrossDomain);
-app.use('/', express.static('frontend'))
+app.use('/', express.static('views'))
 
 module.exports = app;
