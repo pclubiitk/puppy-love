@@ -36,8 +36,8 @@ module.exports = function(db, passport) {
             } else {
                 // if user authenticated maintain the session
                 req.logIn(user, function() {
-                    res.redirect(config.api + '/test');
-                })
+                    res.redirect(config.api + '/');
+                });
             };
         })(req, res, next);
     }
