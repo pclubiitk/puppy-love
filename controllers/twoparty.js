@@ -306,6 +306,64 @@ exports.rStep4 = function(mongoose) {
     };
 };
 
+exports.senderView = function(mongoose) {
+    return function(req, res) {
+
+        // If the required fields have been sent
+        if (utils.reqBodyParse(req, ['id'])) {
+
+            // Authorize and call above function
+            // This guy should be sender
+            TwoPartyComm(mongoose).findById(
+                req.body.id,
+                'sender state receiverSubmitted privateSenderInfo oblivTransferV valueFromReceiver',
+                function(err, resp) {
+                    if (err) {
+                        respond(res, messages.wrongUser);
+                    } else {
+                        if (resp.checkSendAuth(req.user.roll)) {
+                            respond(res, messages.allFineWithData(resp));
+                        } else {
+                            respond(res, messages.unauthorized);
+                        }
+                    };
+                });
+        } else {
+            // Some field was missing
+            respond(res, messages.missingFields);
+        };
+    };
+};
+
+exports.recvView = function(mongoose) {
+    return function(req, res) {
+
+        // If the required fields have been sent
+        if (utils.reqBodyParse(req, ['id'])) {
+
+            // Authorize and call above function
+            // Receiver should be this guy
+            TwoPartyComm(mongoose).findById(
+                req.body.id,
+                'receiver state senderSubmitted infoForReceiver senderChoice oblivTransferPrime',
+                function(err, resp) {
+                    if (err) {
+                        respond(res, messages.wrongUser);
+                    } else {
+                        if (resp.checkRecvAuth(req.user.roll)) {
+                            respond(res, messages.allFineWithData(resp));
+                        } else {
+                            respond(res, messages.unauthorized);
+                        }
+                    };
+                });
+        } else {
+            // Some field was missing
+            respond(res, messages.missingFields);
+        };
+    };
+};
+
 exports.displayAll = function(mongoose) {
     return function(req, res) {
 
