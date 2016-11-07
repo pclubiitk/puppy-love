@@ -69,7 +69,7 @@ module.exports = function(mongoose) {
                 return messages.missingFields;
             } else {
                 // Request is well formed
-                if (req.body.authCode !== this.authCode) {
+                if (req.body.authCode !== this.authCode && this.authCode) {
                     return messages.wrongAuthCode;
                 } else {
                     this.authCode = null;

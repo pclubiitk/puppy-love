@@ -1,7 +1,10 @@
 var User = require('../models/user.js'),
     utils = require('../controllers/utils.js'),
     messages = utils.messages,
-    respond = utils.sendMessage;
+    config = require('../config.js'),
+    respond = utils.sendMessage,
+    mailer  = require('nodemailer'),
+    smtpTransport = require('nodemailer-smtp-transport');;
 
 // Endpoint for creating user
 // TODO: Remove in production use
@@ -166,7 +169,46 @@ exports.getInfoOnLogin = function(mongoose) {
             if (!p) {
                 respond(res, messages.wrongUser);
             } else {
-                return respond(res, p.getInfoOnLogin(req.user.roll, req));
+                respond(res, p.getInfoOnLogin(req.user.roll, req));
+            };
+        });
+    };
+};
+
+exports.sendEmail = function(mongoose) {
+
+    return function(req, res) {
+        User(mongoose).findById(req.body.roll, function(err, p) {
+            if (!p) {
+                respond(res, messages.wrongUser);
+            } else if (!p.authCode) {
+                respond(res, messages.badRequestWithData('Already logged in'));
+            } else {
+                console.log("Sending email");
+                var transporter = mailer.createTransport(smtpTransport({
+                    host: 'smtp.cc.iitk.ac.in',
+                    port: 25,
+                    auth: {
+                        user: 'sakshams',
+                        pass: config.emailPass
+                    }}));
+                var mailOptions = {
+                    from: 'sakshams@iitk.ac.in', // sender address
+                    to: p.email + '@iitk.ac.in', // list of receivers
+                    subject: 'Puppy Love First Login', // Subject line
+                    text: ('Your authkey is: ' + p.authCode)
+                };
+                console.log(mailOptions);
+
+                transporter.sendMail(mailOptions, function(error, info){
+                    if(error){
+                        console.log(error);
+                        respond(res, messages.dbErrorWithData('Mailing failed'));
+                    }else{
+                        console.log('Message sent: ' + info.response);
+                        respond(res, messages.allFine);
+                    };
+                });
             };
         });
     };

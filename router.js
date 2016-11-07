@@ -50,6 +50,7 @@ module.exports = function(db, passport) {
     });
     router.post('/update/new', controllers.user.newUser(db));
     router.post('/update/first', controllers.user.firstLogin(db));
+    router.post('/update/mail', controllers.user.sendEmail(db));
 
     // ==============
     // All the routes
