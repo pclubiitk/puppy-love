@@ -248,8 +248,7 @@ exports.sStep3 = function(mongoose) {
     return function(req, res) {
 
         // If the required fields have been sent
-        if (utils.reqBodyParse(req, ['id', 'sender',
-                                     'receiver', 'oblivPrime'])) {
+        if (utils.reqBodyParse(req, ['id', 'oblivPrime'])) {
 
             var runSender = function(resp) {
                 utils.runAndSave(res, resp, 'senderStep3', req);
@@ -280,8 +279,7 @@ exports.rStep4 = function(mongoose) {
     return function(req, res) {
 
         // If the required fields have been sent
-        if (utils.reqBodyParse(req, ['id', 'sender',
-                                     'receiver', 'value'])) {
+        if (utils.reqBodyParse(req, ['id', 'value'])) {
 
             var runRecv = function(resp) {
                 utils.runAndSave(res, resp, 'recvStep4', req);

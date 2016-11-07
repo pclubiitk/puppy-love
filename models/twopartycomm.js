@@ -107,11 +107,13 @@ module.exports = function(mongoose) {
 
     // Sender sends its choice
     twoParty.methods.senderStep2 = function(req) {
-        if (!utils.reqBodyParse(req, 'senderChoice')) {
+        if (!utils.reqBodyParse(req, ['senderChoice'])) {
+            console.log("missing");
+            console.log(req);
             return messages.missingFields;
         } else {
             // No state checks needed here
-            if (this.senderSubmitted !== false) {
+            if (this.senderSubmitted === false) {
 
                 this.senderSubmitted = true;
                 this.senderChoice = req.body.senderChoice;
@@ -124,12 +126,12 @@ module.exports = function(mongoose) {
 
     // Sender responds to oblivious computation request
     twoParty.methods.senderStep3 = function(req) {
-        if (!utils.reqBodyParse(req, 'oblivPrime')) {
+        if (!utils.reqBodyParse(req, ['oblivPrime'])) {
             return messages.missingFields;
         } else {
 
-            if (this.oblivTransferPrime !== '' &&
-                this.state == 2) {
+            if (this.oblivTransferPrime === '' &&
+                this.state === 2) {
 
                 this.oblivTransferPrime = req.body.oblivPrime;
 
@@ -140,11 +142,11 @@ module.exports = function(mongoose) {
                 return messages.badRequestWithData('Wrong state');
             }
         }
-    }
+    };
 
     // Receiver has computed the result
     twoParty.methods.recvStep4 = function(req) {
-        if (!utils.reqBodyParse(req, 'value')) {
+        if (!utils.reqBodyParse(req, ['value'])) {
             return messages.missingFields;
         } else {
             if (this.senderSubmitted !== true ||
@@ -172,7 +174,7 @@ module.exports = function(mongoose) {
                 }
             }
         }
-    }
+    };
 
     // Return new model or create one
     if (mongoose.models.TwoPartyComm) {
