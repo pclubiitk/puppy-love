@@ -57,6 +57,22 @@ module.exports = function(mongoose) {
         matched: Boolean
     });
 
+    twoParty.methods.checkRecvAuth = function(roll) {
+        if (parseInt(roll) === this.receiver) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    twoParty.methods.checkSendAuth = function(roll) {
+        if (parseInt(roll) === this.sender) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
     // Receiver has chosen, and sends a V, K, B.
     // Sender should NOT know K, B
     twoParty.methods.recvStep2 = function(req) {

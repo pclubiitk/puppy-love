@@ -192,18 +192,19 @@ exports.rStep2 = function(mongoose) {
 
             // Authorize and call above function
             // Receiver should be this guy
-            if (req.body.id.split('-')[1] == req.user.roll) {
-                TwoPartyComm(mongoose).findById(req.body.id,
-                                                function(err, resp) {
-                                                    if (err) {
-                                                        respond(res, messages.wrongUser);
-                                                    } else {
-                                                        runRecv(resp);
-                                                    };
-                                                });
-            } else {
-                respond(res, messages.unauthorized);
-            }
+            TwoPartyComm(mongoose).findById(
+                req.body.id,
+                function(err, resp) {
+                    if (err) {
+                        respond(res, messages.wrongUser);
+                    } else {
+                        if (resp.checkRecvAuth(req.user.roll)) {
+                            runRecv(resp);
+                        } else {
+                            respond(res, messages.unauthorized);
+                        }
+                    };
+                });
         } else {
             // Some field was missing
             respond(res, messages.missingFields);
@@ -223,18 +224,19 @@ exports.sStep2 = function(mongoose) {
 
             // Authorize and call above function
             // This guy should be sender
-            if (req.body.id.split('-')[0] == req.user.roll) {
-                TwoPartyComm(mongoose).findById(req.body.id,
-                                                function(err, resp) {
-                                                    if (err) {
-                                                        respond(res, messages.wrongUser);
-                                                    } else {
-                                                        runSender(resp);
-                                                    };
-                                                });
-            } else {
-                respond(res, messages.unauthorized);
-            }
+            TwoPartyComm(mongoose).findById(
+                req.body.id,
+                function(err, resp) {
+                    if (err) {
+                        respond(res, messages.wrongUser);
+                    } else {
+                        if (resp.checkSendAuth(req.user.roll)) {
+                            runSender(resp);
+                        } else {
+                            respond(res, messages.unauthorized);
+                        }
+                    };
+                });
         } else {
             // Some field was missing
             respond(res, messages.missingFields);
@@ -254,19 +256,19 @@ exports.sStep3 = function(mongoose) {
             };
 
             // Authorize and call above function
-            if (req.body.sender == req.user.roll) {
-                TwoPartyComm(mongoose).find({sender: req.body.sender,
-                                             receiver: req.body.receiver},
-                                            function(err, resp) {
-                                                if (err) {
-                                                    respond(res, messages.wrongUser);
-                                                } else {
-                                                    runSender(resp);
-                                                };
-                                            });
-            } else {
-                respond(res, messages.unauthorized);
-            }
+            TwoPartyComm(mongoose).findById(
+                req.body.id,
+                function(err, resp) {
+                    if (err) {
+                        respond(res, messages.wrongUser);
+                    } else {
+                        if (resp.checkSendAuth(req.user.roll)) {
+                            runSender(resp);
+                        } else {
+                            respond(res, messages.unauthorized);
+                        }
+                    };
+                });
         } else {
             // Some field was missing
             respond(res, messages.missingFields);
@@ -286,19 +288,19 @@ exports.rStep4 = function(mongoose) {
             };
 
             // Authorize and call above function
-            if (req.body.receiver == req.user.roll) {
-                TwoPartyComm(mongoose).find({sender: req.body.sender,
-                                             receiver: req.body.receiver},
-                                            function(err, resp) {
-                                                if (err) {
-                                                    respond(res, messages.wrongUser);
-                                                } else {
-                                                    runRecv(resp);
-                                                };
-                                            });
-            } else {
-                respond(res, messages.unauthorized);
-            }
+            TwoPartyComm(mongoose).findById(
+                req.body.id,
+                function(err, resp) {
+                    if (err) {
+                        respond(res, messages.wrongUser);
+                    } else {
+                        if (resp.checkRecvAuth(req.user.roll)) {
+                            runRecv(resp);
+                        } else {
+                            respond(res, messages.unauthorized);
+                        }
+                    };
+                });
         } else {
             // Some field was missing
             respond(res, messages.missingFields);
