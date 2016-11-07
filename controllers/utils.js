@@ -71,6 +71,13 @@ exports.messages = {
             code: 400,
             data: _data
         };
+    },
+    dbErrorWithData: function(_data) {
+        return {
+            success: false,
+            code: 500,
+            data: _data
+        };
     }
 };
 

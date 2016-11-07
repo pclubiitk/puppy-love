@@ -155,22 +155,29 @@ module.exports = function(mongoose) {
 
                 return messages.badRequestWithData('Wrong state');
             } else {
-                // The moment of truth
-                if (this.privateServerMap.hasOwnProperty(req.value)) {
-                    // A valid result was computed
-                    result = this.privateServerMap[req.value];
-                    if (result) {
-                        this.matched = true;
+                this.valueFromReceiver = req.body.value;
+                try {
+                    smap = JSON.parse(this.privateServerMap.replace(/'/g, '"'));
+                    // The moment of truth
+                    if (smap.hasOwnProperty(req.body.value)) {
+                        // A valid result was computed
+                        result = smap[req.body.value];
+                        if (result) {
+                            this.matched = true;
+                        } else {
+                            this.matched = false;
+                        }
+
+                        this.state = 4;
+
+                        // Do not inform of the result just yet.
+                        return messages.allFine;
                     } else {
-                        this.matched = false;
+                        return messages.badRequestWithData('Missing key in server');
                     }
-
-                    this.state = 4;
-
-                    // Do not inform of the result just yet.
-                    return messages.allFine;
-                } else {
-                    return messages.badRequestWithData('Missing key in server');
+                } catch(e) {
+                    console.log(e);
+                    return messages.dbErrorWithData('Bad JSON submitted by sender');
                 }
             }
         }
