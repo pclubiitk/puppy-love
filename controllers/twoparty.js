@@ -17,45 +17,51 @@ exports.newEntry = function(mongoose) {
                                      'serverMap',
                                      'senderInfo',
                                      'recvInfo']) &&
-            req.body.receiver !== req.body.sender) {
+            req.body.receiver !== req.body.sender &&
+            parseInt(req.body.sender) && parseInt(req.body.receiver)) {
 
             // What actually creates the table entry
-            var createEntry = function() {
+            var createEntry = function(err) {
 
-                // Fix an ordering of people
-                if (parseInt(req.body.sender) > parseInt(req.body.receiver)) {
-                    id = (req.body.sender + req.body.receiver);
+                // If gender matching threw an error
+                if (err) {
+                    respond(err);
                 } else {
-                    id = (req.body.receiver + req.body.sender);
-                }
-
-                // neuerEntrag means new-entry :P
-                var neuerEntrag = new TwoPartyComm(mongoose)({
-                    _id: id,
-                    sender: parseInt(req.body.sender),
-                    receiver: parseInt(req.body.receiver),
-                    state: 1,
-                    senderSubmitted: false,
-                    receiverSubmitted: false,
-                    privateServerMap: req.body.serverMap,
-                    privateSenderInfo: req.body.senderInfo,
-                    infoForReceiver: req.body.recvInfo,
-                    oblivTransferV: '',
-                    oblivTransferKB: '',
-                    senderChoice: '',
-                    oblivTransferPrime: '',
-                    valueFromReceiver: '',
-                    matched: undefined
-                });
-
-                neuerEntrag.save(function(err, entry) {
-                    if (err) {
-                        console.error(err);
-                        return messages.dbError;
+                    // Fix an ordering of people
+                    if (parseInt(req.body.sender) < parseInt(req.body.receiver)) {
+                        id = (req.body.sender + '-' + req.body.receiver);
                     } else {
-                        return messages.allFine;
-                    };
-                });
+                        id = (req.body.receiver + '-' + req.body.sender);
+                    }
+
+                    // neuerEntrag means new-entry :P
+                    var neuerEntrag = new TwoPartyComm(mongoose)({
+                        _id: id,
+                        sender: parseInt(req.body.sender),
+                        receiver: parseInt(req.body.receiver),
+                        state: 1,
+                        senderSubmitted: false,
+                        receiverSubmitted: false,
+                        privateServerMap: req.body.serverMap,
+                        privateSenderInfo: req.body.senderInfo,
+                        infoForReceiver: req.body.recvInfo,
+                        oblivTransferV: '',
+                        oblivTransferKB: '',
+                        senderChoice: '',
+                        oblivTransferPrime: '',
+                        valueFromReceiver: '',
+                        matched: undefined
+                    });
+
+                    neuerEntrag.save(function(err, entry) {
+                        if (err) {
+                            console.error(err);
+                            respond(res, messages.dbError);
+                        } else {
+                            respond(res, messages.allFine);
+                        };
+                    });
+                }
             };
 
             // Authorize and call above functions bottom to top
@@ -63,8 +69,9 @@ exports.newEntry = function(mongoose) {
                 // verifyGender calls createEntry after verifying
                 // that the genders are different.
                 // Either of those functions will return a message for response
-                respond(utils.verifyGender(res.body.sender, res.body.receiver,
-                                           mongoose, createEntry()));
+                utils.verifyGender(parseInt(req.body.sender),
+                                   parseInt(req.body.receiver),
+                                   mongoose, User, createEntry);
             } else {
                 respond(res, messages.unauthorized);
             }
@@ -166,24 +173,23 @@ exports.rStep2 = function(mongoose) {
     return function(req, res) {
 
         // If the required fields have been sent
-        if (utils.reqBodyParse(req, ['id', 'sender',
-                                     'receiver', 'v', 'kb'])) {
+        if (utils.reqBodyParse(req, ['id', 'v', 'kb'])) {
 
             var runRecv = function(resp) {
                 respond(res, resp.recvStep2(req));
             };
 
             // Authorize and call above function
-            if (req.body.receiver == req.user.roll) {
-                TwoPartyComm(mongoose).find({sender: req.body.sender,
-                                             receiver: req.body.receiver},
-                                            function(err, resp) {
-                                                if (err) {
-                                                    respond(messages.wrongUser);
-                                                } else {
-                                                    runRecv(resp);
-                                                };
-                                            });
+            // Receiver should be this guy
+            if (req.body.id.split('-')[1] == req.user.roll) {
+                TwoPartyComm(mongoose).findById(req.body.id,
+                                                function(err, resp) {
+                                                    if (err) {
+                                                        respond(messages.wrongUser);
+                                                    } else {
+                                                        runRecv(resp);
+                                                    };
+                                                });
             } else {
                 respond(messages.unauthorized);
             }
@@ -198,24 +204,23 @@ exports.sStep2 = function(mongoose) {
     return function(req, res) {
 
         // If the required fields have been sent
-        if (utils.reqBodyParse(req, ['id', 'sender',
-                                     'receiver', 'senderChoice'])) {
+        if (utils.reqBodyParse(req, ['id', 'senderChoice'])) {
 
             var runSender = function(resp) {
                 respond(res, resp.senderStep2(req));
             };
 
             // Authorize and call above function
-            if (req.body.sender == req.user.roll) {
-                TwoPartyComm(mongoose).find({sender: req.body.sender,
-                                             receiver: req.body.receiver},
-                                            function(err, resp) {
-                                                if (err) {
-                                                    respond(messages.wrongUser);
-                                                } else {
-                                                    runSender(resp);
-                                                };
-                                            });
+            // This guy should be sender
+            if (req.body.id.split('-')[0] == req.user.roll) {
+                TwoPartyComm(mongoose).findById(req.body.id,
+                                                function(err, resp) {
+                                                    if (err) {
+                                                        respond(messages.wrongUser);
+                                                    } else {
+                                                        runSender(resp);
+                                                    };
+                                                });
             } else {
                 respond(messages.unauthorized);
             }

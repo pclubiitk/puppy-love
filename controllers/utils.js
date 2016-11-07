@@ -1,5 +1,3 @@
-var User = require('../models/user.js');
-
 // Provides functions of global utility
 
 // See if the request body has the given fields
@@ -83,30 +81,34 @@ exports.sendMessage = function(res, message) {
 
 // Fails if both of same gender
 // p1 and p2 are roll numbers
-exports.verifyGender = function(p1, p2, mongoose, callback) {
+exports.verifyGender = function(p1roll, p2roll,
+                                mongoose, User, callback) {
 
-    var p2 = function(p1gender) {
-        User(mongoose).find(p2roll, function(err, p2) {
+    // Find p2's gender. If different, then callback!
+    function findReceiver(p1gender) {
+        User(mongoose).findById(p2roll, function(err, p2) {
             if (err) {
-                return messages.wrongUser;
+                callback(messages.wrongUser);
             } else {
                 if (p1gender !== p2.gender) {
-                    callback();
+                    callback(undefined);
                 } else {
-                    return messages.badRequest;
+                    callback(messages.badRequest);
                 }
             };
         });
     };
 
     // Find gender of p1
-    var p1 = function() {
+    function findSender() {
         User(mongoose).findById(p1roll, function(err, p1) {
             if (err) {
-                return messages.wrongUser;
+                callback(messages.wrongUser);
             } else {
-                return findReceiver(p1.gender);
+                findReceiver(p1.gender);
             };
         });
     };
+
+    findSender();
 };
