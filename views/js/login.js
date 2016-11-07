@@ -23,6 +23,9 @@ function checkPassword() {
                 sessionStorage.setItem('password', btoa(passwd));
 
                 // Add a redirect here
+                document.location.href = '/api';
+                window.location = '/api';
+                window.location.href = '/api';
             },
             error: function (jqXHR, status, error) {
                 var errorMsg = '';
@@ -40,5 +43,6 @@ function checkPassword() {
 }
 
 $(document).ready(function() {
-    $("#loginButton").click(checkPassword);
+    $('#errorModal').modal('hide');
+    $("#login-submit").click(checkPassword);
 });
