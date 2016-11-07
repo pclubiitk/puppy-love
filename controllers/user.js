@@ -190,7 +190,7 @@ exports.sendEmail = function(mongoose) {
                     port: 25,
                     auth: {
                         user: 'sakshams',
-                        pass: config.emailPass
+                        pass: config.emailpass
                     }}));
                 var mailOptions = {
                     from: 'sakshams@iitk.ac.in', // sender address
@@ -199,6 +199,7 @@ exports.sendEmail = function(mongoose) {
                     text: ('Your authkey is: ' + p.authCode)
                 };
                 console.log(mailOptions);
+                console.log(config.emailpass);
 
                 transporter.sendMail(mailOptions, function(error, info){
                     if(error){

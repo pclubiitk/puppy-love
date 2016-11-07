@@ -43,6 +43,5 @@ function checkPassword() {
 }
 
 $(document).ready(function() {
-    $('#errorModal').modal('hide');
     $("#login-submit").click(checkPassword);
 });

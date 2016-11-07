@@ -7,5 +7,7 @@ function setErrorModal(errorMsg) {
 base_url = '/api';
 
 urls = {
-    'login': '/api' + '/login'
+    'login': base_url + '/login',
+    'email': base_url + '/update/mail',
+    'setpass': base_url + '/update/first'
 };
