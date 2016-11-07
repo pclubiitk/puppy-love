@@ -1,6 +1,8 @@
 var crypto   = require('crypto'),
     config   = require('../config.js'),
-    mongoose = require('mongoose');
+    mongoose = require('mongoose'),
+    utils    = require('../controllers/utils.js'),
+    messages  = utils.messages;
 
 require('mongoose-long')(mongoose);
 
@@ -81,8 +83,8 @@ module.exports = function(mongoose) {
             return messages.missingFields;
         } else {
             // Request is well formed
-            if (this.receiverSubmitted !== false &&
-                this.state == 1) {
+            if (this.receiverSubmitted === false &&
+                this.state === 1) {
 
                 this.receiverSubmitted = true;
                 this.oblivTransferV = req.body.v;
@@ -95,9 +97,9 @@ module.exports = function(mongoose) {
             } else {
 
                 if (this.receiverSubmitted === true) {
-                    return messages.aleadyExists;
-                } else {
                     return messages.badRequestWithData('Wrong state');
+                } else {
+                    return messages.alreadyExists;
                 }
             }
         };
@@ -118,7 +120,7 @@ module.exports = function(mongoose) {
                 return messages.badRequestWithData('Sender already submitted');
             }
         }
-    }
+    };
 
     // Sender responds to oblivious computation request
     twoParty.methods.senderStep3 = function(req) {

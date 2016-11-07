@@ -22,7 +22,9 @@
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "require-dir": "*",
-    "winston": "*"
+    "winston": "*",
+    "crypto-js": "*",
+    "aes-js": "*"
   },
   "scripts": {
     "start": "node ./server.js",

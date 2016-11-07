@@ -187,7 +187,7 @@ exports.rStep2 = function(mongoose) {
         if (utils.reqBodyParse(req, ['id', 'v', 'kb'])) {
 
             var runRecv = function(resp) {
-                respond(res, resp.recvStep2(req));
+                utils.runAndSave(res, resp, 'recvStep2', req);
             };
 
             // Authorize and call above function
@@ -219,7 +219,7 @@ exports.sStep2 = function(mongoose) {
         if (utils.reqBodyParse(req, ['id', 'senderChoice'])) {
 
             var runSender = function(resp) {
-                respond(res, resp.senderStep2(req));
+                utils.runAndSave(res, resp, 'senderStep2', req);
             };
 
             // Authorize and call above function
@@ -252,7 +252,7 @@ exports.sStep3 = function(mongoose) {
                                      'receiver', 'oblivPrime'])) {
 
             var runSender = function(resp) {
-                respond(res, resp.senderStep3(req));
+                utils.runAndSave(res, resp, 'senderStep3', req);
             };
 
             // Authorize and call above function
@@ -284,7 +284,7 @@ exports.rStep4 = function(mongoose) {
                                      'receiver', 'value'])) {
 
             var runRecv = function(resp) {
-                respond(res, resp.recvStep4(req));
+                utils.runAndSave(res, resp, 'recvStep4', req);
             };
 
             // Authorize and call above function

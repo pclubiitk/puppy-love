@@ -112,3 +112,19 @@ exports.verifyGender = function(p1roll, p2roll,
 
     findSender();
 };
+
+exports.runAndSave = function(res, resultEntry, method, arg) {
+    var response = resultEntry[method](arg);
+    if (response.success) {
+        resultEntry.save(function(err, entry) {
+            if (err) {
+                console.error(err);
+                exports.sendMessage(res, exports.messages.dbError);
+            } else {
+                exports.sendMessage(res, exports.messages.allFine);
+            }
+        });
+    } else {
+        exports.sendMessage(res, response);
+    }
+};
