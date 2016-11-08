@@ -93,6 +93,7 @@ exports.firstLogin = function(mongoose) {
                     p.save(function(err) {
                         if (err) {
                             console.error("Couldn't save for: " + req.body.roll);
+                            console.error(err);
                             respond(res, messages.dbError);
                         } else {
                             respond(res, couldUpdate);

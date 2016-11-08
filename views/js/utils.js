@@ -36,7 +36,7 @@ function encryptRsa(item, key) {
 };
 
 function hashPass(item) {
-    return CryptoJS.SHA256(btoa(item));
+    return CryptoJS.SHA256(btoa(item)).toString(CryptoJS.enc.Hex);
 };
 
 function genPrivKey(pass) {
