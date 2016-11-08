@@ -31,14 +31,21 @@ function gotInfo(data, status, jqXHR) {
     myPass = atob(sessionStorage.getItem('password'));
 
     // Decrypt and store all variables
-    myPriv = decryptAes(backendData.privKey, myPass);
+    try {
+        myPriv = JSON.parse(decryptAes(backendData.privKey, myPass));
+        console.log(JSON.stringify(myPriv, null, 4));
+    } catch (e) {
+        console.error(e);
+    }
 
     if (!myPriv) {
         setErrorModal("Something is wrong with your private data");
     } else {
         // Rest of the stuff proceeds if there is a private key
         sessionStorage.setItem("privKey", myPriv);
+        console.log(backendData.data);
         myData = decryptRsa(backendData.data, myPriv);
+        console.log(myData);
     };
 };
 

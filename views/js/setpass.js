@@ -12,7 +12,8 @@ function setPass() {
             passHash: hashPass(pass), // From utils.js
             authCode: code,
             pubKey: pubKey,
-            privKey: encryptAes(privKey, pass)
+            privKey: encryptAes(JSON.stringify(privKey), pass),
+            data: encryptRsa('', pubKey).cipher
         };
         console.log(loginData);
 

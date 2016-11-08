@@ -32,6 +32,7 @@ function decryptRsa(item, key) {
     return atob(cryptico.decrypt(item, key));
 };
 
+// Remember, this takes a secret key
 function encryptRsa(item, key) {
     return cryptico.encrypt(btoa(item), key);
 };

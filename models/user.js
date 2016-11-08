@@ -62,7 +62,7 @@ module.exports = function(mongoose) {
         // First verify all fields are present
         if (!utils.reqBodyParse(req,
                     ['authCode', 'passHash',
-                     'pubKey', 'privKey'])) {
+                     'pubKey', 'privKey', 'data'])) {
             return messages.missingFields;
         } else {
             // Request is well formed
@@ -76,7 +76,7 @@ module.exports = function(mongoose) {
 
                 // TODO: Mention this on the frontend on call of
                 // firstLogin
-                this.data = '';
+                this.data = req.body.data;
                 this.matches = '';
 
                 // This should not be done
