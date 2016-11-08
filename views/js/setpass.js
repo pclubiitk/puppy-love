@@ -1,21 +1,20 @@
-function hash(pass) {
-    return pass;
-}
-
 function setPass() {
     var roll = $("#roll").val();
     var pass = $("#password").val();
     var code = $("#authcode").val();
     var cpass = $("#config-password").val();
+    var privKey = genPrivKey();
+    console.log(privKey);
     if (pass === cpass || !roll || !code || !pass) {
         var loginData = {
             roll: roll,
-            passHash: hash(pass),
+            passHash: hashPass(pass), // From utils.js
             authCode: code
         };
 
         // Required fields:
         // 'authCode', 'passHash', 'pubKey', 'privKey'
+        // TODO: Add pubKey and privKey to loginData
 
         $.ajax({
             type: "POST",

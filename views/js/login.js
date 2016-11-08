@@ -3,7 +3,7 @@ function checkPassword() {
     var passwd = $("#password").val();
     var loginData = {
         username: user,
-        password: passwd
+        password: hashPass(passwd) // From utils.js
     };
     if (passwd.length < 4) {
         setErrorModal("Please provide a longer password");

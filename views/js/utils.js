@@ -34,3 +34,11 @@ function decryptRsa(item, key) {
 function encryptRsa(item, key) {
     return cryptico.encrypt(btoa(item), key);
 };
+
+function hashPass(item) {
+    return CryptoJS.SHA256(btoa(item));
+};
+
+function genPrivKey(pass) {
+    return cryptico.generateRSAKey(pass, 512);
+};
