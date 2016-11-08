@@ -35,12 +35,15 @@ function gotInfo(data, status, jqXHR) {
         myPriv = JSON.parse(decryptAes(backendData.privKey, myPass));
         console.log(JSON.stringify(myPriv, null, 4));
     } catch (e) {
+        console.error("Could not parse private key");
         console.error(e);
     }
 
     if (!myPriv) {
         setErrorModal("Something is wrong with your private data");
     } else {
+
+        myPubk = cryptico.publicKeyString(myPriv);
         // Rest of the stuff proceeds if there is a private key
         sessionStorage.setItem("privKey", myPriv);
         console.log(backendData.data);
@@ -89,7 +92,7 @@ function logout() {
             }
             setErrorModal(errorMsg); // From utils.js
         }
-    })
+    });
 }
 
 $(document).ready(function() {

@@ -6,7 +6,7 @@ var config      = require('./config.js'),
     controllers = requireDir('./controllers');
 
 module.exports = function(db, passport) {
-    router = express.Router();
+    var router = express.Router();
 
     // Helper for each call
     var checkAuth = function (req, res, next) {

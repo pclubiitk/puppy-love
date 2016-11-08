@@ -73,7 +73,7 @@ exports.findUser = function(mongoose) {
                                 });
         } else {
             // Some field was missing
-            utils.response(res, "Missing fields", 400);
+            respond(res, "Missing fields", 400);
         };
 
     };

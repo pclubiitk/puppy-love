@@ -3,9 +3,8 @@ function setPass() {
     var pass = $("#password").val();
     var code = $("#code").val();
     var cpass = $("#confirm-password").val();
-    var privKey = genPrivKey(btoa(pass));
+    var privKey = cryptico.generateRSAKey(btoa(pass), 512);
     var pubKey = cryptico.publicKeyString(privKey);
-    console.log(privKey);
     if (pass === cpass || !roll || !code || !pass) {
         var loginData = {
             roll: roll,
@@ -13,13 +12,9 @@ function setPass() {
             authCode: code,
             pubKey: pubKey,
             privKey: encryptAes(JSON.stringify(privKey), pass),
-            data: encryptRsa('', pubKey).cipher
+            data: encryptRsa('', pubKey)
         };
         console.log(loginData);
-
-        // Required fields:
-        // 'authCode', 'passHash', 'pubKey', 'privKey'
-        // TODO: Add pubKey and privKey to loginData
 
         $.ajax({
             type: "POST",

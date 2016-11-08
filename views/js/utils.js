@@ -34,7 +34,7 @@ function decryptRsa(item, key) {
 
 // Remember, this takes a secret key
 function encryptRsa(item, key) {
-    return cryptico.encrypt(btoa(item), key);
+    return cryptico.encrypt(btoa(item), key).cipher;
 };
 
 function hashPass(item) {
