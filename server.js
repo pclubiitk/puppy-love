@@ -8,6 +8,9 @@ var dbControl = require('./db.js'),
 
 // Main file for the code
 
+if (!config.emailuser || !config.emailpass) {
+    console.error("No mailer ENV variables. Mailing will not work");
+};
 
 // Listen only when you could connect to DB
 dbControl.connectAndRun(function(mongoose) {

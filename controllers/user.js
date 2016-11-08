@@ -189,11 +189,11 @@ exports.sendEmail = function(mongoose) {
                     host: 'smtp.cc.iitk.ac.in',
                     port: 25,
                     auth: {
-                        user: 'sakshams',
+                        user: config.emailuser,
                         pass: config.emailpass
                     }}));
                 var mailOptions = {
-                    from: 'sakshams@iitk.ac.in', // sender address
+                    from: config.emailuser + '@iitk.ac.in', // sender address
                     to: p.email + '@iitk.ac.in', // list of receivers
                     subject: 'Puppy Love First Login', // Subject line
                     text: ('Your authkey is: ' + p.authCode)
