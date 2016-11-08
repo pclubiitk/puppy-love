@@ -28,17 +28,16 @@ function gotInfo(data, status, jqXHR) {
     };
 
     // This is in base64, store global
-    myPass = sessionStorage.getItem('password');
+    myPass = atob(sessionStorage.getItem('password'));
 
     // Decrypt and store all variables
     myPriv = decryptAes(backendData.privKey, myPass);
 
     if (!myPriv) {
-        console.log("myPriv: " + myPriv);
         setErrorModal("Something is wrong with your private data");
     } else {
         // Rest of the stuff proceeds if there is a private key
-        sessionStorage.setItem("privKey", btoa(myPriv));
+        sessionStorage.setItem("privKey", myPriv);
         myData = decryptRsa(backendData.data, myPriv);
     };
 };
