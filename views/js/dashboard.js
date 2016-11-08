@@ -60,8 +60,34 @@ function getAndPopulate() {
     });
 };
 
+function logout() {
+    $.ajax({
+        type: "GET",
+        url: urls.logout,    // From utils.js
+        success: function(data, status, jqXHR) {
+            console.log('Data: ' + data);
+            console.log('Status: ' + status);
+            console.log(jqXHR);
+
+            // Add a redirect here
+            redirect('/'); // From utils.js
+        },
+        error: function (jqXHR, status, error) {
+            var errorMsg = '';
+            // Important because JSON.parse can fail
+            try {
+                errorMsg = (JSON.parse(jqXHR.responseText).message);
+            } catch (e) {
+                errorMsg = error;
+            }
+            setErrorModal(errorMsg); // From utils.js
+        }
+    })
+}
+
 $(document).ready(function() {
     getAndPopulate();
+    $("#label_logout").click(logout);
 });
 
 // Credits: http://www.jqueryscript.net

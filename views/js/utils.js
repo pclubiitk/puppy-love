@@ -8,6 +8,7 @@ base_url = '/api';
 
 urls = {
     'login': base_url + '/login',
+    'logout': base_url + '/logout',
     'email': base_url + '/update/mail',
     'setpass': base_url + '/update/first',
     'getinfo': base_url + '/info/login'
