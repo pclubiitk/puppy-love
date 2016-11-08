@@ -199,7 +199,6 @@ exports.sendEmail = function(mongoose) {
                     text: ('Your authkey is: ' + p.authCode)
                 };
                 console.log(mailOptions);
-                console.log(config.emailpass);
 
                 transporter.sendMail(mailOptions, function(error, info){
                     if(error){
