@@ -79,6 +79,8 @@ module.exports = function(db, passport) {
     addRoute('post', '/twoparty/rStep4',  controllers.twoparty.rStep4(db));
     addRoute('post', '/twoparty/sview',   controllers.twoparty.senderView(db));
     addRoute('post', '/twoparty/rview',   controllers.twoparty.recvView(db));
+
+    // Remove this before submitting #todo
     addRoute('post', '/twoparty/disp',    controllers.twoparty.displayAll(db));
     return router;
 };
