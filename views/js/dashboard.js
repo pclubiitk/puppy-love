@@ -2,13 +2,14 @@ var myPass = '';
 var myPriv = '';
 var myPubk = '';
 var myData = '';
+var backendData;
 
 function gotInfo(data, status, jqXHR) {
     console.log('Data: ' + data);
     console.log('Status: ' + status);
     console.log(jqXHR);
 
-    var backendData = data;
+    backendData = data;
 
     // Greet the user and show his/her info
     $("#your_image").attr("src", backendData.image);
@@ -30,24 +31,23 @@ function gotInfo(data, status, jqXHR) {
     // This is in base64, store global
     myPass = atob(sessionStorage.getItem('password'));
 
+    // THE hack of the century
+    myPriv = cryptico.generateRSAKey(btoa(myPass), 512);
+
     // Decrypt and store all variables
     try {
-        myPriv = JSON.parse(decryptAes(backendData.privKey, myPass));
-        console.log(JSON.stringify(myPriv, null, 4));
+        myData = decryptRsa(backendData.data, myPriv);
     } catch (e) {
-        console.error("Could not parse private key");
+        console.error("Could not parse private data");
         console.error(e);
     }
 
-    if (!myPriv) {
+    // It can be empty though
+    if (myData == null || myData == undefined) {
         setErrorModal("Something is wrong with your private data");
     } else {
-
         myPubk = cryptico.publicKeyString(myPriv);
-        // Rest of the stuff proceeds if there is a private key
         sessionStorage.setItem("privKey", myPriv);
-        console.log(backendData.data);
-        myData = decryptRsa(backendData.data, myPriv);
         console.log(myData);
     };
 };
@@ -93,7 +93,7 @@ function logout() {
             setErrorModal(errorMsg); // From utils.js
         }
     });
-}
+};
 
 $(document).ready(function() {
     getAndPopulate();

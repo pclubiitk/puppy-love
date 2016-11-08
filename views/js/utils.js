@@ -29,7 +29,7 @@ function encryptAes(item, password) {
 };
 
 function decryptRsa(item, key) {
-    return atob(cryptico.decrypt(item, key));
+    return btoa((cryptico.decrypt(item, key)).plaintext);
 };
 
 // Remember, this takes a secret key
