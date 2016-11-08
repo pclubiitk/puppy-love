@@ -121,6 +121,8 @@ module.exports = function(mongoose) {
                 name: this.name,
                 email: this.email,
                 gender: this.gender,
+                image: this.image,
+                pubKey: this.pubKey,
                 privKey: this.privKey,
                 data: this.data,
                 submitted: this.submitted,

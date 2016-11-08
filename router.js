@@ -14,7 +14,8 @@ module.exports = function(db, passport) {
             return next();
         } else {
             req.flash('error', 'Unauthenticated request');
-            res.status(401).redirect('/loginPage');
+            res.status(401);
+            res.send();
         };
     };
 

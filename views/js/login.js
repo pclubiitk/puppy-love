@@ -23,9 +23,7 @@ function checkPassword() {
                 sessionStorage.setItem('password', btoa(passwd));
 
                 // Add a redirect here
-                document.location.href = '/api';
-                window.location = '/api';
-                window.location.href = '/api';
+                redirect('/dashboard.html'); // From utils.js
             },
             error: function (jqXHR, status, error) {
                 var errorMsg = '';

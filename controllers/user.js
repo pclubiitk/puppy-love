@@ -165,7 +165,7 @@ exports.changePassword = function(mongoose) {
 exports.getInfoOnLogin = function(mongoose) {
 
     return function(req, res) {
-        User(mongoose).findById(req.body.roll, function(err, p) {
+        User(mongoose).findById(req.user.roll, function(err, p) {
             if (!p) {
                 respond(res, messages.wrongUser);
             } else {
