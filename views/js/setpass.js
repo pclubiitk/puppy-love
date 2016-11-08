@@ -1,16 +1,20 @@
 function setPass() {
     var roll = $("#roll").val();
     var pass = $("#password").val();
-    var code = $("#authcode").val();
-    var cpass = $("#config-password").val();
-    var privKey = genPrivKey();
+    var code = $("#code").val();
+    var cpass = $("#confirm-password").val();
+    var privKey = genPrivKey(btoa(pass));
+    var pubKey = cryptico.publicKeyString(privKey);
     console.log(privKey);
     if (pass === cpass || !roll || !code || !pass) {
         var loginData = {
             roll: roll,
             passHash: hashPass(pass), // From utils.js
-            authCode: code
+            authCode: code,
+            pubKey: pubKey,
+            privKey: encryptAes(privKey, pass)
         };
+        console.log(loginData);
 
         // Required fields:
         // 'authCode', 'passHash', 'pubKey', 'privKey'
@@ -54,5 +58,5 @@ function setPass() {
 }
 
 $(document).ready(function() {
-    $("#register-submit").click(setPass);
+    $("#setpass-submit").click(setPass);
 });

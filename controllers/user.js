@@ -87,7 +87,7 @@ exports.firstLogin = function(mongoose) {
             if (!p) {
                 respond(res, messages.wrongUser);
             } else {
-                var couldUpdate = p.firstLogin(req.user.roll, req);
+                var couldUpdate = p.firstLogin(req);
                 if (couldUpdate.success) {
                     // Auth token was correct
                     p.save(function(err) {
@@ -95,12 +95,12 @@ exports.firstLogin = function(mongoose) {
                             console.error("Couldn't save for: " + req.body.roll);
                             respond(res, messages.dbError);
                         } else {
-                            respond(res, messages.couldUpdate);
+                            respond(res, couldUpdate);
                         };
                     });
                 } else {
                     // Some error
-                    respond(res, messages.couldUpdate);
+                    respond(res, couldUpdate);
                 };
             };
         });

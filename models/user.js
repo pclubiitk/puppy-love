@@ -51,42 +51,38 @@ module.exports = function(mongoose) {
     // Wrapper for all functions to be protected
     // by authorization (authentication is still handled by passport.js)
     userSchema.methods.authorized = function(roll) {
-        if (roll !== this._id) {
+        if (roll != this._id) {
             return false;
         } else {
             return true;
         };
     };
 
-    userSchema.methods.firstLogin = function(roll, req) {
-        if (!this.authorized(roll)) {
-            return messages.unauthorized;
+    userSchema.methods.firstLogin = function(req) {
+        // First verify all fields are present
+        if (!utils.reqBodyParse(req,
+                    ['authCode', 'passHash',
+                     'pubKey', 'privKey'])) {
+            return messages.missingFields;
         } else {
-            // First verify all fields are present
-            if (!utils.reqBodyParse(req,
-                                    'authCode', 'passHash',
-                                    'pubKey', 'privKey')) {
-                return messages.missingFields;
+            // Request is well formed
+            if (req.body.authCode !== this.authCode && this.authCode) {
+                return messages.wrongAuthCode;
             } else {
-                // Request is well formed
-                if (req.body.authCode !== this.authCode && this.authCode) {
-                    return messages.wrongAuthCode;
-                } else {
-                    this.authCode = null;
-                    this.passHash = req.body.passHash;
-                    this.pubKey = req.body.pubKey;
-                    this.privKey = req.body.privKey;
+                this.authCode = null;
+                this.passHash = req.body.passHash;
+                this.pubKey = req.body.pubKey;
+                this.privKey = req.body.privKey;
 
-                    // TODO: Mention this on the frontend on call of
-                    // firstLogin
-                    this.data = '';
-                    this.matches = '';
+                // TODO: Mention this on the frontend on call of
+                // firstLogin
+                this.data = '';
+                this.matches = '';
 
-                    // This should not be done
-                    // this.submitted = false;
+                // This should not be done
+                // this.submitted = false;
 
-                    return messages.allFine;
-                };
+                return messages.allFine;
             };
         };
     };
