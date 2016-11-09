@@ -5,6 +5,7 @@ var myData = '';
 var backendData;
 var searchData;
 var searchDiv;
+var selectedChoices = [];
 
 function gotInfo(data, status, jqXHR) {
     console.log('Data: ' + data);
@@ -51,10 +52,95 @@ function gotInfo(data, status, jqXHR) {
         myPubk = cryptico.publicKeyString(myPriv);
         sessionStorage.setItem("privKey", myPriv);
         console.log(myData);
+        displayChoices(myData); // Updates the database
     };
 
     // To receive male/female data for searching
     getSearchOptions();
+};
+
+function displayChoices(myDataPass) {
+    var choice;
+    try {
+        var parseData = JSON.parse(myDataPass);
+        for (choice in parseData.choices) {
+            selectedChoices.push(choice);
+        };
+    } catch (e) {
+        console.error("Empty private data?");
+    };
+
+    var tmp = {
+        img: 'http://oa.cc.iitk.ac.in/Oa/Jsp/Photo/14588_0.jpg',
+        name: 'Saksham Sharma',
+        roll: '14588'
+    };
+
+    selectedChoices.push(tmp);
+
+    var newdiv, divthumb, img, caption;
+    for (var i=0; i<selectedChoices.length; i++) {
+        console.log(selectedChoices[i]);
+        newdiv = document.createElement('div');
+        newdiv.setAttribute('class', 'col-sm-6 col-md-4');
+        newdiv.setAttribute('id', 'choice-' + selectedChoices[i].roll);
+
+        divthumb = document.createElement('div');
+        divthumb.setAttribute('class', 'thumbnail');
+
+        img = document.createElement('img');
+        img.setAttribute('src', selectedChoices[i].img);
+
+        caption = document.createElement('div');
+        caption.setAttribute('class', 'caption');
+        caption.innerHTML = "<p class='text-center'>" +
+            selectedChoices[i].name +
+            " - " + selectedChoices[i].roll + "</p>" +
+            "<p class='text-center'>" +
+            "<a id='remove-"+ selectedChoices[i].roll +
+            "' class='remove-btn btn btn-default'" +
+            " role='button' onclick=removeUser(" +
+            selectedChoices[i].roll + ")>Remove?</a>" + "</p>";
+
+        divthumb.appendChild(img);
+        divthumb.appendChild(caption);
+        newdiv.appendChild(divthumb);
+        $("#choices-row").append(newdiv);
+    };
+};
+
+function removeUser(rollToRemove) {
+    $("#choice-" + rollToRemove).remove();
+    for (var i=0; i<selectedChoices; i++) {
+        if (selectedChoices[i].roll == rollToRemove) {
+            selectedChoices.splice(i, 1);
+            break;
+        }
+    }
+
+    var newData = encryptRsa(JSON.stringify(selectedChoices), myPubk);
+    updateData(newData);        // Update on backend
+};
+
+function updateData(dataToUpdate) {
+    $.ajax({
+        type: "POST",
+        url: urls.removech,    // From utils.js
+        data: newData,
+        success: function (jqXHR, status, error) {
+            console.log("Saved data on backend");
+        },
+        error: function (jqXHR, status, error) {
+            var errorMsg = "Could not save your data";
+            // Important because JSON.parse can fail
+            try {
+                errorMsg = (JSON.parse(jqXHR.responseText).message);
+            } catch (e) {
+                errorMsg = error;
+            }
+            setErrorModal(errorMsg); // From utils.js
+        }
+    });
 };
 
 function getAndPopulate() {
@@ -137,7 +223,7 @@ function getSearchOptions() {
 function search() {
     searchDiv.innerHTML = "";
     toSearch = $("#label_search").val().toUpperCase();
-    if (toSearch.length >= 3) {
+    if (toSearch.length >= 4) {
         searchData.forEach(function(searchElem) {
             name = searchElem.name;
             if (name.indexOf(toSearch) !== -1) {

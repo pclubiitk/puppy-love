@@ -11,7 +11,8 @@ urls = {
     'logout': base_url + '/logout',
     'email': base_url + '/update/mail',
     'setpass': base_url + '/update/first',
-    'getinfo': base_url + '/info/login'
+    'getinfo': base_url + '/info/login',
+    'removech': base_url + '/update/data'
 };
 
 function redirect(loc) {
