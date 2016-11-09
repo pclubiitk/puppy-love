@@ -3,6 +3,8 @@ var myPriv = '';
 var myPubk = '';
 var myData = '';
 var backendData;
+var searchData;
+var searchDiv;
 
 function gotInfo(data, status, jqXHR) {
     console.log('Data: ' + data);
@@ -50,6 +52,9 @@ function gotInfo(data, status, jqXHR) {
         sessionStorage.setItem("privKey", myPriv);
         console.log(myData);
     };
+
+    // To receive male/female data for searching
+    getSearchOptions();
 };
 
 function getAndPopulate() {
@@ -95,9 +100,59 @@ function logout() {
     });
 };
 
+function getSearchOptions() {
+    gender = "male";
+    if (backendData.gender) gender = "female";
+    url = "/static/" + gender;
+    $.ajax({
+        type: "GET",
+        url: url,    // From utils.js
+        success: function(data, status, jqXHR) {
+            searchData = [];
+            data.split('\n').forEach (function(entry) {
+                elems = entry.split(',\ ');
+                roll = elems[0];
+                name = elems[1].toUpperCase();
+                img = elems[2];
+                searchData.push({
+                    roll: roll,
+                    name: name,
+                    img: img
+                });
+            });
+        },
+        error: function (jqXHR, status, error) {
+            var errorMsg = '';
+            // Important because JSON.parse can fail
+            try {
+                errorMsg = (JSON.parse(jqXHR.responseText).message);
+            } catch (e) {
+                errorMsg = error;
+            }
+            setErrorModal(errorMsg); // From utils.js
+        }
+    });
+}
+
+function search() {
+    searchDiv.innerHTML = "";
+    toSearch = $("#label_search").val().toUpperCase();
+    if (toSearch.length >= 3) {
+        searchData.forEach(function(searchElem) {
+            name = searchElem.name;
+            if (name.indexOf(toSearch) !== -1) {
+                roll = searchElem.roll;
+                searchDiv.innerHTML += "<button type=\"button\" class=\"list-group-item\">" + name + " (" + roll + ")</button>\n";
+            }
+        });
+    }
+}
+
 $(document).ready(function() {
+    searchDiv = document.getElementById("list_search");
     getAndPopulate();
     $("#label_logout").click(logout);
+    $("#label_search").keyup(search);
 });
 
 // Credits: http://www.jqueryscript.net
