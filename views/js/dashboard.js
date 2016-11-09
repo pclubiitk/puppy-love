@@ -41,6 +41,7 @@ function gotInfo(data, status, jqXHR) {
 
     // Decrypt and store all variables
     try {
+        console.log(backendData.data);
         myData = decryptRsa(backendData.data, myPriv);
     } catch (e) {
         console.error("Could not parse private data");
@@ -53,8 +54,7 @@ function gotInfo(data, status, jqXHR) {
     } else {
         myPubk = cryptico.publicKeyString(myPriv);
         sessionStorage.setItem("privKey", myPriv);
-        console.log(myData);
-        displayChoices(myData); // Updates the database
+        dataDisplayChoices(myData); // Updates the database
     };
 
     // To receive male/female data for searching
@@ -64,27 +64,27 @@ function gotInfo(data, status, jqXHR) {
 function dataDisplayChoices(myDataPass) {
     var choice;
     try {
-        var parseData = JSON.parse(myDataPass);
-        for (choice in parseData.choices) {
-            selectedChoices.push(choice);
+        var parseData = (JSON.parse(myDataPass)).choices;
+        console.log("PARse data:");
+        console.log(parseData);
+        var len = parseData.length;
+        for (var i=0; i<len; i++) {
+            selectedChoices.push(parseData[i]);
         };
     } catch (e) {
         console.error("Empty private data?");
     };
 
-    var tmp = {
-        img: 'http://oa.cc.iitk.ac.in/Oa/Jsp/Photo/14588_0.jpg',
-        name: 'Saksham Sharma',
-        roll: '14588'
-    };
-
-    selectedChoices.push(tmp);
+    console.log(selectedChoices);
 
     displayChoices();
 };
 
 function displayChoices() {
     var newdiv, divthumb, img, caption;
+
+    $("#choices-row").empty();
+
     for (var i=0; i<selectedChoices.length; i++) {
         console.log(selectedChoices[i]);
         newdiv = document.createElement('div');
@@ -117,14 +117,16 @@ function displayChoices() {
 
 function removeUser(rollToRemove) {
     $("#choice-" + rollToRemove).remove();
-    for (var i=0; i<selectedChoices; i++) {
+    for (var i=0; i<selectedChoices.length; i++) {
         if (selectedChoices[i].roll == rollToRemove) {
             selectedChoices.splice(i, 1);
             break;
         }
     }
 
-    var newData = encryptRsa(JSON.stringify(selectedChoices), myPubk);
+    var newData = encryptRsa(JSON.stringify({
+        choices: selectedChoices
+    }), myPubk);
     updateData(newData);        // Update on backend
 };
 
@@ -135,7 +137,7 @@ function addUser(rollToAdd) {
     var len;
     len = selectedChoices.length;
 
-    if (len > 4) {
+    if (len >= 4) {
         setErrorModal("You can only add up to 4 choices");
         return;
     }
@@ -157,11 +159,15 @@ function addUser(rollToAdd) {
 
     displayChoices();
 
-    var newData = encryptRsa(JSON.stringify(selectedChoices), myPubk);
+    var newData = encryptRsa(JSON.stringify({
+        choices: selectedChoices
+    }), myPubk);
     updateData(newData);        // Update on backend
 };
 
 function updateData(dataToUpdate) {
+    console.log("Saving:");
+    console.log(selectedChoices);
     $.ajax({
         type: "POST",
         url: urls.removech,    // From utils.js
