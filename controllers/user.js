@@ -52,6 +52,33 @@ exports.newUser = function(mongoose) {
     };
 };
 
+exports.submittedTrue = function(mongoose) {
+    return function(req, res) {
+        User(mongoose).findById(req.user.roll, function(err, p) {
+            if (!p) {
+                respond(res, messages.wrongUser);
+            } else {
+                var couldUpdate = p.submittedTrue(req);
+                if (couldUpdate.success) {
+                    // Auth token was correct
+                    p.save(function(err) {
+                        if (err) {
+                            console.error("Couldn't save for: " + req.body.roll);
+                            console.error(err);
+                            respond(res, messages.dbError);
+                        } else {
+                            respond(res, couldUpdate);
+                        };
+                    });
+                } else {
+                    // Some error
+                    respond(res, couldUpdate);
+                };
+            };
+        });
+    };
+};
+
 // Endpoint to get user information
 // TODO: Modify to only pass basic info in production
 // Usage: http get localhost:8091/api/findUser name="Saksham"

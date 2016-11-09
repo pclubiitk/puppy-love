@@ -141,6 +141,15 @@ module.exports = function(mongoose) {
         };
     };
 
+    userSchema.methods.submittedTrue = function(roll, req) {
+        if (!this.authorized(roll)) {
+            return messages.unauthorized;
+        } else {
+            this.submitted = true;
+            return messages.allFine;
+        };
+    };
+
     // Use some random data to prevent forging
     userSchema.methods.getAuthCode = function() {
         var token = crypto.randomBytes(16).toString('hex');
