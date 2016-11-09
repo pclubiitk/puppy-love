@@ -82,6 +82,48 @@ exports.newEntry = function(mongoose) {
     };
 };
 
+// Returns the situation in the database
+// at this moment for the person asking for this
+exports.getSenderStatus = function(mongoose) {
+    return function(req, res) {
+        if (!req.user.roll) {
+            respond(res, messages.unauthorized);
+            return;
+        }
+
+        TwoPartyComm(mongoose).find(
+            {sender: parseInt(req.user.roll)},
+            'receiver state senderSubmitted receiverSubmitted oblivTransferV privateSenderInfo',
+            function(err, resp) {
+                if (err) {
+                    respond(res, messages.wrongUser);
+                } else {
+                    res.send(resp);
+                };
+            });
+    };
+};
+
+exports.getReceiverStatus = function(mongoose) {
+    return function(req, res) {
+        if (!req.user.roll) {
+            respond(res, messages.unauthorized);
+            return;
+        }
+
+        TwoPartyComm(mongoose).find(
+            {receiver: parseInt(req.user.roll)},
+            'sender state senderSubmitted receiverSubmitted oblivTransferKB infoForReceiver senderChoice oblivTransferPrime',
+            function(err, resp) {
+                if (err) {
+                    respond(res, messages.wrongUser);
+                } else {
+                    res.send(resp);
+                };
+            });
+    };
+};
+
 // Create objects in bulk
 exports.newBulk = function(mongoose) {
     return function(req, res) {
