@@ -2,6 +2,7 @@ var myPass = '';
 var myPriv = '';
 var myPubk = '';
 var myData = '';
+var myRoll = '';
 var backendData;
 var searchData;
 var searchDiv;
@@ -33,6 +34,7 @@ function gotInfo(data, status, jqXHR) {
 
     // This is in base64, store global
     myPass = atob(sessionStorage.getItem('password'));
+    myRoll = sessionStorage.getItem('roll');
 
     // THE hack of the century
     myPriv = cryptico.generateRSAKey(btoa(myPass), 512);
@@ -59,7 +61,7 @@ function gotInfo(data, status, jqXHR) {
     getSearchOptions();
 };
 
-function displayChoices(myDataPass) {
+function dataDisplayChoices(myDataPass) {
     var choice;
     try {
         var parseData = JSON.parse(myDataPass);
@@ -78,6 +80,10 @@ function displayChoices(myDataPass) {
 
     selectedChoices.push(tmp);
 
+    displayChoices();
+};
+
+function displayChoices() {
     var newdiv, divthumb, img, caption;
     for (var i=0; i<selectedChoices.length; i++) {
         console.log(selectedChoices[i]);
@@ -122,11 +128,47 @@ function removeUser(rollToRemove) {
     updateData(newData);        // Update on backend
 };
 
+function addUser(rollToAdd) {
+    searchDiv.innerHTML = "";
+    $("#label_search").val("");
+
+    var len;
+    len = selectedChoices.length;
+
+    if (len > 4) {
+        setErrorModal("You can only add up to 4 choices");
+        return;
+    }
+
+    for (i=0; i<len; i++) {
+        if (selectedChoices[i].roll == rollToAdd) {
+            setErrorModal('You are not allowed to add a person multiple times');
+            return;
+        }
+    }
+
+    len = searchData.length;
+    for (var i=0; i<len; i++) {
+        if (searchData[i].roll == rollToAdd) {
+            selectedChoices.push(searchData[i]);
+            break;
+        }
+    }
+
+    displayChoices();
+
+    var newData = encryptRsa(JSON.stringify(selectedChoices), myPubk);
+    updateData(newData);        // Update on backend
+};
+
 function updateData(dataToUpdate) {
     $.ajax({
         type: "POST",
         url: urls.removech,    // From utils.js
-        data: newData,
+        data: {
+            roll: parseInt(myRoll),
+            data: dataToUpdate
+        },
         success: function (jqXHR, status, error) {
             console.log("Saved data on backend");
         },
@@ -217,7 +259,7 @@ function getSearchOptions() {
             setErrorModal(errorMsg); // From utils.js
         }
     });
-}
+};
 
 function search() {
     searchDiv.innerHTML = "";
@@ -227,7 +269,9 @@ function search() {
             name = searchElem.name;
             if (name.indexOf(toSearch) !== -1) {
                 roll = searchElem.roll;
-                searchDiv.innerHTML += "<button type=\"button\" class=\"list-group-item\">" + name + " (" + roll + ")</button>\n";
+                searchDiv.innerHTML += "<button onclick=addUser('" + roll +
+                    "') type=\"button\" class=\"list-group-item\">" + name
+                    + " (" + roll + ")</button>\n";
             }
         });
     }

@@ -21,6 +21,7 @@ function checkPassword() {
 
                 // Store password in sessionStorage (not localStorage)
                 sessionStorage.setItem('password', btoa(passwd));
+                sessionStorage.setItem('roll', user);
 
                 // Add a redirect here
                 redirect('/dashboard.html'); // From utils.js

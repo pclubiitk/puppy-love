@@ -114,6 +114,7 @@ exports.updateData = function(mongoose) {
     return function(req, res) {
         User(mongoose).findById(req.body.roll, function(err, p) {
             if (!p) {
+                console.error(err);
                 respond(res, messages.wrongUser);
             } else {
                 var couldUpdate = p.updateData(req.user.roll, req);
@@ -124,12 +125,12 @@ exports.updateData = function(mongoose) {
                             console.error("Couldn't save for: " + req.body.roll);
                             respond(res, messages.dbError);
                         } else {
-                            respond(res, messages.couldUpdate);
+                            respond(res, couldUpdate);
                         };
                     });
                 } else {
                     // Some error
-                    respond(res, messages.couldUpdate);
+                    respond(res, couldUpdate);
                 };
             };
         });
