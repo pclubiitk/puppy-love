@@ -196,15 +196,14 @@ function getSearchOptions() {
         success: function(data, status, jqXHR) {
             searchData = [];
             data.split('\n').forEach (function(entry) {
-                elems = entry.split(',\ ');
-                roll = elems[0];
-                name = elems[1].toUpperCase();
-                img = elems[2];
-                searchData.push({
-                    roll: roll,
-                    name: name,
-                    img: img
-                });
+                if (entry != "") {
+                    elems = entry.split(',\ ');
+                    searchData.push({
+                        roll: elems[0],
+                        name: elems[1].toUpperCase(),
+                        img: elems[2]
+                    });
+                }
             });
         },
         error: function (jqXHR, status, error) {
