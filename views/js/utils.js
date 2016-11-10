@@ -14,7 +14,8 @@ urls = {
     'getinfo': base_url + '/info/login',
     'removech': base_url + '/update/data',
     'sendstatus': base_url + '/twoparty/sendstat',
-    'recvstatus': base_url + '/twoparty/recvstat'
+    'recvstatus': base_url + '/twoparty/recvstat',
+    'step1': base_url + '/twoparty/new'
 };
 
 function redirect(loc) {
@@ -84,3 +85,34 @@ function getRequest(_url, _errorMsg, _callback) {
         }
     });
 };
+
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    while (0 !== currentIndex) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}
+
+function stringGen(len) {
+    var text = " ";
+    var charset = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+    for(var i=0; i < len; i++)
+        text += charset.charAt(Math.floor(Math.random() * charset.length));
+    return text;
+};
+
+function getRandomInt(min, max) {
+    if (min == undefined) min = 10000000;
+    if (max == undefined) max = 1000000000;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}

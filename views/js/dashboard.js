@@ -76,6 +76,7 @@ function dataDisplayChoices(myDataPass) {
         console.error("Empty private data?");
     };
 
+    console.log("Selected Choices:");
     console.log(selectedChoices);
 
     displayChoices();
