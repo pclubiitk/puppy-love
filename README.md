@@ -21,9 +21,8 @@ Implementation will be using the following platforms:
 ## Running
 Recommended way using Docker:
 ```
-docker run -d -p 27017:27017 -v $HOME/.mongodata:/data/db --name mongodb-puppy mongo
-docker build -t 'puppy:v1' .
-docker run --net=host -it -p 8091:8091 puppy:v1
+docker run -d -P -v $HOME/.mongodata:/data/db --name mongodb-puppy mongo
+docker run --net=host -it -P puppy:v1
 ```
 
 Alternatively:
