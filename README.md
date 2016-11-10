@@ -19,30 +19,35 @@ Implementation will be using the following platforms:
 * Bootstrap
 
 ## Running
-For frontend:
 ```
+# Run Mongodb
+mongod --dbpath=$HOME/.mongodata
+
+# Get dependencies for frontend
 gem install sass
 sudo npm install -g bower
 # Now add $HOME/.gem/ruby/<version>/bin to your path
 
-cd frontend
+cd views
 bower install
 sass --watch css
 
-# Use either of these
-python3 -m http.server
-python2 -m SimpleHTTPServer
+# Now run the backend
+cd ..
+npm install
+
+# Recommended, for restarting on failure
+sudo npm install -g nodemon
+nodemon
+
+# Alternative to nodemon:
+npm run start
 ```
 You can open the local website on [localhost:8000](localhost:8000)
 
 For backend:
 ```
 cd backend
-npm install
-
-# Recommended
-sudo npm install -g nodemon
-nodemon
 ```
 The backend will be listening on the printed port number.
 
