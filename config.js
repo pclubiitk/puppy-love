@@ -15,7 +15,7 @@ config.secret = 'notThereOnServerSmile';
 config.sessionSecret = 'smell cat smelly cat';
 
 config.api = '/api';
-config.emailuser = String(process.env.EMAILUSER) || '';
-config.emailpass = String(process.env.EMAILPASS) || '';
+config.emailuser = process.env.EMAILUSER || '';
+config.emailpass = process.env.EMAILPASS || '';
 
 module.exports = config;

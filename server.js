@@ -8,8 +8,8 @@ var dbControl = require('./db.js'),
 
 // Main file for the code
 
-if (!config.emailuser || !config.emailpass) {
-    console.error("No mailer ENV variables. Mailing will not work");
+if (config.emailuser == "" || config.emailpass == "") {
+    console.error("[Error] Missing mailer ENV vars. Mailing will not work");
 };
 
 // Listen only when you could connect to DB
