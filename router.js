@@ -80,6 +80,8 @@ module.exports = function(db, passport) {
     addRoute('post', '/twoparty/rStep4',  controllers.twoparty.rStep4(db));
     addRoute('post', '/twoparty/sview',   controllers.twoparty.senderView(db));
     addRoute('post', '/twoparty/rview',   controllers.twoparty.recvView(db));
+    addRoute('get', '/twoparty/sendstat',controllers.twoparty.getSenderStatus(db));
+    addRoute('get', '/twoparty/recvstat',controllers.twoparty.getReceiverStatus(db));
 
     // Remove this before submitting #todo
     addRoute('post', '/twoparty/disp',    controllers.twoparty.displayAll(db));

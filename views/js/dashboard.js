@@ -6,6 +6,7 @@ var myRoll = '';
 var backendData;
 var searchData;
 var searchDiv;
+var toSendReqs = [];
 var selectedChoices = [];
 
 function gotInfo(data, status, jqXHR) {
@@ -251,8 +252,10 @@ function getSearchOptions() {
                         name: elems[1].toUpperCase(),
                         img: elems[2]
                     });
+                    toSendReqs.push(elems[0]);
                 }
             });
+            getStatusOfSubmissions();
         },
         error: function (jqXHR, status, error) {
             var errorMsg = '';
