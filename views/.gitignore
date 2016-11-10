@@ -1,5 +1,3 @@
 bower_components
-*.css
-*.css.map
 .sass-cache
 .tern-port

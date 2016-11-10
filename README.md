@@ -15,7 +15,6 @@ Implementation will be using the following platforms:
 * Node.js
 * Express.js
 * JavaScript
-* Sass
 * Bootstrap
 
 ## Running
@@ -24,13 +23,10 @@ Implementation will be using the following platforms:
 mongod --dbpath=$HOME/.mongodata
 
 # Get dependencies for frontend
-gem install sass
 sudo npm install -g bower
-# Now add $HOME/.gem/ruby/<version>/bin to your path
 
 cd views
 bower install
-sass --watch css
 
 # Now run the backend
 cd ..
