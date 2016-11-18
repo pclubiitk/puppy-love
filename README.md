@@ -19,10 +19,10 @@ Implementation will be using the following platforms:
 * Docker
 
 ## Running
-Recommended way using Docker:
+Recommended way using prebuilt Dockers:
 ```
 docker run -d -P -v $HOME/.mongodata:/data/db --name mongodb-puppy mongo
-docker run --net=host -it -P puppy:v1
+docker run --net=host -it -P pclub/puppy-love
 ```
 
 Alternatively:
