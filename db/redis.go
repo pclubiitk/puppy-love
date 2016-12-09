@@ -1,8 +1,8 @@
 package db
 
 import (
-	"github.com/kataras/go-sessions/sessiondb/redis"
-	"github.com/kataras/go-sessions/sessiondb/redis/service"
+	"gopkg.in/kataras/go-sessions.v0/sessiondb/redis"
+	"gopkg.in/kataras/go-sessions.v0/sessiondb/redis/service"
 )
 
 func RedisSession() *redis.Database {

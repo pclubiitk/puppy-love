@@ -6,7 +6,7 @@ import:
 - package: github.com/iris-contrib/plugin
   subpackages:
   - oauth
-- package: github.com/kataras/go-sessions
+- package: gopkg.in/kataras/go-sessions.v0
   subpackages:
   - sessiondb/redis
   - sessiondb/redis/service
