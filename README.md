@@ -54,17 +54,19 @@ mongod --dbpath=$HOME/.mongodata
 # Run redis for session management
 redis-server
 
-# Get dependencies
-sudo npm install -g yarn
-
+# Get dependencies for frontend
 cd views
+sudo npm install -g yarn
 yarn install
 
 # Run frontend
 npm run start
 
-# Now run the backend
 cd ..
+
+# Backend dependencies
+go get github.com/Masterminds/glide
+glide install
 go run puppy.go
 ```
 You can open the local website at [puppy.pclub.in](puppy.pclub.in)

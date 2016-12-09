@@ -1,0 +1,16 @@
+package: github.com/sakshamsharma/puppy-love
+import:
+- package: github.com/iris-contrib/middleware
+  subpackages:
+  - basicauth
+- package: github.com/iris-contrib/plugin
+  subpackages:
+  - oauth
+- package: github.com/kataras/go-sessions
+  subpackages:
+  - sessiondb/redis
+  - sessiondb/redis/service
+- package: github.com/kataras/iris
+- package: gopkg.in/mgo.v2
+  subpackages:
+  - bson
