@@ -19,8 +19,9 @@ func PuppyRoute(db db.PuppyDb) {
 	iris.Handle("POST", uPre+"/login/first", controllers.UserFirst{db})
 	iris.Handle("POST", uPre+"/login/info", controllers.UserLoginGet{db})
 
-	iris.Get(uPre+"/mail/:id", controllers.UserMail)
 	iris.Handle("GET", uPre+"/get/:id", controllers.UserGet{db})
+
+	iris.Get(uPre+"/mail/:id", controllers.UserMail)
 
 	// Session administration
 	sesPre := "/session"

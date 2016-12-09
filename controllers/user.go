@@ -119,8 +119,7 @@ func (m UserGet) Serve(ctx *iris.Context) {
 	ctx.JSON(iris.StatusAccepted, resp)
 }
 
-// Get user's private information on login
-// AUTH
+// @AUTH Get user's private information on login
 // ---------------------------------------
 type UserLoginGet struct {
 	Db db.PuppyDb
@@ -185,8 +184,7 @@ func (m UserSubmitTrue) Serve(ctx *iris.Context) {
 	ctx.JSON(iris.StatusAccepted, "Submitted successfully")
 }
 
-// Update user data
-// AUTH
+// @AUTH Update user data
 // ------------------------------
 type UserUpdateData struct {
 	Db db.PuppyDb

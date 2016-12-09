@@ -7,14 +7,12 @@ import (
 
 	"github.com/sakshamsharma/puppy-love/db"
 	"github.com/sakshamsharma/puppy-love/router"
-	"github.com/sakshamsharma/puppy-love/utils/auth"
 	"github.com/sakshamsharma/puppy-love/utils/config"
 
 	"github.com/kataras/iris"
 )
 
 func main() {
-	// auth.PuppyAuth()
 	sessionDb := db.RedisSession()
 
 	mongoDb, error := db.MongoConnect()
@@ -23,7 +21,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	auth.SetupSessions(sessionDb)
+	iris.UseSessionDB(sessionDb)
 
 	router.PuppyRoute(mongoDb)
 
