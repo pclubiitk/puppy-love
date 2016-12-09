@@ -22,11 +22,23 @@ Implementation using:
 * Bootstrap
 * Docker
 
+# Requirements
+* golang
+* NPM
+* Nginx
+* Redis
+* MongoDB
+
 # Set up nginx
 You need to set up nginx to allow both server and backend to respond to the queries.
 ```
 sudo cp puppy.nginx.conf /etc/nginx/sites_enabled/
-sudo systemctl start nginx # Or restart
+
+# For people using systemd
+sudo systemctl start nginx
+
+# For people using upstart (do not use if you have systemd)
+sudo service nginx start
 
 # Edit /etc/hosts file
 # Map puppy.pclub.in to 127.0.0.1
