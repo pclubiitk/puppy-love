@@ -1,0 +1,126 @@
+<div class="row">
+
+    <div class="col-sm-3">
+        <!-- Contains details of total people and your status -->
+
+        <div class="panel panel-default">
+            <div id="your_name" class="panel-heading">
+                {{ greeting }} {{ your_name }}
+            </div>
+            <div class="panel-body">
+                <div class="thumbnail text-center">
+                    <img id="your_image" src="{{ your_image }}" alt="You?">
+                </div>
+                <div class="text-center" id="your_gender">{{ your_gender }}</div>
+            </div>
+
+
+            <!-- Have you submitted? -->
+            <div class="[ form-group text-center ]" style="margin: 15px;">
+                <div class="[ btn-group ]">
+                    <label id="label_submit" class="btn"
+                    [ngClass]="{'btn-info': submitted,
+                                'btn-warning': !submitted}">
+                        <span id="span_submit" class="glyphicon"
+                        [ngClass]="{'glyphicon-ok': submitted,
+                                   'glyphicon-remove': !submitted}"></span>
+                        <span> </span>
+                    </label>
+                    <label class="[ btn btn-default ]">
+                        Submitted?
+                    </label>
+                </div>
+            </div>
+
+            <div class="[ form-group text-center ]" style="margin: 15px;">
+                <div class="[ btn-group ]">
+                    <label id="label_submit" class="btn btn-danger">
+                        <span id="span_submit" class="glyphicon glyphicon-off"></span>
+                        <span> </span>
+                    </label>
+                    <label id="label_logout" class="[ btn btn-default ]">
+                        Logout
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-sm-8">
+        <!-- Contains the main field where you can choose your choices -->
+
+        <div class="panel panel-default">
+            <div class="panel-heading"><h3 class="panel-title">Choose!</h3></div>
+            <div class="panel-body">
+
+                <input id="label_search" type="text" class="form-control" placeholder="Search for names!" aria-describedby="basic-addon1">
+                <div id="list_search" class="list-group">
+                </div>
+
+                <br/><br/>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Your choices</div>
+                            <div class="panel-body">
+
+                                <!-- Choices -->
+                                <div class="row" id="choices-row">
+                                </div>
+                                <!-- End of choices row -->
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of choices panel row -->
+
+                <div class="[ form-group text-center ]" style="margin: 15px;">
+                    <div class="[ btn-group ]">
+                        <label id="label_submit_int" class="btn btn-danger"
+                        style="padding-right: 0; padding-top: 0; padding-bottom: 0; border: 0;">
+                            <span id="span_heart" class="glyphicon glyphicon-heart"></span>
+                            <span> </span>
+                            <label id="submit_button" class="[ btn btn-default ]"
+                                   style="margin-right: 0; margin-top: 0; margin-bottom: 0; border-radius: 0;">
+                                Submit!
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="col-sm-1">
+        <!-- Empty div for padding -->
+    </div>
+
+    <div id="errorModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        &times;
+                    </button>
+                    <h4 class="modal-title">An error occured</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="errorDescription"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- End of main content div -->
+
+</div>

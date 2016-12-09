@@ -1,0 +1,18 @@
+<div class="signup center-block jumbotron">
+  <h1>Signup</h1>
+  <form role="form" (submit)="signup($event, roll.value, password.value, authCode.value)">
+  <div class="form-group">
+    <label for="roll">Username</label>
+    <input type="text" #roll class="form-control" id="roll" placeholder="Username">
+  </div>
+  <div class="form-group">
+    <label for="passHash">Password</label>
+    <input type="password" #password class="form-control" id="password" placeholder="Password">
+  </div>
+  <div class="form-group">
+    <label for="authCode">Auth Code</label>
+    <input type="text" #authCode class="form-control" id="authCode" placeholder="Authentication code (check email)">
+  </div>
+  <button type="submit" class="btn btn-default">Submit</button>
+</form>
+</div>
