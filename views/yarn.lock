@@ -271,7 +271,14 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
-bootstrap@^3.3.7:
+bootstrap-material-design@^0.5.10:
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/bootstrap-material-design/-/bootstrap-material-design-0.5.10.tgz#b36b0035b528a821c1758695b25d25e25e121372"
+  dependencies:
+    bootstrap ">=3.0"
+    jquery ">=1.9.1"
+
+bootstrap@>=3.0, bootstrap@^3.3.7:
   version "3.3.7"
   resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-3.3.7.tgz#5a389394549f23330875a3b150656574f8a9eb71"
 
@@ -1477,6 +1484,10 @@ jodid25519@^1.0.0:
   dependencies:
     jsbn "~0.1.0"
 
+jquery@>=1.9.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.1.1.tgz#347c1c21c7e004115e0a4da32cece041fad3c8a3"
+
 js-base64@^2.1.9:
   version "2.1.9"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.1.9.tgz#f0e80ae039a4bd654b5f281fc93f04a914a7fcce"
@@ -2649,6 +2660,14 @@ shelljs@^0.7.0:
 signal-exit@^3.0.0:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
+
+sjcl-typescript-definitions@^1.0.1-1:
+  version "1.0.1-1"
+  resolved "https://registry.yarnpkg.com/sjcl-typescript-definitions/-/sjcl-typescript-definitions-1.0.1-1.tgz#1e71a4dd23455731e7b0f9ec207acbc1cbe1d9b4"
+
+sjcl@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/sjcl/-/sjcl-1.0.6.tgz#6415462a63cc0d4215c49baec9d3fa0c1b53520f"
 
 slice-ansi@0.0.4:
   version "0.0.4"

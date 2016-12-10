@@ -3,9 +3,40 @@ import { Http } from '@angular/http';
 import { Router } from '@angular/router';
 import { AuthHttp } from 'angular2-jwt';
 import { Config } from '../config';
+import { Crypto } from '../common/crypto';
 
 const styles = require('./home.css');
 const template = require('./home.html');
+
+class Person {
+  name: string;
+  roll: string;
+  dept: string;
+  image: string;
+
+  static deserialize(jsonData): Person[] {
+    if (!jsonData) {
+      return [];
+    }
+
+    let len = jsonData.length;
+    let result: Person[] = [];
+    for (let i = 0; i < len; i++) {
+      result.push(new Person(
+        jsonData[i].name,
+        jsonData[i].roll,
+        jsonData[i].dept,
+        jsonData[i].image
+      ));
+    }
+    return result;
+  }
+
+  constructor(public name: string,
+              public roll: string,
+              public dept: string,
+              public image: string) {};
+}
 
 @Component({
   selector: 'home',
@@ -24,9 +55,13 @@ export class Home {
   submitted: string = 'close';
   greeting: string = '';
   saving: string = 'Fetching ...';
+  crypto: Crypto;
+  choices: Person[];
+  data;
 
   constructor(public router: Router, public http: Http, public authHttp: AuthHttp) {
     this.password = sessionStorage.getItem('password');
+    this.crypto = new Crypto(this.password);
 
     this.make_greeting();
 
@@ -35,6 +70,13 @@ export class Home {
         response => this.parseInfo(response['_body']),
         error => window.alert('Error loading data')
       );
+
+    this.choices = [];
+    // this.choices.push(new Person('nice', 'roll', 'CSE', 'something'));
+
+    this.data = {
+      choices: this.choices
+    };
   }
 
   parseInfo(info: string) {
@@ -44,6 +86,13 @@ export class Home {
     this.your_gender = infoObj.gender === '1' ? 'Male' : 'Female';
     this.your_image = infoObj.image;
     this.submitted = infoObj.submitted ? 'check' : 'close';
+
+    this.data = this.crypto.toJson(this.crypto.decrypt(infoObj.data));
+    this.choices = Person.deserialize(this.data.choices);
+
+    console.log('Choices ==>');
+    console.log(this.choices);
+
     this.saving = 'Saved ...';
   }
 
@@ -70,31 +119,17 @@ export class Home {
       );
   }
 
-  callAnonymousApi() {
-    this._callApi('Anonymous', 'http://localhost:3001/api/random-quote');
+  save() {
+    let encData = this.crypto.encrypt(this.crypto.fromJson(this.data));
+    this.saving = 'Saving ...';
+    this.http.post(Config.dataSaveUrl, {data: encData}, null)
+      .subscribe (
+        response => this.saving = 'Saved ...',
+        error => this.saving = 'Error saving your choices!'
+      );
   }
 
-  callSecuredApi() {
-    this._callApi('Secured', 'http://localhost:3001/api/protected/random-quote');
-  }
-
-  _callApi(type, url) {
-    this.response = null;
-    if (type === 'Anonymous') {
-      // For non-protected routes, just use Http
-      this.http.get(url)
-        .subscribe(
-          response => this.response = response.text(),
-          error => this.response = error.text()
-        );
-    }
-    if (type === 'Secured') {
-      // For protected routes, use AuthHttp
-      this.authHttp.get(url)
-        .subscribe(
-          response => this.response = response.text(),
-          error => this.response = error.text()
-        );
-    }
+  submit() {
+    this.save();
   }
 }
