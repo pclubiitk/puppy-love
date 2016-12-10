@@ -3,7 +3,7 @@
     <div class="col-sm-3">
         <!-- Contains details of total people and your status -->
 
-        <div class="panel panel-default">
+        <div class="panel panel-primary">
             <div id="your_name" class="panel-heading">
                 {{ greeting }} {{ your_name }}
             </div>
@@ -19,7 +19,7 @@
             <div class="[ form-group text-center ]" style="margin: 15px;">
                 <div class="[ btn-group ]">
                     <label id="label_submitted" class="[ btn btn-default ]">
-                        <i class="fa fa-times"></i> Submitted?
+                        <i class="material-icons">{{ submitted }}</i> Submitted?
                     </label>
                 </div>
             </div>
@@ -28,7 +28,7 @@
                 <div class="[ btn-group ]">
                     <label (click)="logout()" id="label_logout"
                            class="[ btn btn-default ]">
-                        <i class="fa fa-power-off"></i> Logout
+                        <i class="material-icons">power_settings_new</i> Logout
                     </label>
                 </div>
             </div>
@@ -38,7 +38,7 @@
     <div class="col-sm-8">
         <!-- Contains the main field where you can choose your choices -->
 
-        <div class="panel panel-default">
+        <div class="panel panel-primary">
             <div class="panel-heading"><h3 class="panel-title">Choose!</h3></div>
             <div class="panel-body">
 
@@ -50,7 +50,12 @@
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="panel panel-default">
-                            <div class="panel-heading">Your choices</div>
+                            <div class="panel-heading">
+                                Your choices
+                                <span style="float: right;">
+                                    {{ saving }}
+                                </span>
+                            </div>
                             <div class="panel-body">
 
                                 <!-- Choices -->
@@ -67,7 +72,7 @@
                 <div class="[ form-group text-center ]" style="margin: 15px;">
                     <div class="[ btn-group ]">
                         <label id="submit_button" class="[ btn btn-default ]">
-                            <i class="fa fa-heart"></i> Submit!
+                            <i class="material-icons">sentiment_very_satisfied</i> Submit!
                         </label>
                     </div>
                 </div>

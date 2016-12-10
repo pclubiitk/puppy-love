@@ -21,8 +21,9 @@ export class Home {
   your_gender: string = '';
   your_name: string = '';
   priv_key: string;
-  submitted: boolean = false;
+  submitted: string = 'close';
   greeting: string = '';
+  saving: string = 'Fetching ...';
 
   constructor(public router: Router, public http: Http, public authHttp: AuthHttp) {
     this.password = sessionStorage.getItem('password');
@@ -42,7 +43,8 @@ export class Home {
     this.your_name = infoObj.name;
     this.your_gender = infoObj.gender === '1' ? 'Male' : 'Female';
     this.your_image = infoObj.image;
-    this.submitted = infoObj.submitted;
+    this.submitted = infoObj.submitted ? 'check' : 'close';
+    this.saving = 'Saved ...';
   }
 
   make_greeting() {
