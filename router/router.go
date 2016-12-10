@@ -26,5 +26,5 @@ func PuppyRoute(db db.PuppyDb) {
 	// Session administration
 	sesPre := "/session"
 	iris.Handle("POST", sesPre+"/login", controllers.SessionLogin{db})
-	iris.Post(sesPre+"/logout", controllers.SessionLogout)
+	iris.Get(sesPre+"/logout", controllers.SessionLogout)
 }

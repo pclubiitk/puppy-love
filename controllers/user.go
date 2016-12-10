@@ -137,7 +137,11 @@ type typeUserLoginGet struct {
 }
 
 func (m UserLoginGet) Serve(ctx *iris.Context) {
-	id := SessionId(ctx)
+	id, err := SessionId(ctx)
+	if err != nil {
+		ctx.EmitError(iris.StatusForbidden)
+		return
+	}
 
 	user := models.User{}
 
@@ -169,7 +173,11 @@ type UserSubmitTrue struct {
 }
 
 func (m UserSubmitTrue) Serve(ctx *iris.Context) {
-	id := SessionId(ctx)
+	id, err := SessionId(ctx)
+	if err != nil {
+		ctx.EmitError(iris.StatusForbidden)
+		return
+	}
 
 	user := models.User{}
 
@@ -191,7 +199,12 @@ type UserUpdateData struct {
 }
 
 func (m UserUpdateData) Serve(ctx *iris.Context) {
-	id := SessionId(ctx)
+	id, err := SessionId(ctx)
+	if err != nil {
+		ctx.EmitError(iris.StatusForbidden)
+		return
+	}
+
 	info := new(models.TypeUserUpdateData)
 	if err := ctx.ReadJSON(info); err != nil {
 		ctx.EmitError(iris.StatusBadRequest)

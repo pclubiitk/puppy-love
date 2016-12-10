@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"log"
 
 	"github.com/sakshamsharma/puppy-love/db"
@@ -54,6 +55,10 @@ func SessionLogout(ctx *iris.Context) {
 	ctx.SessionDestroy()
 }
 
-func SessionId(ctx *iris.Context) string {
-	return ctx.Session().Get("id").(string)
+func SessionId(ctx *iris.Context) (string, error) {
+	id := ctx.Session().Get("id")
+	if id != nil {
+		return id.(string), nil
+	}
+	return "", errors.New("No such session")
 }

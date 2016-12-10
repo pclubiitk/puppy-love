@@ -61,7 +61,7 @@ export class Home {
 
   logout() {
     sessionStorage.removeItem('password');
-    this.http.post(Config.logoutUrl, null)
+    this.http.get(Config.logoutUrl)
       .subscribe(
         response => this.router.navigate(['login']),
         error => this.router.navigate(['login'])
