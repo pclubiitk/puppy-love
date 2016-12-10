@@ -13,6 +13,7 @@ const template = require('./signup.html');
   styles: [ styles ]
 })
 export class Signup {
+  message: string = '';
   constructor(public router: Router, public http: Http) {
   }
 
@@ -26,7 +27,7 @@ export class Signup {
           this.router.navigate(['home']);
         },
         error => {
-          alert(error.text());
+          this.message = 'Wrong authentication code!';
           console.log(error.text());
         }
       );
@@ -35,6 +36,19 @@ export class Signup {
   login(event) {
     event.preventDefault();
     this.router.navigate(['login']);
+  }
+
+  mailer(event, roll) {
+    event.preventDefault();
+    this.http.get(Config.loginMailUrl + roll)
+      .subscribe(
+        response => {
+          this.message = 'Mail sent to your @iitk ID !';
+        },
+        error => {
+          this.message = 'There was an error. Please tell us at pclubiitk@gmail';
+        }
+      );
   }
 
 }
