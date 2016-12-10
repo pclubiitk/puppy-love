@@ -64,7 +64,7 @@ export class Home {
     this.http.post(Config.logoutUrl, null)
       .subscribe(
         response => this.router.navigate(['login']),
-        error => window.alert('Could not logout')
+        error => this.router.navigate(['login'])
       );
   }
 

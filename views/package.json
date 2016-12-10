@@ -31,7 +31,9 @@
     "@angular/router": "3.0.1",
     "angular2-jwt": "0.1.23",
     "bootstrap": "^3.3.7",
+    "bootstrap-material-design": "^0.5.10",
     "core-js": "^2.4.1",
+    "font-awesome": "^4.7.0",
     "jwt-decode": "^2.0.1",
     "rxjs": "5.0.0-beta.12",
     "zone.js": "~0.6.25"
