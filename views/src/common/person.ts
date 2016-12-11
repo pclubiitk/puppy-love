@@ -20,5 +20,7 @@ export class Person {
   constructor(public name: string,
               public roll: string,
               public dept: string,
-              public image: string) {};
+              public image: string) {
+    this.name = name;
+  };
 }

@@ -31,7 +31,7 @@ export class Home {
   choices: Person[];
   data;
 
-  people: string[];
+  people: Person[];
 
   constructor(public router: Router, public http: Http, public authHttp: AuthHttp) {
     this.password = sessionStorage.getItem('password');
@@ -66,7 +66,7 @@ export class Home {
       choices: this.choices
     };
 
-    this.people = ['Name1', 'Name2'];
+    this.people = [];
   }
 
   parseInfo(info: string) {
@@ -89,6 +89,31 @@ export class Home {
     console.log(this.choices);
 
     this.saving = 'Saved ...';
+
+    this.loadPeople();
+  }
+
+  loadPeople() {
+    let parsePeople = (json) => {
+      let people = JSON.parse(json._body);
+      this.people = [];
+      for (let person of people) {
+        this.people.push(
+          new Person(
+            person.name,
+            person._id,
+            '',
+            person.image
+          ));
+      }
+    };
+
+    this.http.get(Config.listGender + '/' +
+                  (this.your_gender === 'Male' ? '0' : '1'))
+      .subscribe(
+        response => parsePeople(response),
+        error => console.error('Could not get list of people')
+      );
   }
 
   personSelected(data: string) {

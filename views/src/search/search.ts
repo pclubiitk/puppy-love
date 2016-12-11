@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Http } from '@angular/http';
 import { contentHeaders } from '../common/headers';
 import { Config } from '../config';
+import { Person } from '../common/person';
 
 const styles   = require('./search.css');
 const template = require('./search.html');
@@ -14,7 +15,7 @@ const template = require('./search.html');
 })
 export class Search {
   @Input('placeholder') placeholder: string;
-  @Input('md-items') suggestions: string[];
+  @Input('md-items') suggestions: Person[];
   @Input('md-content') content: string;
 
   @Output('md-search-text-change')
