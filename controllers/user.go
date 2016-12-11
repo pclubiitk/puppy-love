@@ -131,6 +131,7 @@ type typeUserLoginGet struct {
 	Gender  string `json:"gender" bson:"gender"`
 	Image   string `json:"image" bson:"image"`
 	PrivK   string `json:"privKey" bson:"privKey"`
+	PubK    string `json:"pubKey" bson:"pubKey"`
 	Data    string `json:"data" bson:"data"`
 	Submit  bool   `json:"submitted" bson:"submitted"`
 	Matches string `json:"matches" bson:"matches"`
@@ -158,6 +159,7 @@ func (m UserLoginGet) Serve(ctx *iris.Context) {
 		Gender:  user.Gender,
 		Image:   user.Image,
 		PrivK:   user.PrivK,
+		PubK:    user.PubK,
 		Data:    user.Data,
 		Submit:  user.Submit,
 		Matches: user.Matches,
