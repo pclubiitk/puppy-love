@@ -11,6 +11,7 @@ import { Home } from './home';
 import { Login } from './login';
 import { Signup } from './signup';
 import { Search } from './search';
+import { Choices } from './choices';
 import { App } from './app';
 
 import { routes } from './app.routes';
@@ -18,7 +19,7 @@ import { routes } from './app.routes';
 @NgModule({
   bootstrap: [App],
   declarations: [
-    Home, Login, Signup, App, Search
+    Home, Login, Signup, App, Search, Choices
   ],
   imports: [
     HttpModule, BrowserModule, FormsModule,

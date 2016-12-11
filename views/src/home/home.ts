@@ -5,34 +5,10 @@ import { AuthHttp } from 'angular2-jwt';
 import { Config } from '../config';
 import { Search } from '../search';
 import { Crypto } from '../common/crypto';
+import { Person } from '../common/person';
 
 const styles = require('./home.css');
 const template = require('./home.html');
-
-class Person {
-  static deserialize(jsonData): Person[] {
-    if (!jsonData) {
-      return [];
-    }
-
-    let len = jsonData.length;
-    let result: Person[] = [];
-    for (let i = 0; i < len; i++) {
-      result.push(new Person(
-        jsonData[i].name,
-        jsonData[i].roll,
-        jsonData[i].dept,
-        jsonData[i].image
-      ));
-    }
-    return result;
-  }
-
-  constructor(public name: string,
-              public roll: string,
-              public dept: string,
-              public image: string) {};
-}
 
 @Component({
   selector: 'home',
@@ -70,7 +46,18 @@ export class Home {
       );
 
     this.choices = [];
-    // this.choices.push(new Person('nice', 'roll', 'CSE', 'something'));
+    // this.choices.push(new Person(
+    //   'Saksham', '14588', 'CSE',
+    //   'https://avatars3.githubusercontent.com/u/10418596?v=3&s=460'));
+    // this.choices.push(new Person(
+    //   'Crazy', '12000', 'MTH',
+    //   'https://www.gentoo.org/assets/img/logo/gentoo-3d-small.png'));
+    // this.choices.push(new Person(
+    //   'Saksham', '14588', 'CSE',
+    //   'https://avatars3.githubusercontent.com/u/10418596?v=3&s=460'));
+    // this.choices.push(new Person(
+    //   'Crazy', '12000', 'MTH',
+    //   'https://www.gentoo.org/assets/img/logo/gentoo-3d-small.png'));
 
     this.data = {
       choices: this.choices
