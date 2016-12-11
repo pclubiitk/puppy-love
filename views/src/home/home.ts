@@ -9,11 +9,6 @@ const styles = require('./home.css');
 const template = require('./home.html');
 
 class Person {
-  name: string;
-  roll: string;
-  dept: string;
-  image: string;
-
   static deserialize(jsonData): Person[] {
     if (!jsonData) {
       return [];
@@ -87,13 +82,38 @@ export class Home {
     this.your_image = infoObj.image;
     this.submitted = infoObj.submitted ? 'check' : 'close';
 
-    this.data = this.crypto.toJson(this.crypto.decrypt(infoObj.data));
+    this.crypto.deserializePriv(this.crypto.decryptSym(infoObj.privKey));
+    this.crypto.deserializePub(infoObj.pubKey);
+
+    this.data = Crypto.toJson(this.crypto.decryptSym(infoObj.data));
     this.choices = Person.deserialize(this.data.choices);
 
     console.log('Choices ==>');
     console.log(this.choices);
 
     this.saving = 'Saved ...';
+  }
+
+  save() {
+    let encData = this.crypto.encryptSym(Crypto.fromJson(this.data));
+    this.saving = 'Saving ...';
+    this.http.post(Config.dataSaveUrl, {data: encData}, null)
+      .subscribe (
+        response => this.saving = 'Saved ...',
+        error => this.saving = 'Error saving your choices!'
+      );
+  }
+
+  submit() {
+  }
+
+  logout() {
+    sessionStorage.removeItem('password');
+    this.http.get(Config.logoutUrl)
+      .subscribe(
+        response => this.router.navigate(['login']),
+        error => this.router.navigate(['login'])
+      );
   }
 
   make_greeting() {
@@ -108,28 +128,5 @@ export class Home {
     } else {
       this.greeting = 'Good Evening,';
     }
-  }
-
-  logout() {
-    sessionStorage.removeItem('password');
-    this.http.get(Config.logoutUrl)
-      .subscribe(
-        response => this.router.navigate(['login']),
-        error => this.router.navigate(['login'])
-      );
-  }
-
-  save() {
-    let encData = this.crypto.encrypt(this.crypto.fromJson(this.data));
-    this.saving = 'Saving ...';
-    this.http.post(Config.dataSaveUrl, {data: encData}, null)
-      .subscribe (
-        response => this.saving = 'Saved ...',
-        error => this.saving = 'Error saving your choices!'
-      );
-  }
-
-  submit() {
-    this.save();
   }
 }

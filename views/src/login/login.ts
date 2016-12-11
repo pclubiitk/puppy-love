@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Http } from '@angular/http';
 import { contentHeaders } from '../common/headers';
 import { Config } from '../config';
+import { Crypto } from '../common/crypto';
 
 const styles   = require('./login.css');
 const template = require('./login.html');
@@ -16,13 +17,17 @@ export class Login {
   constructor(public router: Router, public http: Http) {
   }
 
-  login(event, username, password) {
+  login(event, username, _password) {
     event.preventDefault();
+
+    let password = Crypto.hash(_password);
+
     let body = JSON.stringify({ username, password });
+
     this.http.post(Config.loginUrl, body, { headers: contentHeaders })
       .subscribe(
         response => {
-          sessionStorage.setItem('password', password);
+          sessionStorage.setItem('password', _password);
           this.router.navigate(['home']);
         },
         error => {

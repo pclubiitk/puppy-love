@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Http } from '@angular/http';
 import { contentHeaders } from '../common/headers';
 import { Config } from '../config';
+import { Crypto } from '../common/crypto';
 
 const styles   = require('./signup.css');
 const template = require('./signup.html');
@@ -14,17 +15,36 @@ const template = require('./signup.html');
 })
 export class Signup {
   message: string = '';
+  crypto: Crypto;
+
   constructor(public router: Router, public http: Http) {
   }
 
   signup(event, roll, password, authCode) {
     event.preventDefault();
-    let passHash = password;
-    let body = JSON.stringify({ roll, passHash, authCode });
+    let beginData = Crypto.fromJson({
+      choices: []
+    });
+
+    this.crypto = new Crypto(password);
+
+    let passHash = Crypto.hash(password);
+
+    this.crypto.newKey();
+
+    let body = JSON.stringify({
+      roll,
+      passHash,
+      authCode,
+      privKey: this.crypto.encryptSym(this.crypto.serializePriv()),
+      pubKey: this.crypto.serializePub(),
+      data: this.crypto.encryptSym(beginData)
+    });
+
     this.http.post(Config.loginFirstUrl, body, { headers: contentHeaders })
       .subscribe(
         response => {
-          this.router.navigate(['home']);
+          this.router.navigate(['login']);
         },
         error => {
           this.message = 'Wrong authentication code!';
