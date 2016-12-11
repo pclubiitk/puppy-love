@@ -28,6 +28,10 @@ func PuppyRoute(db db.PuppyDb) {
 	lPre := "/list"
 	iris.Handle("GET", lPre+"/gender/:gender", controllers.ListAll{db})
 
+	// Compute
+	cPre := "/compute"
+	iris.Handle("POST", cPre+"/new/bulk", controllers.ComputeNewBulk{db})
+
 	// Session administration
 	sesPre := "/session"
 	iris.Handle("POST", sesPre+"/login", controllers.SessionLogin{db})
