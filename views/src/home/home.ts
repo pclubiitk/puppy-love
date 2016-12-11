@@ -35,6 +35,9 @@ export class Home {
 
   constructor(public router: Router, public http: Http, public authHttp: AuthHttp) {
     this.password = sessionStorage.getItem('password');
+    if (!this.password) {
+      this.router.navigate(['login']);
+    }
     this.crypto = new Crypto(this.password);
 
     this.make_greeting();
