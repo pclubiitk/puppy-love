@@ -2550,6 +2550,10 @@ restore-cursor@^1.0.1:
     exit-hook "^1.0.0"
     onetime "^1.0.0"
 
+retyped-sjcl-tsd-ambient@0.0.0-0:
+  version "0.0.0-0"
+  resolved "https://registry.yarnpkg.com/retyped-sjcl-tsd-ambient/-/retyped-sjcl-tsd-ambient-0.0.0-0.tgz#27cccab4b75855f4798d26767230bee50ca3370c"
+
 right-align@^0.1.1:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/right-align/-/right-align-0.1.3.tgz#61339b722fe6a3515689210d24e14c96148613ef"
@@ -2660,10 +2664,6 @@ shelljs@^0.7.0:
 signal-exit@^3.0.0:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
-
-sjcl-typescript-definitions@^1.0.1-1:
-  version "1.0.1-1"
-  resolved "https://registry.yarnpkg.com/sjcl-typescript-definitions/-/sjcl-typescript-definitions-1.0.1-1.tgz#1e71a4dd23455731e7b0f9ec207acbc1cbe1d9b4"
 
 sjcl@^1.0.6:
   version "1.0.6"
