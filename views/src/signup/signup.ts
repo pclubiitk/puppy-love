@@ -32,6 +32,7 @@ export class Signup {
 
     this.crypto.newKey();
 
+    // Store encrypted private key, public key, and encrypted empty data
     let body = JSON.stringify({
       roll,
       passHash,

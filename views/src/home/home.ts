@@ -3,6 +3,7 @@ import { Http } from '@angular/http';
 import { Router } from '@angular/router';
 import { AuthHttp } from 'angular2-jwt';
 import { Config } from '../config';
+import { Search } from '../search';
 import { Crypto } from '../common/crypto';
 
 const styles = require('./home.css');
@@ -54,6 +55,8 @@ export class Home {
   choices: Person[];
   data;
 
+  people: string[];
+
   constructor(public router: Router, public http: Http, public authHttp: AuthHttp) {
     this.password = sessionStorage.getItem('password');
     this.crypto = new Crypto(this.password);
@@ -72,6 +75,8 @@ export class Home {
     this.data = {
       choices: this.choices
     };
+
+    this.people = ['Name1', 'Name2'];
   }
 
   parseInfo(info: string) {
@@ -82,9 +87,11 @@ export class Home {
     this.your_image = infoObj.image;
     this.submitted = infoObj.submitted ? 'check' : 'close';
 
+    // Extract public and private keys
     this.crypto.deserializePriv(this.crypto.decryptSym(infoObj.privKey));
     this.crypto.deserializePub(infoObj.pubKey);
 
+    // Decrypt stored choices info
     this.data = Crypto.toJson(this.crypto.decryptSym(infoObj.data));
     this.choices = Person.deserialize(this.data.choices);
 
@@ -92,6 +99,10 @@ export class Home {
     console.log(this.choices);
 
     this.saving = 'Saved ...';
+  }
+
+  personSelected(data: string) {
+    console.log('Clicked: ' + data);
   }
 
   save() {

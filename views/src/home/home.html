@@ -42,7 +42,10 @@
             <div class="panel-heading"><h3 class="panel-title">Choose!</h3></div>
             <div class="panel-body">
 
-                <input id="label_search" type="text" class="form-control" placeholder="Search for names!" aria-describedby="basic-addon1">
+                <search placeholder="Search for names"
+                        (md-selected-item-change)="personSelected($event)"
+                        [md-items]="people">
+                </search>
                 <div id="list_search" class="list-group">
                 </div>
 

@@ -1,0 +1,24 @@
+<div class="SearchDiv"
+              (click)="clickHandler($event)">
+
+    <input placeholder="{{ placeholder }}"
+           (keyup)="keyPressHandler($event)"
+           style="width:100%;"
+           floatingPlaceholder="false"
+           class="SearchBox form-control"
+           aria-describedby="basic-addon1"
+           type="text"
+           [ngModel]="content">
+
+    <div class="SearchResults"
+         [ngClass]="{'visible': displayCompletions}">
+        <ul style="list-style: none; padding-left: 0px;">
+            <li *ngFor="let item of suggestions"
+                class="SearchResultEntry"
+                tabindex="0"
+                (click)="itemClicked($event)">
+                {{item}}
+            </li>
+        </ul>
+    </div>
+</div>
