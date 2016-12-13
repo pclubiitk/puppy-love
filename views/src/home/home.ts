@@ -17,6 +17,7 @@ const template = require('./home.html');
 })
 export class Home {
   password: string;
+  id: string;
   response: string;
   api: string;
 
@@ -35,7 +36,8 @@ export class Home {
 
   constructor(public router: Router, public http: Http, public authHttp: AuthHttp) {
     this.password = sessionStorage.getItem('password');
-    if (!this.password) {
+    this.id = sessionStorage.getItem('id');
+    if (!this.password || !this.id) {
       this.router.navigate(['login']);
     }
     this.crypto = new Crypto(this.password);
@@ -131,6 +133,16 @@ export class Home {
   }
 
   submit() {
+    let toSend = [];
+    for (let p of this.people) {
+      toSend.push({id: p.roll, tk: 'abcd'});
+    }
+
+    this.http.post(Config.computeNewBulk, toSend, null)
+      .subscribe(
+        response => console.log(response),
+        error => console.error(error)
+      );
   }
 
   logout() {

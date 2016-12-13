@@ -8,4 +8,6 @@ export class Config {
   static dataSaveUrl: string = Config.baseUrl + '/users/data/update';
 
   static listGender: string = Config.baseUrl + '/list/gender';
+
+  static computeNewBulk: string = Config.baseUrl + '/compute/new/bulk';
 }

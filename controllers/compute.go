@@ -1,61 +1,79 @@
 package controllers
 
 import (
+	"log"
+
 	"github.com/sakshamsharma/puppy-love/db"
 	"github.com/sakshamsharma/puppy-love/models"
 
 	"github.com/kataras/iris"
+	"gopkg.in/mgo.v2/bson"
 )
 
-// @AUTH Get user's private information on login
-// ---------------------------------------
-type ComputeNewBulk struct {
+// @AUTH @Admin Drop compute table
+// ----------------------------------------------------
+type ComputeDelete struct {
 	Db db.PuppyDb
 }
 
-type typeComputeNew struct {
-	Id    string `json:"id" bson:"id"`
-	Token string `json:"tk" bson:"tk"`
-}
-
-func (m ComputeNewBulk) Serve(ctx *iris.Context) {
+func (m ComputeDelete) Serve(ctx *iris.Context) {
 	id, err := SessionId(ctx)
-	if err != nil {
+	if err != nil || id != "admin" {
 		ctx.EmitError(iris.StatusForbidden)
 		return
 	}
 
-	info := new([]typeComputeNew)
-	if err := ctx.ReadJSON(info); err != nil {
-		ctx.EmitError(iris.StatusBadRequest)
+	if err := m.Db.GetCollection("compute").DropCollection(); err != nil {
+		ctx.Error("Could not delete collection", iris.StatusInternalServerError)
 		return
 	}
 
-	toInsert := make([]models.Compute, len(*info))
+	ctx.JSON(iris.StatusOK, "Deleted compute table")
+}
 
-	for i, item := range *info {
-		itemId := id + "-" + item.Id
-		p1 := id
-		p2 := item.Id
-		t1 := item.Token
-		t2 := ""
-		if id > item.Id {
-			itemId = item.Id + "-" + id
-			p1 = item.Id
-			p2 = id
-			t1 = ""
-			t2 = item.Token
-		}
+// @AUTH @Admin Create the entries in the compute table
+// ----------------------------------------------------
+type ComputePrepare struct {
+	Db db.PuppyDb
+}
 
-		toInsert[i].Id = itemId
-		toInsert[i].Person1 = p1
-		toInsert[i].Person2 = p2
-		toInsert[i].Token1 = t1
-		toInsert[i].Token2 = t2
+func (m ComputePrepare) Serve(ctx *iris.Context) {
+	id, err := SessionId(ctx)
+	if err != nil || id != "admin" {
+		ctx.EmitError(iris.StatusForbidden)
+		return
 	}
 
-	// No return value here
-	m.Db.GetCollection("compute").Bulk().Insert(&toInsert)
+	type typeIds struct {
+		Id string `json:"_id" bson:"_id"`
+	}
 
-	ctx.JSON(iris.StatusOK, "")
+	var females []typeIds
+	var males []typeIds
+
+	collection := m.Db.GetCollection("user")
+	err1 := collection.Find(bson.M{"gender": "0"}).All(&females)
+	err2 := collection.Find(bson.M{"gender": "1"}).All(&males)
+
+	if err1 != nil || err2 != nil {
+		ctx.EmitError(iris.StatusInternalServerError)
+		return
+	}
+
+	// var toInsert []interface{}
+	bulk := m.Db.GetCollection("compute").Bulk()
+	for _, fe := range females {
+		for _, ma := range males {
+			res := models.UpsertEntry(fe.Id, ma.Id)
+			bulk.Upsert(res.Selector, res.Change)
+		}
+	}
+	r, err := bulk.Run()
+
+	if err != nil {
+		ctx.EmitError(iris.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+	ctx.JSON(iris.StatusOK, r)
 }

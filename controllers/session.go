@@ -30,12 +30,25 @@ func (m SessionLogin) Serve(ctx *iris.Context) {
 		return
 	}
 
+	// @TODO @IMPORTANT Move password to env variable
+	if u.Username == "admin" {
+		if u.Passhash == "passhash" {
+			ctx.Session().Set("Status", "login")
+			ctx.Session().Set("id", u.Username)
+			ctx.Write("Logged in: %s", u.Username)
+		} else {
+			SessionLogout(ctx)
+			ctx.Write("Invalid username or password")
+		}
+		return
+	}
+
 	user := models.User{}
 
 	// Fetch user
 	if err := m.Db.GetById("user", u.Username).One(&user); err != nil {
 		ctx.Write("Bad user.")
-		log.Fatal(err)
+		log.Println("Invalid user: " + u.Username)
 		return
 	}
 
@@ -43,7 +56,6 @@ func (m SessionLogin) Serve(ctx *iris.Context) {
 	if user.Pass == u.Passhash {
 		ctx.Session().Set("Status", "login")
 		ctx.Session().Set("id", u.Username)
-
 		ctx.Write("Logged in: %s", u.Username)
 	} else {
 		SessionLogout(ctx)

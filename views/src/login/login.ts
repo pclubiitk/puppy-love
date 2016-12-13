@@ -28,6 +28,7 @@ export class Login {
       .subscribe(
         response => {
           sessionStorage.setItem('password', _password);
+          sessionStorage.setItem('id', username);
           this.router.navigate(['home']);
         },
         error => {

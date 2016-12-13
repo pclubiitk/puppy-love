@@ -30,10 +30,15 @@ func PuppyRoute(db db.PuppyDb) {
 
 	// Compute
 	cPre := "/compute"
-	iris.Handle("POST", cPre+"/new/bulk", controllers.ComputeNewBulk{db})
 
 	// Session administration
 	sesPre := "/session"
 	iris.Handle("POST", sesPre+"/login", controllers.SessionLogin{db})
 	iris.Get(sesPre+"/logout", controllers.SessionLogout)
+
+	// Admin
+	aPre := "/admin"
+	iris.Handle("GET", aPre+"/compute/drop", controllers.ComputeDelete{db})
+	iris.Handle("GET", aPre+"/compute/list", controllers.ComputeList{db})
+	iris.Handle("GET", aPre+"/compute/prepare", controllers.ComputePrepare{db})
 }
