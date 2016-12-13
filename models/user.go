@@ -20,6 +20,7 @@ type (
 		Data    string `json:"data" bson:"data"`
 		Submit  bool   `json:"submitted" bson:"submitted"`
 		Matches string `json:"matches" bson:"matches"`
+		State   int32  `json:"state" bson:"state"`
 	}
 )
 
@@ -47,6 +48,7 @@ func NewUser(info *TypeUserNew) User {
 		Data:    "",
 		Submit:  false,
 		Matches: "",
+		State:   0,
 	}
 }
 

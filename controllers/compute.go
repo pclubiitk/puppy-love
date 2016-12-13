@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"log"
+	"strings"
 
 	"github.com/sakshamsharma/puppy-love/db"
 	"github.com/sakshamsharma/puppy-love/models"
@@ -75,5 +76,81 @@ func (m ComputePrepare) Serve(ctx *iris.Context) {
 		log.Println(err)
 		return
 	}
+	ctx.JSON(iris.StatusOK, r)
+}
+
+type ComputeStep struct {
+	Db    db.PuppyDb
+	State int32
+}
+
+func (m ComputeStep) Serve(ctx *iris.Context) {
+	id, err := SessionId(ctx)
+	if err != nil {
+		ctx.EmitError(iris.StatusForbidden)
+		return
+	}
+
+	// Depending on the thing to update, set the needed variables
+	var dbUpdate string
+	if m.State == 0 {
+		dbUpdate = "t"
+	} else if m.State == 1 {
+		dbUpdate = "r"
+	}
+
+	user := struct {
+		State int32 `json:"state" bson:"state"`
+	}{}
+
+	// Check that the user is valid
+	if err := m.Db.GetById("user", id).One(&user); err != nil {
+		ctx.JSON(iris.StatusBadRequest, "Invalid user")
+		return
+	}
+
+	type idToken struct {
+		Id    string `json:"id" bson:"id"`
+		Value string `json:"v" bson:"v"`
+	}
+
+	// Verify valid requested changes
+	info := new([]idToken)
+	if err := ctx.ReadJSON(info); err != nil {
+		ctx.JSON(iris.StatusBadRequest, "Invalid JSON")
+		log.Println(err)
+		return
+	}
+
+	// Verify all ids are valid
+	for _, pInfo := range *info {
+		if !models.CheckId(pInfo.Id, id) {
+			ctx.JSON(iris.StatusBadRequest, "Invalid ID")
+			return
+		}
+	}
+
+	// Bulk update all entries
+	// dbUpdate+"1" means t1 in case of tokens, r1 in case of results
+	bulk := m.Db.GetCollection("compute").Bulk()
+	var chunks []string
+	var update bson.M
+	for _, pInfo := range *info {
+		chunks = strings.Split(pInfo.Id, "-")
+		if chunks[0] == id {
+			update = bson.M{"$set": bson.M{dbUpdate + "1": pInfo.Value}}
+		} else {
+			update = bson.M{"$set": bson.M{dbUpdate + "2": pInfo.Value}}
+		}
+		bulk.Update(bson.M{"_id": pInfo.Id}, update)
+	}
+
+	r, err := bulk.Run()
+	if err != nil {
+		ctx.EmitError(iris.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+
 	ctx.JSON(iris.StatusOK, r)
 }

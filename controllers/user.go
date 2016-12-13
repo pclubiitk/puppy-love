@@ -9,13 +9,40 @@ import (
 	"github.com/kataras/iris"
 )
 
-// Admin endpoint: Create new user
+// @AUTH @Admin Drop users table
+// ----------------------------------------------------
+type UserDelete struct {
+	Db db.PuppyDb
+}
+
+func (m UserDelete) Serve(ctx *iris.Context) {
+	id, err := SessionId(ctx)
+	if err != nil || id != "admin" {
+		ctx.EmitError(iris.StatusForbidden)
+		return
+	}
+
+	if err := m.Db.GetCollection("user").DropCollection(); err != nil {
+		ctx.Error("Could not delete collection", iris.StatusInternalServerError)
+		return
+	}
+
+	ctx.JSON(iris.StatusOK, "Deleted user table")
+}
+
+// @AUTH @Admin Create new user
 // -------------------------------
 type UserNew struct {
 	Db db.PuppyDb
 }
 
 func (m UserNew) Serve(ctx *iris.Context) {
+	id, err := SessionId(ctx)
+	if err != nil || id != "admin" {
+		ctx.EmitError(iris.StatusForbidden)
+		return
+	}
+
 	info := new(models.TypeUserNew)
 	if err := ctx.ReadJSON(info); err != nil {
 		ctx.EmitError(iris.StatusBadRequest)

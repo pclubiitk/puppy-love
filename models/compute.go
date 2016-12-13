@@ -1,6 +1,8 @@
 package models
 
 import (
+	"strings"
+
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -48,5 +50,21 @@ func UpsertEntry(id1 string, id2 string) PairUpsert {
 			"r2":    "",
 			"match": false,
 		}},
+	}
+}
+
+func CheckId(id string, p string) bool {
+	chunks := strings.Split(id, "-")
+	if len(chunks) != 2 || (chunks[0] != p && chunks[1] != p) ||
+		(chunks[0] == chunks[1]) {
+		return false
+	}
+	return true
+}
+
+func MakeChange(change bson.M) mgo.Change {
+	return mgo.Change{
+		Update:    change,
+		ReturnNew: true,
 	}
 }
