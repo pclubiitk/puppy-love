@@ -59,7 +59,7 @@ func (m SessionLogin) Serve(ctx *iris.Context) {
 		ctx.Write("Logged in: %s", u.Username)
 	} else {
 		SessionLogout(ctx)
-		ctx.Write("Invalid request")
+		ctx.JSON(iris.StatusForbidden, "Invalid username or password")
 	}
 }
 
