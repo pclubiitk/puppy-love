@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sakshamsharma/puppy-love/db"
-	"github.com/sakshamsharma/puppy-love/router"
-	"github.com/sakshamsharma/puppy-love/utils/config"
+	"github.com/pclubiitk/puppy-love/db"
+	"github.com/pclubiitk/puppy-love/router"
+	"github.com/pclubiitk/puppy-love/utils/config"
 
 	"github.com/kataras/iris"
 )

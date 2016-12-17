@@ -1,8 +1,8 @@
 package router
 
 import (
-	"github.com/sakshamsharma/puppy-love/controllers"
-	"github.com/sakshamsharma/puppy-love/db"
+	"github.com/pclubiitk/puppy-love/controllers"
+	"github.com/pclubiitk/puppy-love/db"
 
 	"github.com/kataras/iris"
 )

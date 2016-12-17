@@ -3,8 +3,8 @@ package controllers
 import (
 	"log"
 
-	"github.com/sakshamsharma/puppy-love/db"
-	"github.com/sakshamsharma/puppy-love/models"
+	"github.com/pclubiitk/puppy-love/db"
+	"github.com/pclubiitk/puppy-love/models"
 
 	"github.com/kataras/iris"
 )

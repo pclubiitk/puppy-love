@@ -3,7 +3,7 @@ package auth
 import (
 	"time"
 
-	"github.com/sakshamsharma/puppy-love/utils/config"
+	"github.com/pclubiitk/puppy-love/utils/config"
 
 	"github.com/iris-contrib/middleware/basicauth"
 	"github.com/iris-contrib/plugin/oauth"

@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/sakshamsharma/puppy-love/utils/config"
+	"github.com/pclubiitk/puppy-love/utils/config"
 
 	"gopkg.in/mgo.v2"
 )
