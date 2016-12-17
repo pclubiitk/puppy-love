@@ -27,6 +27,7 @@ func PuppyRoute(db db.PuppyDb) {
 	lPre := "/list"
 	iris.Handle("GET", lPre+"/gender/:gender", controllers.ListAll{db})
 	iris.Handle("GET", lPre+"/compute", controllers.ComputeList{db})
+	iris.Handle("GET", lPre+"/pubkey/:gender", controllers.PubkeyList{db})
 
 	// Compute
 	cPre := "/compute"

@@ -96,5 +96,36 @@ func (m ComputeList) Serve(ctx *iris.Context) {
 		return
 	}
 
+	if query == nil {
+		query = []models.Compute{}
+	}
+
+	ctx.JSON(iris.StatusAccepted, query)
+}
+
+type PubkeyList struct {
+	Db db.PuppyDb
+}
+
+func (m PubkeyList) Serve(ctx *iris.Context) {
+	_gender := ctx.Param("gender")
+	if _gender != "0" && _gender != "1" {
+		ctx.EmitError(iris.StatusBadRequest)
+		return
+	}
+
+	var query [](struct {
+		Id string `json:"_id" bson:"_id"`
+		PK string `json:"pubKey" bson:"pubKey"`
+	})
+
+	if err := m.Db.GetCollection("user").
+		Find(bson.M{"gender": _gender}).All(&query); err != nil {
+
+		ctx.EmitError(iris.StatusNotFound)
+		log.Fatal(err)
+		return
+	}
+
 	ctx.JSON(iris.StatusAccepted, query)
 }
