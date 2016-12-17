@@ -16,13 +16,13 @@ const template = require('./choices.html');
 export class Choices {
   @Input('people') people: Person[];
 
-  @Output('person-clicked')
+  @Output('person-remove')
   selectedItem: EventEmitter<string> = new EventEmitter<string>();
 
   constructor() {
   }
 
   itemClicked(event) {
-    this.selectedItem.emit(event.target.innerText);
+    this.selectedItem.emit(event.target.id.split('-')[1].trim());
   }
 }

@@ -118,11 +118,30 @@ export class Home {
       );
   }
 
-  personSelected(data: string) {
-    console.log('Clicked: ' + data);
+  personSelected(data: Person) {
+    this.choices.push(data);
+    this.save();
+  }
+
+  personRemoved(data: string) {
+    let remove = null;
+    for (let i = 0; i < this.choices.length; i++) {
+      if (this.choices[i].roll === data) {
+        remove = i;
+        break;
+      }
+    }
+
+    if (remove === null) {
+      console.error('Unknown person removed: ' + data);
+    } else {
+      this.choices.splice(remove, 1);
+      this.save();
+    }
   }
 
   save() {
+    this.data = {choices: this.choices};
     let encData = this.crypto.encryptSym(Crypto.fromJson(this.data));
     this.saving = 'Saving ...';
     this.http.post(Config.dataSaveUrl, {data: encData}, null)

@@ -25,7 +25,7 @@ export class Search {
   searchText: EventEmitter<string> = new EventEmitter<string>();
 
   @Output('md-selected-item-change')
-  selectedItem: EventEmitter<string> = new EventEmitter<string>();
+  selectedItem: EventEmitter<Person> = new EventEmitter<Person>();
 
   @Output('md-click-handler')
   clickEvent: EventEmitter<Event> = new EventEmitter<Event>();
@@ -56,7 +56,15 @@ export class Search {
   }
 
   itemClicked(event) {
-    this.selectedItem.emit(event.target.innerText);
-    this.displayCompletions = false;
+    let id = event.target.innerText.split('-')[1].trim();
+    for (let p of this.suggestions) {
+      if (p.roll === id) {
+        this.selectedItem.emit(p);
+        this.displayCompletions = false;
+        return;
+      }
+    }
+
+    console.error('Unknown completion clicked: ' + id);
   }
 }

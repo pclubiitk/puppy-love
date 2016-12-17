@@ -9,7 +9,11 @@
                             {{person.name}} - {{person.roll}}
                         </p>
                         <p class="text-center">
-                            <a class="btn btn-primary" role="button">Remove</a>
+                            <a class="btn btn-primary" role="button"
+                               id="del-{{person.roll}}"
+                               (click)="itemClicked($event)">
+                                Remove
+                            </a>
                         </p>
                     </div>
                 </div>
