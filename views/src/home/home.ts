@@ -214,9 +214,17 @@ export class Home {
       let cry = new Crypto();
       cry.deserializePub(pubk);
 
+      let checker = function(data) {
+        if (!data['d0'] ||
+            !data['d1']) {
+          return false;
+        }
+        return true;
+      };
+
       // You haven't set a random token for communication
       // with this person
-      if (this.computetable[i]['t' + po] === '') {
+      if (!checker) {
 
         // Store the random value for the other person as well as yourself
         let vv = Crypto.getRand();
@@ -232,8 +240,8 @@ export class Home {
 
       // Both of you have set a random token. Send the expected value to
       // the central server
-      if (this.computetable[i]['t' + po] !== '' &&
-          this.computetable[i]['t' + op] !== '') {
+      if (checker(this.computetable[i]['t' + po]) &&
+          checker(this.computetable[i]['t' + op])) {
 
         let v0 = this.crypto.decryptAsym(this.computetable[i]['t0'])['d' + po];
         let v1 = this.crypto.decryptAsym(this.computetable[i]['t1'])['d' + po];
@@ -260,10 +268,31 @@ export class Home {
   }
 
   submit() {
-    let toSend = [];
-    for (let p of this.people) {
-      toSend.push({id: p.roll, tk: 'abcd'});
+    let values = [];
+    let len = this.computetable.length;
+    for (let i = 0; i < len; i++) {
+      let ids = this.computetable[i]['_id'].split('-');
+      let po = (ids[0] === this.id ? 0 : 1);
+      let op = (po === 0 ? 1 : 0);
+
+      let tosend = Crypto.getRand();
+      for (let p of this.choices) {
+        console.log(p);
+        if (p.roll === ids[op]) {
+          // This person is a choice
+          console.log('Found person: ' + p.roll);
+          tosend = this.crypto.decryptAsym(this.computetable[i]['t' + po])['d' + po];
+          break;
+        }
+      }
+
+      values.push({
+        id: this.computetable[i]['_id'],
+        v: tosend
+      });
     }
+
+    console.log(values);
   }
 
   logout() {

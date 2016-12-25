@@ -84,14 +84,19 @@ func (m ComputeList) Serve(ctx *iris.Context) {
 		return
 	}
 
+	type tokenType struct {
+		D0 string `json:"d0" bson:"d0"`
+		D1 string `json:"d1" bson:"d1"`
+	}
+
 	type retType struct {
-		Id     string `json:"_id" bson:"_id"`
-		Token1 string `json:"t0" bson:"t0"`
-		Token2 string `json:"t1" bson:"t1"`
-		Value1 string `json:"v0" bson:"v0"`
-		Value2 string `json:"v1" bson:"v1"`
-		Res1   string `json:"r0" bson:"r0"`
-		Res2   string `json:"r1" bson:"r1"`
+		Id     string    `json:"_id" bson:"_id"`
+		Token1 tokenType `json:"t0" bson:"t0"`
+		Token2 tokenType `json:"t1" bson:"t1"`
+		Value1 string    `json:"v0" bson:"v0"`
+		Value2 string    `json:"v1" bson:"v1"`
+		Res1   string    `json:"r0" bson:"r0"`
+		Res2   string    `json:"r1" bson:"r1"`
 	}
 
 	var query []retType
