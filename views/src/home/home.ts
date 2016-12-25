@@ -196,10 +196,10 @@ export class Home {
     let res = [];
     let errors = [];
 
-    for (let i = 0; i < len; i++) {
+    for (let item of this.computetable) {
       // po => Your index
       // op => Other's index
-      let ids = this.computetable[i]['_id'].split('-');
+      let ids = item['_id'].split('-');
       let po = (ids[0] === this.id ? 0 : 1);
       let op = (po === 0 ? 1 : 0);
       let pubk = this.pubkeys[ids[op]];
@@ -228,27 +228,27 @@ export class Home {
 
         // Store the random value for the other person as well as yourself
         let vv = Crypto.getRand();
-        this.computetable[i]['t' + po] = {};
-        this.computetable[i]['t' + po]['d' + po] = this.crypto.encryptAsym(vv);
-        this.computetable[i]['t' + po]['d' + op] = cry.encryptAsym(vv);
+        item['t' + po] = {};
+        item['t' + po]['d' + po] = this.crypto.encryptAsym(vv);
+        item['t' + po]['d' + op] = cry.encryptAsym(vv);
 
         token.push({
-          id: this.computetable[i]['_id'],
-          v: this.computetable[i]['t' + po]
+          id: item['_id'],
+          v: item['t' + po]
         });
       }
 
       // Both of you have set a random token. Send the expected value to
       // the central server
-      if (checker(this.computetable[i]['t' + po]) &&
-          checker(this.computetable[i]['t' + op])) {
+      if (checker(item['t' + po]) &&
+          checker(item['t' + op])) {
 
-        let v0 = this.crypto.decryptAsym(this.computetable[i]['t0'])['d' + po];
-        let v1 = this.crypto.decryptAsym(this.computetable[i]['t1'])['d' + po];
+        let v0 = this.crypto.decryptAsym(item['t0'])['d' + po];
+        let v1 = this.crypto.decryptAsym(item['t1'])['d' + po];
 
         let expRes = Crypto.hash(v0 + '-' + v1);
         res.push({
-          id: this.computetable[i]['_id'],
+          id: item['_id'],
           v: expRes
         });
       }
@@ -269,25 +269,23 @@ export class Home {
 
   submit() {
     let values = [];
-    let len = this.computetable.length;
-    for (let i = 0; i < len; i++) {
-      let ids = this.computetable[i]['_id'].split('-');
+    for (let item of this.computetable) {
+
+      let ids = item['_id'].split('-');
       let po = (ids[0] === this.id ? 0 : 1);
       let op = (po === 0 ? 1 : 0);
 
       let tosend = Crypto.getRand();
       for (let p of this.choices) {
-        console.log(p);
         if (p.roll === ids[op]) {
           // This person is a choice
-          console.log('Found person: ' + p.roll);
-          tosend = this.crypto.decryptAsym(this.computetable[i]['t' + po])['d' + po];
+          tosend = this.crypto.decryptAsym(item['t' + po])['d' + po];
           break;
         }
       }
 
       values.push({
-        id: this.computetable[i]['_id'],
+        id: item['_id'],
         v: tosend
       });
     }
