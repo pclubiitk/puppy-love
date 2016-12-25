@@ -10,4 +10,7 @@ export class Config {
   static listGender: string = Config.baseUrl + '/list/gender';
   static listPubkey: string = Config.baseUrl + '/list/pubkey';
   static listCompute: string = Config.baseUrl + '/list/compute';
+
+  static computeToken: string = Config.baseUrl + '/compute/token';
+  static computeRes: string = Config.baseUrl + '/compute/result';
 }

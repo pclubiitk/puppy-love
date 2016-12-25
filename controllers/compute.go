@@ -113,7 +113,10 @@ func (m ComputeStep) Serve(ctx *iris.Context) {
 
 	type idToken struct {
 		Id    string `json:"id" bson:"id"`
-		Value string `json:"v" bson:"v"`
+		Value struct {
+			D0 string `json:"d0" bson:"d0"`
+			D1 string `json:"d1" bson:"d1"`
+		} `json:"v" bson:"v"`
 	}
 
 	// Verify valid requested changes

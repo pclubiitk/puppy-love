@@ -224,7 +224,7 @@ export class Home {
         this.computetable[i]['t' + po]['d' + op] = cry.encryptAsym(vv);
 
         token.push({
-          _id: this.computetable[i]['_id'],
+          id: this.computetable[i]['_id'],
           v: this.computetable[i]['t' + po]
         });
       }
@@ -233,13 +233,14 @@ export class Home {
       // the central server
       if (this.computetable[i]['t' + po] !== '' &&
           this.computetable[i]['t' + op] !== '') {
+        continue;
 
         let v0 = this.crypto.decryptAsym(this.computetable[i]['t0']['d' + po]);
         let v1 = this.crypto.decryptAsym(this.computetable[i]['t1']['d' + po]);
 
         let expRes = Crypto.hash(v0 + '-' + v1);
         res.push({
-          _id: this.computetable[i]['_id'],
+          id: this.computetable[i]['_id'],
           v: expRes
         });
       }
@@ -247,6 +248,12 @@ export class Home {
 
     console.log(token);
     console.log(res);
+
+    this.http.post(Config.computeToken, token, null)
+      .subscribe (
+        response => console.log('Saved tokens'),
+        error => 'Error saving tokens!'
+      );
   }
 
   submit() {
