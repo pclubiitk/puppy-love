@@ -188,6 +188,7 @@ export class Home {
   }
 
   // Sets up required communication via compute table on backend
+  // To be run somewhat frequently
   actuponcompute() {
     let len = this.computetable.length;
 
@@ -233,10 +234,9 @@ export class Home {
       // the central server
       if (this.computetable[i]['t' + po] !== '' &&
           this.computetable[i]['t' + op] !== '') {
-        continue;
 
-        let v0 = this.crypto.decryptAsym(this.computetable[i]['t0']['d' + po]);
-        let v1 = this.crypto.decryptAsym(this.computetable[i]['t1']['d' + po]);
+        let v0 = this.crypto.decryptAsym(this.computetable[i]['t0'])['d' + po];
+        let v1 = this.crypto.decryptAsym(this.computetable[i]['t1'])['d' + po];
 
         let expRes = Crypto.hash(v0 + '-' + v1);
         res.push({
@@ -246,13 +246,16 @@ export class Home {
       }
     }
 
-    console.log(token);
-    console.log(res);
-
     this.http.post(Config.computeToken, token, null)
       .subscribe (
         response => console.log('Saved tokens'),
-        error => 'Error saving tokens!'
+        error => console.error('Error saving tokens!')
+      );
+
+    this.http.post(Config.computeRes, res, null)
+      .subscribe (
+        response => console.log('Saved compute results'),
+        error => console.error('Error saving compute results!')
       );
   }
 
