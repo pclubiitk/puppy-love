@@ -17,11 +17,28 @@ export class Crypto {
     return JSON.stringify(data);
   }
 
-  constructor(private password: string,
+  static getRand(cnt?: number): string {
+    if (!cnt) cnt = 5;
+    return sjcl.codec.hex.fromBits(sjcl.random.randomWords(cnt));
+  }
+
+  constructor(private password?: string,
               pubK?: sjcl.SjclElGamalPublicKey,
               priK?: sjcl.SjclElGamalSecretKey) {
     this.pubK = pubK;
     this.priK = priK;
+  }
+
+  test() {
+    let ct = sjcl.encrypt(this.pubK, 'Hello World!');
+    let pt = sjcl.decrypt(this.priK, ct);
+    console.log(ct);
+    console.log(pt);
+
+    ct = this.encryptAsym('Hello dude');
+    pt = this.decryptAsym(ct);
+    console.log(ct);
+    console.log(pt);
   }
 
   // Key creation and storage
@@ -74,20 +91,21 @@ export class Crypto {
   // Asymmetric enc and dec
   // ----------------------
   encryptAsym(data: string): sjcl.SjclCipherEncrypted {
-    if (!this.priK) {
-      console.error('Using non-existing private key');
+    if (!this.pubK) {
+      console.error('Using non-existing public key');
       return;
     }
 
-    sjcl.encrypt(this.pubK, data);
+    return sjcl.encrypt(this.pubK, data);
   }
+
 
   decryptAsym(data: sjcl.SjclCipherEncrypted) {
     if (!this.priK) {
-      console.error('Decryption requires public key');
+      console.error('Decryption requires private key');
       return;
     }
 
-    sjcl.decrypt(this.priK, data);
+    return sjcl.decrypt(this.priK, data);
   }
 }
