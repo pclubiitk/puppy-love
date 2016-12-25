@@ -97,6 +97,8 @@ func (m ComputeStep) Serve(ctx *iris.Context) {
 		dbUpdate = "t"
 	} else if m.State == 1 {
 		dbUpdate = "r"
+	} else if m.State == 2 {
+		dbUpdate = "v"
 	}
 
 	user := struct {
@@ -131,16 +133,16 @@ func (m ComputeStep) Serve(ctx *iris.Context) {
 	}
 
 	// Bulk update all entries
-	// dbUpdate+"1" means t1 in case of tokens, r1 in case of results
+	// dbUpdate+"1" means t1 in case of tokens, r1 in case of results, v1 too
 	bulk := m.Db.GetCollection("compute").Bulk()
 	var chunks []string
 	var update bson.M
 	for _, pInfo := range *info {
 		chunks = strings.Split(pInfo.Id, "-")
 		if chunks[0] == id {
-			update = bson.M{"$set": bson.M{dbUpdate + "1": pInfo.Value}}
+			update = bson.M{"$set": bson.M{dbUpdate + "0": pInfo.Value}}
 		} else {
-			update = bson.M{"$set": bson.M{dbUpdate + "2": pInfo.Value}}
+			update = bson.M{"$set": bson.M{dbUpdate + "1": pInfo.Value}}
 		}
 		bulk.Update(bson.M{"_id": pInfo.Id}, update)
 	}

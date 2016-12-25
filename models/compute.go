@@ -8,15 +8,19 @@ import (
 )
 
 type (
-	// User represents the structure of our resource
+	// Token => Private communication between parties
+	// Value => Value sent to the server
+	// Res => Expected hash if there is a match
 	Compute struct {
 		Id      string `json:"_id" bson:"_id"`
 		Person1 string `json:"p1" bson:"p1"`
 		Person2 string `json:"p2" bson:"p2"`
-		Token1  string `json:"t1" bson:"t1"`
-		Token2  string `json:"t2" bson:"t2"`
-		Res1    string `json:"r1" bson:"r1"`
-		Res2    string `json:"r2" bson:"r2"`
+		Token1  string `json:"t0" bson:"t0"`
+		Token2  string `json:"t1" bson:"t1"`
+		Value1  string `json:"v0" bson:"v0"`
+		Value2  string `json:"v1" bson:"v1"`
+		Res1    string `json:"r0" bson:"r0"`
+		Res2    string `json:"r1" bson:"r1"`
 		Match   bool   `json:"match" bson:"match"`
 	}
 )
@@ -44,10 +48,12 @@ func UpsertEntry(id1 string, id2 string) PairUpsert {
 			"_id":   itemId,
 			"p1":    p1,
 			"p2":    p2,
-			"t1":    "",
-			"t2":    "",
+			"t0":    bson.M{},
+			"t1":    bson.M{},
+			"r0":    "",
 			"r1":    "",
-			"r2":    "",
+			"v0":    "",
+			"v1":    "",
 			"match": false,
 		}},
 	}
