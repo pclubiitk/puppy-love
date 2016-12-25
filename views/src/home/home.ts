@@ -32,6 +32,9 @@ export class Home {
   choices: Person[];
   data;
 
+  pubkeys; // Map from roll number to key
+  computetable; // Status of the compute table
+
   people: Person[];
 
   constructor(public router: Router, public http: Http, public authHttp: AuthHttp) {
@@ -69,6 +72,8 @@ export class Home {
     };
 
     this.people = [];
+
+    this.pubkeys = {};
   }
 
   parseInfo(info: string) {
@@ -93,6 +98,12 @@ export class Home {
     this.saving = 'Saved ...';
 
     this.loadPeople();
+
+    // Needs to be after the gender has been set
+    this.getallpubkey();
+
+    // Negotiate compute values with people
+    this.getcomputetable();
   }
 
   loadPeople() {
@@ -151,17 +162,98 @@ export class Home {
       );
   }
 
+  getallpubkey() {
+    this.http.get(Config.listPubkey + '/' +
+                  (this.your_gender === 'Male' ? '0' : '1'))
+      .subscribe (
+        response => {
+          let items = JSON.parse(response['_body']);
+          for (let i in items) {
+            this.pubkeys[items[i]['_id']] = items[i]['pubKey'];
+          }
+        },
+        error => console.error('Error getting public keys')
+      );
+  }
+
+  getcomputetable() {
+    this.http.get(Config.listCompute)
+      .subscribe (
+        response => {
+          this.computetable = JSON.parse(response['_body']);
+          this.actuponcompute();
+        },
+        error => console.error('Error getting compute table')
+      );
+  }
+
+  // Sets up required communication via compute table on backend
+  actuponcompute() {
+    let len = this.computetable.length;
+
+    let token = [];
+    let res = [];
+    let errors = [];
+
+    for (let i = 0; i < len; i++) {
+      // po => Your index
+      // op => Other's index
+      let ids = this.computetable[i]['_id'].split('-');
+      let po = (ids[0] === this.id ? 0 : 1);
+      let op = (po === 0 ? 1 : 0);
+      let pubk = this.pubkeys[ids[op]];
+
+      if (!pubk) {
+        errors.push(ids[op]);
+        console.error('No public key for ' + ids[op]);
+        continue;
+      }
+
+      // Instantiate a crypto instance for this person
+      let cry = new Crypto();
+      cry.deserializePub(pubk);
+
+      // You haven't set a random token for communication
+      // with this person
+      if (this.computetable[i]['t' + po] === '') {
+
+        // Store the random value for the other person as well as yourself
+        let vv = Crypto.getRand();
+        this.computetable[i]['t' + po] = {};
+        this.computetable[i]['t' + po]['d' + po] = this.crypto.encryptAsym(vv);
+        this.computetable[i]['t' + po]['d' + op] = cry.encryptAsym(vv);
+
+        token.push({
+          _id: this.computetable[i]['_id'],
+          v: this.computetable[i]['t' + po]
+        });
+      }
+
+      // Both of you have set a random token. Send the expected value to
+      // the central server
+      if (this.computetable[i]['t' + po] !== '' &&
+          this.computetable[i]['t' + op] !== '') {
+
+        let v0 = this.crypto.decryptAsym(this.computetable[i]['t0']['d' + po]);
+        let v1 = this.crypto.decryptAsym(this.computetable[i]['t1']['d' + po]);
+
+        let expRes = Crypto.hash(v0 + '-' + v1);
+        res.push({
+          _id: this.computetable[i]['_id'],
+          v: expRes
+        });
+      }
+    }
+
+    console.log(token);
+    console.log(res);
+  }
+
   submit() {
     let toSend = [];
     for (let p of this.people) {
       toSend.push({id: p.roll, tk: 'abcd'});
     }
-
-    this.http.post(Config.computeNewBulk, toSend, null)
-      .subscribe(
-        response => console.log(response),
-        error => console.error(error)
-      );
   }
 
   logout() {
