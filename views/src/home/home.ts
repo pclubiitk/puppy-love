@@ -54,18 +54,6 @@ export class Home {
       );
 
     this.choices = [];
-    // this.choices.push(new Person(
-    //   'Saksham', '14588', 'CSE',
-    //   'https://avatars3.githubusercontent.com/u/10418596?v=3&s=460'));
-    // this.choices.push(new Person(
-    //   'Crazy', '12000', 'MTH',
-    //   'https://www.gentoo.org/assets/img/logo/gentoo-3d-small.png'));
-    // this.choices.push(new Person(
-    //   'Saksham', '14588', 'CSE',
-    //   'https://avatars3.githubusercontent.com/u/10418596?v=3&s=460'));
-    // this.choices.push(new Person(
-    //   'Crazy', '12000', 'MTH',
-    //   'https://www.gentoo.org/assets/img/logo/gentoo-3d-small.png'));
 
     this.data = {
       choices: this.choices
@@ -100,10 +88,11 @@ export class Home {
     this.loadPeople();
 
     // Needs to be after the gender has been set
-    this.getallpubkey();
-
-    // Negotiate compute values with people
-    this.getcomputetable();
+    this.getallpubkey(
+      // Negotiate compute values with people
+      // Requires the public keys to be in memory
+      this.getcomputetable();
+    );
   }
 
   loadPeople() {
@@ -151,6 +140,8 @@ export class Home {
     }
   }
 
+  // Save your (transient and changing) choices on the backend
+  // Not for anyone else's eyes
   save() {
     this.data = {choices: this.choices};
     let encData = this.crypto.encryptSym(Crypto.fromJson(this.data));
@@ -162,7 +153,8 @@ export class Home {
       );
   }
 
-  getallpubkey() {
+  // Populate the public keys list
+  getallpubkey(callback: () => ()) {
     this.http.get(Config.listPubkey + '/' +
                   (this.your_gender === 'Male' ? '0' : '1'))
       .subscribe (
@@ -171,17 +163,22 @@ export class Home {
           for (let i in items) {
             this.pubkeys[items[i]['_id']] = items[i]['pubKey'];
           }
+          callback();
         },
         error => console.error('Error getting public keys')
       );
   }
 
+  // Get the complete compute table from backend
   getcomputetable() {
     this.http.get(Config.listCompute)
       .subscribe (
         response => {
           this.computetable = JSON.parse(response['_body']);
           this.actuponcompute();
+
+          // Queue itself to send a redo this after 10 seconds
+          setTimeout(() => this.getcomputetable(), 10000);
         },
         error => console.error('Error getting compute table')
       );
@@ -254,19 +251,42 @@ export class Home {
       }
     }
 
+    // Save initial token messages
     this.http.post(Config.computeToken, token, null)
       .subscribe (
         response => console.log('Saved tokens'),
         error => console.error('Error saving tokens!')
       );
 
+    // Tell expected hashes to server
     this.http.post(Config.computeRes, res, null)
       .subscribe (
         response => console.log('Saved compute results'),
         error => console.error('Error saving compute results!')
       );
+
+    // Person might have submitted his choices
+    // We should probably look at the submission thing again
+    if (this.submitted === 'check') {
+      submit();
+    }
   }
 
+  // Only used when submit button is pressed
+  submitButton() {
+    // Only proceed if not already submitted
+    if (this.submitted !== 'check') {
+      // TODO Inform backend that you've submitted now
+      this.submitted = 'check';
+      submit();
+    } else {
+      // TODO Some way of showing an error
+    }
+
+    // TODO Also add way to edit choices
+  }
+
+  // Goes over the compute table, and sends final value messages to server
   submit() {
     let values = [];
     for (let item of this.computetable) {
@@ -275,22 +295,35 @@ export class Home {
       let po = (ids[0] === this.id ? 0 : 1);
       let op = (po === 0 ? 1 : 0);
 
-      let tosend = Crypto.getRand();
-      for (let p of this.choices) {
-        if (p.roll === ids[op]) {
-          // This person is a choice
-          tosend = this.crypto.decryptAsym(item['t' + po])['d' + po];
-          break;
-        }
-      }
+      // If you have declared your token, and you have not
+      // yet sent the final value to the backend
+      if (item['t' + po] && !item['v' + po]) {
 
-      values.push({
-        id: item['_id'],
-        v: tosend
-      });
+        // By default random token
+        let tosend = Crypto.getRand();
+
+        for (let p of this.choices) {
+          if (p.roll === ids[op]) {
+            // This person is a choice
+            // We should not send random thing
+            tosend = this.crypto.decryptAsym(item['t' + po])['d' + po];
+            break;
+          }
+        }
+
+        values.push({
+          id: item['_id'],
+          v: tosend
+        });
+      }
     }
 
-    console.log(values);
+    // Send the computed stuff
+    this.http.post(Config.computeValue, res, null)
+      .subscribe (
+        response => console.log('Saved compute values'),
+        error => console.error('Error saving compute values!')
+      );
   }
 
   logout() {
