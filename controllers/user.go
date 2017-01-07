@@ -23,7 +23,7 @@ func (m UserDelete) Serve(ctx *iris.Context) {
 	}
 
 	if err := m.Db.GetCollection("user").DropCollection(); err != nil {
-		ctx.Error("Could not delete collection", iris.StatusInternalServerError)
+		ctx.Text(iris.StatusInternalServerError, "Could not delete collection")
 		return
 	}
 

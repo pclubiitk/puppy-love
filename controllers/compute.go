@@ -25,7 +25,7 @@ func (m ComputeDelete) Serve(ctx *iris.Context) {
 	}
 
 	if err := m.Db.GetCollection("compute").DropCollection(); err != nil {
-		ctx.Error("Could not delete collection", iris.StatusInternalServerError)
+		ctx.Text(iris.StatusInternalServerError, "Could not delete collection")
 		return
 	}
 

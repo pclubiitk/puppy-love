@@ -1,5 +1,5 @@
-hash: 51315faef26e094e6e237cd6ec75b31f5e2bfbf09a3dd114f143c84eb677d63e
-updated: 2016-12-10T03:12:04.705592781+05:30
+hash: 55879b10ac4be206aceb802b60c6b908b1b973add1bbfc7f7d9f5bf58542c260
+updated: 2017-01-08T01:32:03.794525985+05:30
 imports:
 - name: github.com/fatih/structs
   version: dc3312cb1a4513a366c4c9e622ad55c32df12ed3
@@ -8,6 +8,15 @@ imports:
   subpackages:
   - internal
   - redis
+- name: github.com/geekypanda/httpcache
+  version: 76ba6c68462ae362cda7564c44492b95322b363a
+  subpackages:
+  - internal
+  - internal/fhttp
+  - internal/fhttp/rule
+  - internal/nethttp
+  - internal/nethttp/rule
+  - internal/server
 - name: github.com/golang/protobuf
   version: 8ee79997227bf9b34611aee7946ae64735e6fd93
   subpackages:
@@ -26,27 +35,53 @@ imports:
   version: e96d3840402619007766590ecea8dd7af1292276
 - name: github.com/imdario/mergo
   version: 50d4dbd4eb0e84778abe37cefef140271d96fade
+- name: github.com/iris-contrib/formBinder
+  version: 81b6a071e35797b83562caf4b3cad24dc01912dc
+- name: github.com/iris-contrib/gothic
+  version: 1cbef10677dd98d13c684d317723cf04feae8f67
 - name: github.com/iris-contrib/lego
   version: 095d7f6459c501cb15319aa2754afa221b81a3ec
   subpackages:
   - acme
+- name: github.com/iris-contrib/letsencrypt
+  version: 1a3e5c619a13b307df3b1b4da7cb7e57d2e156dd
 - name: github.com/iris-contrib/middleware
-  version: d918054efd6f421666f2e23da1e0c11629e98126
+  version: eff973db50aaea60190e75f8f5dc343f7de34b38
   subpackages:
   - basicauth
 - name: github.com/iris-contrib/plugin
-  version: 3164b55cc27d5b562a1d49d0549df3a41ba4d7d9
+  version: fd9a67d0d63bc25eda23cbd7d88158c657c046d3
   subpackages:
   - oauth
+- name: github.com/iris-contrib/websocket
+  version: cc9f1712095295a828e9a2efaef388d30b9c7760
 - name: github.com/kataras/go-errors
   version: 0f977b82cc78d5d31bb75fb6f903ad9e852c8bbd
+- name: github.com/kataras/go-fs
+  version: c029e113d9faaf558b730f06041c8bf9545a3502
+- name: github.com/kataras/go-options
+  version: 23b556c1b935c594ec6d71ff81ead4dbeec3aa8d
+- name: github.com/kataras/go-serializer
+  version: 0bd874a15c70db74ef2e668e5eeda27041f03b81
+  subpackages:
+  - data
+  - json
+  - jsonp
+  - markdown
+  - text
+  - xml
 - name: github.com/kataras/go-sessions
   version: d66895d7f2802f7109185621459ae26521ac6ecf
+- name: github.com/kataras/go-template
+  version: 457f21178102f4688603eccbb4f2e8d5ae1023bf
   subpackages:
-  - sessiondb/redis
-  - sessiondb/redis/service
+  - html
+- name: github.com/kataras/go-websocket
+  version: c729bee5acd8f738a3e8f7dd675430aede00c21f
 - name: github.com/kataras/iris
-  version: 7e286481367a88741e38b610c49dc32b6487c8fe
+  version: bfac948889256ebe36e3a1b2b2dc32bbd3c7e82a
+  subpackages:
+  - utils
 - name: github.com/klauspost/compress
   version: e3b7981a12dd3cab49afa1d3a50e715846f23732
   subpackages:
@@ -142,45 +177,15 @@ imports:
   - internal/remote_api
   - internal/urlfetch
   - urlfetch
-- name: gopkg.in/geekypanda/httpcache.v0
-  version: 76cace3b49b4d5d13592f13e4e7024d7107a4043
-- name: gopkg.in/iris-contrib/formBinder.v4
-  version: 39c8cd740c8f5a6831bec11c534a850e02c342a3
-- name: gopkg.in/iris-contrib/gothic.v4
-  version: a17572dcb7cb70e42cebb2f4e2055697ab0fdc39
-- name: gopkg.in/iris-contrib/letsencrypt.v4
-  version: 1a3e5c619a13b307df3b1b4da7cb7e57d2e156dd
-- name: gopkg.in/iris-contrib/websocket.v4
-  version: 655e781f648acd8b35a698e949b972ad8d9cbf53
 - name: gopkg.in/kataras/go-errors.v0
   version: d2aaffdebcb40c69c4cb6a95e436430cde192435
-- name: gopkg.in/kataras/go-fs.v0
-  version: ecf3587588f7218a21a991a1c0a9f4bdebd20cc1
-- name: gopkg.in/kataras/go-options.v0
-  version: 23b556c1b935c594ec6d71ff81ead4dbeec3aa8d
-- name: gopkg.in/kataras/go-serializer.v0
-  version: 58326973780f8eb63f576033dca215707a05a51a
-  subpackages:
-  - data
-  - json
-  - jsonp
-  - markdown
-  - text
-  - xml
 - name: gopkg.in/kataras/go-sessions.v0
-  version: d66895d7f2802f7109185621459ae26521ac6ecf
+  version: d7ae81e3f9a643facd6f210f3bb1dc3674302b10
   subpackages:
+  - sessiondb/redis
   - sessiondb/redis/service
-- name: gopkg.in/kataras/go-template.v0
-  version: ad601fbfa7744aba4bfa592d781b2cc8f6db6539
-  subpackages:
-  - html
-- name: gopkg.in/kataras/go-websocket.v0
-  version: c77a562c4403defbb12a5a495be4d636691c0bf9
-- name: gopkg.in/kataras/iris.v4
-  version: c1f22b9545617914995c0decc7f54f65336c12e4
-  subpackages:
-  - utils
+- name: gopkg.in/kataras/iris.v5
+  version: bfac948889256ebe36e3a1b2b2dc32bbd3c7e82a
 - name: gopkg.in/mgo.v2
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
@@ -188,4 +193,9 @@ imports:
   - internal/json
   - internal/sasl
   - internal/scram
+- name: gopkg.in/square/go-jose.v1
+  version: 296c7f1463ec9b712176dc804dea0173d06dc728
+  subpackages:
+  - cipher
+  - json
 testImports: []
