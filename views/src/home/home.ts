@@ -47,8 +47,11 @@ export class Home {
 
     this.make_greeting();
 
+    // All actions begin here
+    // We fetch user's personal info
     this.http.get(Config.loginDataUrl)
       .subscribe(
+        // Parse the information. Then do other actions from inside parseInfo
         response => this.parseInfo(response['_body']),
         error => window.alert('Error loading data')
       );
@@ -64,6 +67,7 @@ export class Home {
     this.pubkeys = {};
   }
 
+  // Parse user's personal info. Lay bedrock for future actions.
   parseInfo(info: string) {
     var infoObj = JSON.parse(info);
     console.log(infoObj);
@@ -72,7 +76,7 @@ export class Home {
     this.your_image = infoObj.image;
     this.submitted = infoObj.submitted ? 'check' : 'close';
 
-    // Extract public and private keys
+    // Extract public and private keys of the user
     this.crypto.deserializePriv(this.crypto.decryptSym(infoObj.privKey));
     this.crypto.deserializePub(infoObj.pubKey);
 
@@ -85,6 +89,8 @@ export class Home {
 
     this.saving = 'Saved ...';
 
+    // Useful for autocompletion
+    // TODO Typing in box does not do search
     this.loadPeople();
 
     // Needs to be after the gender has been set
@@ -95,7 +101,11 @@ export class Home {
     );
   }
 
+  // Fetch list of people for autocompletion search from backend
+  // Updates value of this.people to list of all people
   loadPeople() {
+
+    // Helper function called later
     let parsePeople = (json) => {
       let people = JSON.parse(json._body);
       this.people = [];
@@ -113,47 +123,13 @@ export class Home {
     this.http.get(Config.listGender + '/' +
                   (this.your_gender === 'Male' ? '0' : '1'))
       .subscribe(
+        // Fetch list and parse
         response => parsePeople(response),
         error => console.error('Could not get list of people')
       );
   }
 
-  personSelected(data: Person) {
-    this.choices.push(data);
-    this.save();
-  }
-
-  personRemoved(data: string) {
-    let remove = null;
-    for (let i = 0; i < this.choices.length; i++) {
-      if (this.choices[i].roll === data) {
-        remove = i;
-        break;
-      }
-    }
-
-    if (remove === null) {
-      console.error('Unknown person removed: ' + data);
-    } else {
-      this.choices.splice(remove, 1);
-      this.save();
-    }
-  }
-
-  // Save your (transient and changing) choices on the backend
-  // Not for anyone else's eyes
-  save() {
-    this.data = {choices: this.choices};
-    let encData = this.crypto.encryptSym(Crypto.fromJson(this.data));
-    this.saving = 'Saving ...';
-    this.http.post(Config.dataSaveUrl, {data: encData}, null)
-      .subscribe (
-        response => this.saving = 'Saved ...',
-        error => this.saving = 'Error saving your choices!'
-      );
-  }
-
-  // Populate the public keys list
+  // Populate the public keys list from backend
   getallpubkey(callback: () => ()) {
     this.http.get(Config.listPubkey + '/' +
                   (this.your_gender === 'Male' ? '0' : '1'))
@@ -175,6 +151,8 @@ export class Home {
       .subscribe (
         response => {
           this.computetable = JSON.parse(response['_body']);
+
+          // Act upon the compute table now
           this.actuponcompute();
 
           // Queue itself to send a redo this after 10 seconds
@@ -272,20 +250,6 @@ export class Home {
     }
   }
 
-  // Only used when submit button is pressed
-  submitButton() {
-    // Only proceed if not already submitted
-    if (this.submitted !== 'check') {
-      // TODO Inform backend that you've submitted now
-      this.submitted = 'check';
-      submit();
-    } else {
-      // TODO Some way of showing an error
-    }
-
-    // TODO Also add way to edit choices
-  }
-
   // Goes over the compute table, and sends final value messages to server
   submit() {
     let values = [];
@@ -324,6 +288,61 @@ export class Home {
         response => console.log('Saved compute values'),
         error => console.error('Error saving compute values!')
       );
+  }
+
+  // Save your (transient and changing) choices on the backend
+  // Not for anyone else's eyes
+  save() {
+    this.data = {choices: this.choices};
+    let encData = this.crypto.encryptSym(Crypto.fromJson(this.data));
+    this.saving = 'Saving ...';
+    this.http.post(Config.dataSaveUrl, {data: encData}, null)
+      .subscribe (
+        response => this.saving = 'Saved ...',
+        error => this.saving = 'Error saving your choices!'
+      );
+  }
+
+  // ===============================================
+  // Handlers for click and user interaction buttons
+  // ===============================================
+
+  // Only used when submit button is pressed
+  submitButton() {
+    // Only proceed if not already submitted
+    if (this.submitted !== 'check') {
+      // TODO Inform backend that you've submitted now
+      this.submitted = 'check';
+      submit();
+    } else {
+      // TODO Some way of showing an error
+    }
+
+    // TODO Also add way to edit choices
+  }
+
+  // Called when an entry is clicked in the search box
+  personSelected(data: Person) {
+    this.choices.push(data);
+    this.save();
+  }
+
+  // Called when user removes a saved choice
+  personRemoved(data: string) {
+    let remove = null;
+    for (let i = 0; i < this.choices.length; i++) {
+      if (this.choices[i].roll === data) {
+        remove = i;
+        break;
+      }
+    }
+
+    if (remove === null) {
+      console.error('Unknown person removed: ' + data);
+    } else {
+      this.choices.splice(remove, 1);
+      this.save();
+    }
   }
 
   logout() {
