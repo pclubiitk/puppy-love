@@ -97,7 +97,7 @@ export class Home {
     this.getallpubkey(
       // Negotiate compute values with people
       // Requires the public keys to be in memory
-      this.getcomputetable();
+      this.getcomputetable
     );
   }
 
@@ -130,7 +130,7 @@ export class Home {
   }
 
   // Populate the public keys list from backend
-  getallpubkey(callback: () => ()) {
+  getallpubkey(callback: () => void) {
     this.http.get(Config.listPubkey + '/' +
                   (this.your_gender === 'Male' ? '0' : '1'))
       .subscribe (
@@ -246,7 +246,7 @@ export class Home {
     // Person might have submitted his choices
     // We should probably look at the submission thing again
     if (this.submitted === 'check') {
-      submit();
+      this.submit();
     }
   }
 
@@ -313,7 +313,7 @@ export class Home {
     if (this.submitted !== 'check') {
       // TODO Inform backend that you've submitted now
       this.submitted = 'check';
-      submit();
+      this.submit();
     } else {
       // TODO Some way of showing an error
     }
