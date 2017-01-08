@@ -29,12 +29,25 @@ Implementation using:
 * Redis
 * MongoDB
 
-# Set up nginx
+# Installation / Setup
+
+## Getting the source
+We use `glide` instead of `go get` to maintain dependencies. And thus, `go get` is not recommended.
+
+```
+mkdir -p $HOME/go/src
+export GOPATH=$HOME/go:$GOPATH  # Include this in .bashrc
+git clone https://github.com/pclubiitk/puppy-love $HOME/go/src/github.com/pclubiitk/puppy-love
+```
+
+All remaining steps will be executed in that directory.
+
+## Set up nginx
 You need to set up nginx to allow both server and backend to respond to the queries.
 ```
 sudo cp puppy.nginx.conf /etc/nginx/sites_enabled/
 
-# For people using systemd
+# For people using systemd (Ubuntu 16.04 and above, Arch, Gentoo etc)
 sudo systemctl start nginx
 
 # For people using upstart (do not use if you have systemd)
@@ -46,14 +59,17 @@ sudo service nginx start
 # Remember to remove the /etc/hosts entry when you want to visit the actual website.
 ```
 
-## Running
+## Running services needed
 ```
 # Run Mongodb
 mongod --dbpath=$HOME/.mongodata
 
 # Run redis for session management
 redis-server
+```
 
+## Get frontend dependencies and run
+```
 # Get dependencies for frontend
 cd views
 sudo npm install -g yarn
@@ -62,13 +78,16 @@ yarn install
 # Run frontend
 npm run start
 
-cd ..
-
-# Backend dependencies
-go get github.com/Masterminds/glide
-glide install
-go run puppy.go
 ```
+
+## Get backend dependencies and run
+```
+curl https://glide.sh/get | sh
+glide install
+go build
+./puppy-love
+```
+
 You can open the local website at [puppy.pclub.in](puppy.pclub.in)
 The backend will be listening on the printed port number.
 
