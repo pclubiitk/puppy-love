@@ -17,6 +17,7 @@ func PuppyRoute(db db.PuppyDb) {
 	uPre := "/users"
 	iris.Handle("POST", uPre+"/login/first", controllers.UserFirst{db})
 	iris.Handle("POST", uPre+"/data/update", controllers.UserUpdateData{db})
+	iris.Handle("POST", uPre+"/data/submit", controllers.UserSubmitTrue{db})
 
 	iris.Handle("GET", uPre+"/data/info", controllers.UserLoginGet{db})
 	iris.Handle("GET", uPre+"/get/:id", controllers.UserGet{db})
@@ -47,6 +48,5 @@ func PuppyRoute(db db.PuppyDb) {
 	iris.Handle("GET", aPre+"/compute/prepare", controllers.ComputePrepare{db})
 
 	iris.Handle("GET", aPre+"/user/drop", controllers.UserDelete{db})
-
 	iris.Handle("POST", aPre+"/user/new", controllers.UserNew{db})
 }

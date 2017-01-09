@@ -309,9 +309,15 @@ export class Home {
   submitButton() {
     // Only proceed if not already submitted
     if (this.submitted !== 'check') {
-      // TODO Inform backend that you've submitted now
-      this.submitted = 'check';
-      this.submit();
+
+      this.http.post(Config.submitSaveUrl, null, null)
+        .subscribe (
+          response => {
+            this.submitted = 'check';
+            this.submit();
+          },
+          error => console.error('Could not submit choices')
+        );
     } else {
       // TODO Some way of showing an error
     }
