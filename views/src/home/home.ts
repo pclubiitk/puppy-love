@@ -94,11 +94,7 @@ export class Home {
     this.loadPeople();
 
     // Needs to be after the gender has been set
-    this.getallpubkey(
-      // Negotiate compute values with people
-      // Requires the public keys to be in memory
-      this.getcomputetable
-    );
+    this.getallpubkey();
   }
 
   // Fetch list of people for autocompletion search from backend
@@ -130,7 +126,7 @@ export class Home {
   }
 
   // Populate the public keys list from backend
-  getallpubkey(callback: () => void) {
+  getallpubkey() {
     this.http.get(Config.listPubkey + '/' +
                   (this.your_gender === 'Male' ? '0' : '1'))
       .subscribe (
@@ -139,7 +135,9 @@ export class Home {
           for (let i in items) {
             this.pubkeys[items[i]['_id']] = items[i]['pubKey'];
           }
-          callback();
+          // Negotiate compute values with people
+          // Requires the public keys to be in memory
+          this.getcomputetable();
         },
         error => console.error('Error getting public keys')
       );
