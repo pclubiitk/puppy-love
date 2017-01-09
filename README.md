@@ -36,8 +36,10 @@ We use `glide` instead of `go get` to maintain dependencies. And thus, `go get` 
 
 ```
 mkdir -p $HOME/go/src
-export GOPATH=$HOME/go:$GOPATH  # Include this in .bashrc
+export GOPATH=$HOME/go:$GOPATH  # Include this in .bashrc or .zshrc
 git clone https://github.com/pclubiitk/puppy-love $HOME/go/src/github.com/pclubiitk/puppy-love
+
+# You can also clone in your favorite location and symlink inside the go directory
 ```
 
 All remaining steps will be executed in that directory.
@@ -62,6 +64,7 @@ sudo service nginx start
 ## Running services needed
 ```
 # Run Mongodb
+mkdir $HOME/.mongodata
 mongod --dbpath=$HOME/.mongodata
 
 # Run redis for session management
