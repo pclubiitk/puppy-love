@@ -47,6 +47,7 @@ func (m SessionLogin) Serve(ctx *iris.Context) {
 
 	// Fetch user
 	if err := m.Db.GetById("user", u.Username).One(&user); err != nil {
+		SessionLogout(ctx)
 		ctx.Write("Bad user.")
 		log.Println("Invalid user: " + u.Username)
 		return

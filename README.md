@@ -57,6 +57,8 @@ sudo service nginx start
 
 # Edit /etc/hosts file
 # Map puppy.pclub.in to 127.0.0.1
+# It should have a line saying:
+# 127.0.0.1 <something> <more> puppy.pclub.in
 
 # Remember to remove the /etc/hosts entry when you want to visit the actual website.
 ```
