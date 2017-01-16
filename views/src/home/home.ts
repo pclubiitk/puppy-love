@@ -188,7 +188,8 @@ export class Home {
       cry.deserializePub(pubk);
 
       let checker = function(data) {
-        if (!data['d0'] ||
+        if (!data ||
+            !data['d0'] ||
             !data['d1']) {
           return false;
         }
@@ -197,7 +198,7 @@ export class Home {
 
       // You haven't set a random token for communication
       // with this person
-      if (!checker) {
+      if (!checker(item['t' + po])) {
 
         // Store the random value for the other person as well as yourself
         let vv = Crypto.getRand();
@@ -230,14 +231,14 @@ export class Home {
     // Save initial token messages
     this.http.post(Config.computeToken, token, null)
       .subscribe (
-        response => console.log('Saved tokens'),
+        response => console.log('Saved tokens: ' + token.length),
         error => console.error('Error saving tokens!')
       );
 
     // Tell expected hashes to server
     this.http.post(Config.computeRes, res, null)
       .subscribe (
-        response => console.log('Saved compute results'),
+        response => console.log('Saved compute results: ' + res.length),
         error => console.error('Error saving compute results!')
       );
 
@@ -268,7 +269,7 @@ export class Home {
           if (p.roll === ids[op]) {
             // This person is a choice
             // We should not send random thing
-            tosend = this.crypto.decryptAsym(item['t' + po])['d' + po];
+            tosend = this.crypto.decryptAsym(item['t' + po]['d' + po]);
             break;
           }
         }
@@ -281,7 +282,7 @@ export class Home {
     }
 
     // Send the computed stuff
-    this.http.post(Config.computeValue, res, null)
+    this.http.post(Config.computeValue, values, null)
       .subscribe (
         response => console.log('Saved compute values'),
         error => console.error('Error saving compute values!')
