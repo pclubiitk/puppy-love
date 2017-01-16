@@ -215,10 +215,11 @@ export class Home {
       // Both of you have set a random token. Send the expected value to
       // the central server
       if (checker(item['t' + po]) &&
-          checker(item['t' + op])) {
+          checker(item['t' + op]) &&
+          !item['r' + po]) {
 
-        let v0 = this.crypto.decryptAsym(item['t0'])['d' + po];
-        let v1 = this.crypto.decryptAsym(item['t1'])['d' + po];
+        let v0 = this.crypto.decryptAsym(item['t0']['d' + po]);
+        let v1 = this.crypto.decryptAsym(item['t1']['d' + po]);
 
         let expRes = Crypto.hash(v0 + '-' + v1);
         res.push({
