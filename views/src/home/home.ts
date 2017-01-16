@@ -37,6 +37,15 @@ export class Home {
 
   people: Person[];
 
+  private static checker(data): bool {
+    if (!data ||
+        !data['d0'] ||
+        !data['d1']) {
+      return false;
+    }
+    return true;
+  };
+
   constructor(public router: Router, public http: Http, public authHttp: AuthHttp) {
     this.password = sessionStorage.getItem('password');
     this.id = sessionStorage.getItem('id');
@@ -187,18 +196,9 @@ export class Home {
       let cry = new Crypto();
       cry.deserializePub(pubk);
 
-      let checker = function(data) {
-        if (!data ||
-            !data['d0'] ||
-            !data['d1']) {
-          return false;
-        }
-        return true;
-      };
-
       // You haven't set a random token for communication
       // with this person
-      if (!checker(item['t' + po])) {
+      if (!Home.checker(item['t' + po])) {
 
         // Store the random value for the other person as well as yourself
         let vv = Crypto.getRand();
@@ -214,8 +214,8 @@ export class Home {
 
       // Both of you have set a random token. Send the expected value to
       // the central server
-      if (checker(item['t' + po]) &&
-          checker(item['t' + op]) &&
+      if (Home.checker(item['t' + po]) &&
+          Home.checker(item['t' + op]) &&
           !item['r' + po]) {
 
         let v0 = this.crypto.decryptAsym(item['t0']['d' + po]);
@@ -261,7 +261,7 @@ export class Home {
 
       // If you have declared your token, and you have not
       // yet sent the final value to the backend
-      if (item['t' + po] && !item['v' + po]) {
+      if (Home.checker(item['t' + po]) && item['v' + po] === '') {
 
         // By default random token
         let tosend = Crypto.getRand();
@@ -285,7 +285,7 @@ export class Home {
     // Send the computed stuff
     this.http.post(Config.computeValue, values, null)
       .subscribe (
-        response => console.log('Saved compute values'),
+        response => console.log('Saved compute values: ' + values.length),
         error => console.error('Error saving compute values!')
       );
   }
@@ -323,8 +323,6 @@ export class Home {
     } else {
       // TODO Some way of showing an error
     }
-
-    // TODO Also add way to edit choices
   }
 
   // Called when an entry is clicked in the search box
