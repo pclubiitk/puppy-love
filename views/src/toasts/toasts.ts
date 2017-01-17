@@ -1,4 +1,5 @@
-import {Component, Output, Input, EventEmitter} from '@angular/core';
+import {Component, Output, Input, EventEmitter,
+        trigger, transition, style, animate, state} from '@angular/core';
 import 'rxjs/Rx';
 
 const styles = require('./toasts.css');
@@ -6,15 +7,29 @@ const template = require('./toasts.html');
 
 class Toast {
   value: string;
+  show: boolean;
 
   constructor(_value: string) {
     this.value = _value;
+    this.show = false;
   }
 };
 
 @Component({
   selector: 'toasts',
   styles: [ styles ],
+  animations: [
+    trigger('flyInOut', [
+      state('in', style({transform: 'translateX(0)'})),
+      transition('void => *', [
+        style({transform: 'translateX(-100%)'}),
+        animate(100)
+      ]),
+      transition('* => void', [
+        animate(100, style({transform: 'translateX(100%)'}))
+      ])
+    ])
+  ],
   template: template
 })
 export class Toasts {
@@ -26,8 +41,10 @@ export class Toasts {
   values: Array<Toast> = [];
 
   constructor() {
-    this.newToast('abcd cool man casasdas daadas ');
-    this.newToast('efghi');
+    setTimeout(() => {
+      this.newToast('abcd cool man casasdas daadas ');
+      this.newToast('efghi');
+    }, 3000);
   }
 
   ngOnInit() {
@@ -44,11 +61,17 @@ export class Toasts {
     let nt = new Toast(value);
     this.values.push(nt);
     setTimeout(() => {
+      nt.show = true;
+    }, 100);
+    setTimeout(() => {
       this.removeItem(nt);
     }, 3000);
   }
 
   removeItem(value: Toast) {
-    this.values.splice(this.values.indexOf(value), 1);
+    value.show = false;
+    setTimeout(() => {
+      this.values.splice(this.values.indexOf(value), 1);
+    }, 2000);
   }
 }

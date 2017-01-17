@@ -13,10 +13,11 @@
     background-color: black;
     padding-left: 20px;
     padding-right: 20px;
-    padding-top: auto;
-    padding-bottom: auto;
+    padding-top: inherit;
+    padding-bottom: inherit;
     margin: 10px;
     border-radius: 5px;
+    transition: height 1s;
 }
 
 .toastval {
