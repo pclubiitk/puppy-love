@@ -13,6 +13,7 @@ Algorithm designed from the ground up, with a completely secure computation mode
 Posts describing the algorithm:
 * [Part 1](https://sakshamsharma.com/2016/10/puppy1/)
 * [Part 2](https://sakshamsharma.com/2016/11/puppy2/)
+* [Part 3](https://sakshamsharma.com/2016/12/puppy3/)
 
 Implementation using:
 
@@ -39,7 +40,8 @@ mkdir -p $HOME/go/src
 export GOPATH=$HOME/go:$GOPATH  # Include this in .bashrc or .zshrc
 git clone https://github.com/pclubiitk/puppy-love $HOME/go/src/github.com/pclubiitk/puppy-love
 
-# You can also clone in your favorite location and symlink inside the go directory
+# You can later symlink the above folder into your project directory.
+# Just make sure that the actual folder (not symlink) is in the go directory.
 ```
 
 All remaining steps will be executed in that directory.

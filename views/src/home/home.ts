@@ -353,6 +353,7 @@ export class Home {
         );
     } else {
       // TODO Some way of showing an error
+      this.toast('You have already submitted! Do not be desperate :)');
     }
   }
 
@@ -406,5 +407,15 @@ export class Home {
 
   toast(val: string) {
     this.dataObserver.next(val);
+  }
+
+  submitsidebutton() {
+    if (this.submitted === 'check') {
+      this.toast('You\'ve submitted, hurray!');
+    } else if (!this.submitted) {
+      this.toast('Still loading');
+    } else {
+      this.toast('You haven\'t yet submitted..');
+    }
   }
 }
