@@ -6,6 +6,8 @@ import { Config } from '../config';
 import { Search } from '../search';
 import { Crypto } from '../common/crypto';
 import { Person } from '../common/person';
+import { Toasts } from '../toasts';
+import {Observable} from 'rxjs/Observable';
 
 const styles = require('./home.css');
 const template = require('./home.html');
@@ -36,6 +38,9 @@ export class Home {
   computetable; // Status of the compute table
 
   people: Person[];
+
+  toasthandler: Observable<Array<string>>;
+  private dataObserver: Observer;
 
   private static checker(data): bool {
     if (!data ||
@@ -74,6 +79,10 @@ export class Home {
     this.people = [];
 
     this.pubkeys = {};
+
+    this.toasthandler = new Observable<Array<string>>(observer => {
+      this.dataObserver = observer;
+    });
   }
 
   // Parse user's personal info. Lay bedrock for future actions.

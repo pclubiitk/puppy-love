@@ -1,0 +1,34 @@
+.wrapper {
+    display: table-cell;
+    vertical-align: bottom;
+    position: absolute;
+    bottom: 10px;
+    width: 25em;
+}
+
+.content {
+    max-height: 200px;
+    color: white;
+    overflow-x: overlay;
+    background-color: black;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: auto;
+    padding-bottom: auto;
+    margin: 10px;
+    border-radius: 5px;
+}
+
+.toastval {
+    padding: 10px;
+    margin-top: auto;
+    margin-bottom: auto;
+    float: left;
+    vertical-align: middle;
+}
+
+.diebutton {
+    float: right;
+    display: inline-block;
+    color: white !important;
+}
