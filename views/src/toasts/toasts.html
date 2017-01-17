@@ -1,6 +1,6 @@
 <div class="wrapper">
-    <div *ngFor="let value of values" class="content">
-        <div *ngIf="value.show" [@flyInOut]>
+    <div *ngFor="let value of values">
+        <div *ngIf="value.show" [@flyInOut] class="content">
             <div class="row">
                 <div class="col-sm-8 toastval">
                     {{value.value}}

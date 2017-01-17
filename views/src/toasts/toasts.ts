@@ -23,15 +23,16 @@ class Toast {
       state('in', style({transform: 'translateX(0)'})),
       transition('void => *', [
         style({transform: 'translateX(-100%)'}),
-        animate(300)
+        animate(200)
       ]),
       transition('* => void', [
-        animate(300, style({transform: 'translateX(100%)'}))
+        animate(200, style({transform: 'translateX(100%)'}))
       ])
     ])
   ],
   template: template
 })
+
 export class Toasts {
 
   // This gets the events
