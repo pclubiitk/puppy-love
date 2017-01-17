@@ -167,6 +167,22 @@ export class Home {
       );
   }
 
+  // Prerequisite knowledge:
+  // * Compute table handles the matching part
+  // * It has m*n rows, one for each girl-guy pair
+  // * Table schema is as follows:
+  //   + _id: Concatenated roll numbers (in lexical order)
+  //   + t0: Token sent by 1st person
+  //     - d0: Token of 1st person encrypted with his/her own public key
+  //     - d1: Token of 1st person encrypted with the other person's public key
+  //   + t1: Token sent by 1st person
+  //     - d0: Token of 2nd person encrypted with his/her own public key
+  //     - d1: Token of 2nd person encrypted with the other person's public key
+  //   + r0: Expected if-matched-hash according to 1st person
+  //   + r1: Expected if-matched-hash according to 2nd person
+  //   + v0: Value sent finally to server by 1st person
+  //   + v1: Value sent finally to server by 2nd person
+
   // Get the complete compute table from backend
   getcomputetable() {
     this.http.get(Config.listCompute)
@@ -178,12 +194,12 @@ export class Home {
           this.actuponcompute();
 
           // Queue itself to send a redo this after 10 seconds
-          setTimeout(() => this.getcomputetable(), 10000);
+          setTimeout(() => this.getcomputetable(), 20000);
         },
         error => {
           console.error('Error getting compute table');
           this.toast('Error getting compute table');
-          setTimeout(() => this.getcomputetable(), 20000);
+          setTimeout(() => this.getcomputetable(), 10000);
         }
       );
   }
@@ -359,12 +375,22 @@ export class Home {
 
   // Called when an entry is clicked in the search box
   personSelected(data: Person) {
+    if (this.submitted === 'check') {
+      this.toast('You have already submitted. Cannot change now');
+      return;
+    }
+
     this.choices.push(data);
     this.save();
   }
 
   // Called when user removes a saved choice
   personRemoved(data: string) {
+    if (this.submitted === 'check') {
+      this.toast('You have already submitted. Cannot change now');
+      return;
+    }
+
     let remove = null;
     for (let i = 0; i < this.choices.length; i++) {
       if (this.choices[i].roll === data) {
