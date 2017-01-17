@@ -41,10 +41,6 @@ export class Toasts {
   values: Array<Toast> = [];
 
   constructor() {
-    setTimeout(() => {
-      this.newToast('abcd cool man casasdas daadas ');
-      this.newToast('efghi');
-    }, 3000);
   }
 
   ngOnInit() {

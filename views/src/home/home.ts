@@ -67,7 +67,7 @@ export class Home {
       .subscribe(
         // Parse the information. Then do other actions from inside parseInfo
         response => this.parseInfo(response['_body']),
-        error => window.alert('Error loading data')
+        error => this.toast('Error loading data')
       );
 
     this.choices = [];
@@ -139,7 +139,10 @@ export class Home {
       .subscribe(
         // Fetch list and parse
         response => parsePeople(response),
-        error => console.error('Could not get list of people')
+        error => {
+          console.error('Could not get list of people');
+          this.toast('Could not get list of people');
+        }
       );
   }
 
@@ -157,7 +160,10 @@ export class Home {
           // Requires the public keys to be in memory
           this.getcomputetable();
         },
-        error => console.error('Error getting public keys')
+        error => {
+          console.error('Error getting public keys');
+          this.toast('Error getting public keys');
+        }
       );
   }
 
@@ -174,7 +180,11 @@ export class Home {
           // Queue itself to send a redo this after 10 seconds
           setTimeout(() => this.getcomputetable(), 10000);
         },
-        error => console.error('Error getting compute table')
+        error => {
+          console.error('Error getting compute table');
+          this.toast('Error getting compute table');
+          setTimeout(() => this.getcomputetable(), 20000);
+        }
       );
   }
 
@@ -242,14 +252,20 @@ export class Home {
     this.http.post(Config.computeToken, token, null)
       .subscribe (
         response => console.log('Saved tokens: ' + token.length),
-        error => console.error('Error saving tokens!')
+        error => {
+          console.error('Error saving tokens!');
+          this.toast('Error saving tokens!');
+        }
       );
 
     // Tell expected hashes to server
     this.http.post(Config.computeRes, res, null)
       .subscribe (
         response => console.log('Saved compute results: ' + res.length),
-        error => console.error('Error saving compute results!')
+        error => {
+          console.error('Error saving compute results!');
+          this.toast('Error saving compute results!');
+        }
       );
 
     // Person might have submitted his choices
@@ -295,7 +311,10 @@ export class Home {
     this.http.post(Config.computeValue, values, null)
       .subscribe (
         response => console.log('Saved compute values: ' + values.length),
-        error => console.error('Error saving compute values!')
+        error => {
+          console.error('Error saving compute values!');
+          this.toast('Error saving compute values!');
+        }
       );
   }
 
@@ -327,7 +346,10 @@ export class Home {
             this.submitted = 'check';
             this.submit();
           },
-          error => console.error('Could not submit choices')
+          error => {
+            console.error('Could not submit choices');
+            this.toast('Could not submit choices');
+          }
         );
     } else {
       // TODO Some way of showing an error
@@ -352,6 +374,7 @@ export class Home {
 
     if (remove === null) {
       console.error('Unknown person removed: ' + data);
+      this.toast('Unknown person removed: ' + data);
     } else {
       this.choices.splice(remove, 1);
       this.save();
@@ -379,5 +402,9 @@ export class Home {
     } else {
       this.greeting = 'Good Evening,';
     }
+  }
+
+  toast(val: string) {
+    this.dataObserver.next(val);
   }
 }
