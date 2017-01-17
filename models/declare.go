@@ -27,3 +27,18 @@ func UpsertDeclareTable(d *Declare) mgo.Change {
 		ReturnNew: true,
 	}
 }
+
+func NewDeclareTable(id string) PairUpsert {
+	_selector := bson.M{"_id": id}
+
+	return PairUpsert{
+		Selector: _selector,
+		Change: bson.M{"$setOnInsert": bson.M{
+			"_id": id,
+			"t0":  "",
+			"t1":  "",
+			"t2":  "",
+			"t3":  "",
+		}},
+	}
+}

@@ -144,3 +144,37 @@ func (m PubkeyList) Serve(ctx *iris.Context) {
 
 	ctx.JSON(iris.StatusAccepted, query)
 }
+
+type DeclareList struct {
+	Db db.PuppyDb
+}
+
+func (m DeclareList) Serve(ctx *iris.Context) {
+	id, err := SessionId(ctx)
+	if err != nil {
+		ctx.EmitError(iris.StatusForbidden)
+		return
+	}
+
+	var resp models.Declare
+	if err := m.Db.GetById("declare", id).One(&resp); err != nil {
+		ctx.EmitError(iris.StatusNotFound)
+		log.Fatal(err)
+		return
+	}
+
+	if resp.Token0 != "" {
+		resp.Token0 = "1"
+	}
+	if resp.Token1 != "" {
+		resp.Token1 = "1"
+	}
+	if resp.Token2 != "" {
+		resp.Token2 = "1"
+	}
+	if resp.Token3 != "" {
+		resp.Token3 = "1"
+	}
+
+	ctx.JSON(iris.StatusOK, resp)
+}
