@@ -7,7 +7,7 @@ import { Search } from '../search';
 import { Crypto } from '../common/crypto';
 import { Person } from '../common/person';
 import { Toasts } from '../toasts';
-import {Observable} from 'rxjs/Observable';
+import { Observable, Observer } from 'rxjs';
 
 const styles = require('./home.css');
 const template = require('./home.html');
@@ -39,10 +39,10 @@ export class Home {
 
   people: Person[];
 
-  toasthandler: Observable<Array<string>>;
-  private dataObserver: Observer;
+  toasthandler: Observable<string>;
+  private dataObserver: Observer<any>;
 
-  private static checker(data): bool {
+  private static checker(data): boolean {
     if (!data ||
         !data['d0'] ||
         !data['d1']) {
@@ -80,7 +80,7 @@ export class Home {
 
     this.pubkeys = {};
 
-    this.toasthandler = new Observable<Array<string>>(observer => {
+    this.toasthandler = new Observable<string>(observer => {
       this.dataObserver = observer;
     });
   }

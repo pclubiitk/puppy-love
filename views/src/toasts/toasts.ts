@@ -1,5 +1,6 @@
 import {Component, Output, Input, EventEmitter,
         trigger, transition, style, animate, state} from '@angular/core';
+import {Observable} from 'rxjs/Observable';
 import 'rxjs/Rx';
 
 const styles = require('./toasts.css');
@@ -36,7 +37,7 @@ class Toast {
 export class Toasts {
 
   // This gets the events
-  @Input() toasthandler: Observable<Array<string>>;
+  @Input() toasthandler: Observable<string>;
 
   // This is looped over to display toasts
   values: Array<Toast> = [];
