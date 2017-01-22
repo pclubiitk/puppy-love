@@ -418,7 +418,7 @@ export class Home {
       } else {
         // You need to think for a while before locking choices
         this.toast(
-          'You will not be able to change your choices. Wait 5 seconds before submitting');
+          'You will not be able to change your choices. Wait 10 seconds before submitting');
 
         // If another timeout was running, then ignore
         if (!this.submittimeron) {
@@ -431,7 +431,7 @@ export class Home {
             setTimeout(() => {
               this.canyousubmitrightnow = false;
             }, 20000);
-          }, 5000);
+          }, 10000);
           this.submittimeron = false;
         }
       }
