@@ -48,6 +48,29 @@ export class Search {
     this.textChange.emit(event);
     this.searchText.emit(this.content);
     this.displayCompletions = true;
+
+    this.shortlist();
+  }
+
+  shortlist() {
+    let searchterm = this.content;
+
+    // Small search => Show no one
+    if (searchterm.length < 3) {
+      for (let p of this.suggestions) {
+        p.display = false;
+      }
+      return;
+    }
+
+    for (let p of this.suggestions) {
+      if (p.name.indexOf(searchterm) !== -1 ||
+          p.roll.indexOf(searchterm) !== -1) {
+        p.display = true;
+      } else {
+        p.display = false;
+      }
+    }
   }
 
   clickHandler(event) {
@@ -57,6 +80,7 @@ export class Search {
 
   itemClicked(event) {
     let id = event.target.innerText.split('-')[1].trim();
+    this.content = '';
     for (let p of this.suggestions) {
       if (p.roll === id) {
         this.selectedItem.emit(p);

@@ -1,4 +1,7 @@
 export class Person {
+
+  display: boolean = false;
+
   static deserialize(jsonData): Person[] {
     if (!jsonData) {
       return [];
