@@ -43,6 +43,9 @@ export class Home {
   canyousubmitrightnow: boolean = false;
   submittimeron: boolean = false;
 
+  // Will be sent if you've submitted your choices
+  declarevalues = [];
+
   toasthandler: Observable<string>;
   private dataObserver: Observer<any>;
 
@@ -217,6 +220,8 @@ export class Home {
     let res = [];
     let errors = [];
 
+    this.declarevalues = [];
+
     for (let item of this.computetable) {
       // po => Your index
       // op => Other's index
@@ -254,18 +259,31 @@ export class Home {
       // Both of you have set a random token. Send the expected value to
       // the central server
       if (Home.checker(item['t' + po]) &&
-          Home.checker(item['t' + op]) &&
-          !item['r' + po]) {
+          Home.checker(item['t' + op])) {
 
         let v0 = this.crypto.decryptAsym(item['t0']['d' + po]);
         let v1 = this.crypto.decryptAsym(item['t1']['d' + po]);
 
-        let expRes = Crypto.hash(v0 + '-' + v1);
-        res.push({
-          id: item['_id'],
-          v: expRes
-        });
+        // You haven't sent the result yet
+        if (!item['r' + po]) {
+          let expRes = Crypto.hash(v0 + '-' + v1);
+          res.push({
+            id: item['_id'],
+            v: expRes
+          });
+        }
+
+        // And if this person is your choice, declare another
+        // expected value
+        for (let p of this.choices) {
+          if (p.roll === ids[op]) {
+            // This person is a choice
+            let expHash = Crypto.hash(v0 + '1231abcdsjklasdla1239042' + v1);
+            this.declarevalues.push(expHash);
+          }
+        }
       }
+
     }
 
     // Save initial token messages
@@ -334,6 +352,31 @@ export class Home {
         error => {
           console.error('Error saving compute values!');
           this.toast('Error saving compute values!');
+        }
+      );
+
+    // Populate the declare table
+    // NO, this does NOT mean you are telling your choices
+    this.declareyourchoices();
+  }
+
+  declareyourchoices() {
+    let declarePayload = {
+      _id: this.id
+    };
+
+    let count = Math.min(4, this.declarevalues.length);
+
+    for (let i = 0; i < count; i++) {
+      declarePayload['t' + i] = this.declarevalues[i];
+    }
+
+    this.http.post(Config.declareChoices, declarePayload, null)
+      .subscribe (
+        response => console.log('Saved declare values: ' + count),
+        error => {
+          console.error('Error saving declare values!');
+          this.toast('Error saving declare values!');
         }
       );
   }

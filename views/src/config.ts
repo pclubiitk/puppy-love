@@ -15,4 +15,6 @@ export class Config {
   static computeToken: string = Config.baseUrl + '/compute/token';
   static computeRes: string = Config.baseUrl + '/compute/result';
   static computeValue: string = Config.baseUrl + '/compute/value';
+
+  static declareChoices: string = Config.baseUrl + '/declare/choices';
 }
