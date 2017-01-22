@@ -39,6 +39,10 @@ export class Home {
 
   people: Person[];
 
+  // Safeguard to let people think a bit before locking
+  canyousubmitrightnow: boolean = false;
+  submittimeron: boolean = false;
+
   toasthandler: Observable<string>;
   private dataObserver: Observer<any>;
 
@@ -356,17 +360,38 @@ export class Home {
     // Only proceed if not already submitted
     if (this.submitted !== 'check') {
 
-      this.http.post(Config.submitSaveUrl, null, null)
-        .subscribe (
-          response => {
-            this.submitted = 'check';
-            this.submit();
-          },
-          error => {
-            console.error('Could not submit choices');
-            this.toast('Could not submit choices');
-          }
-        );
+      if (this.canyousubmitrightnow) {
+        this.http.post(Config.submitSaveUrl, null, null)
+          .subscribe (
+            response => {
+              this.submitted = 'check';
+              this.submit();
+            },
+            error => {
+              console.error('Could not submit choices');
+              this.toast('Could not submit choices');
+            }
+          );
+      } else {
+        // You need to think for a while before locking choices
+        this.toast(
+          'You will not be able to change your choices. Wait 5 seconds before submitting');
+
+        // If another timeout was running, then ignore
+        if (!this.submittimeron) {
+          this.submittimeron = true;
+          setTimeout(() => {
+            // Lets you lock your choices now
+            this.canyousubmitrightnow = true;
+
+            // But only for 20 more seconds
+            setTimeout(() => {
+              this.canyousubmitrightnow = false;
+            }, 20000);
+          }, 5000);
+          this.submittimeron = false;
+        }
+      }
     } else {
       // TODO Some way of showing an error
       this.toast('You have already submitted! Do not be desperate :)');
