@@ -1,6 +1,8 @@
 package models
 
 import (
+	"github.com/pclubiitk/puppy-love/utils"
+
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -44,7 +46,7 @@ func NewUser(info *TypeUserNew) User {
 		Pass:    info.PassHash,
 		PrivK:   "",
 		PubK:    "",
-		AuthC:   "assdasdas",
+		AuthC:   utils.RandStringRunes(15),
 		Data:    "",
 		Submit:  false,
 		Matches: "",
@@ -86,6 +88,16 @@ func (u User) HasSubmitted() mgo.Change {
 	return mgo.Change{
 		Update: bson.M{"$set": bson.M{
 			"submitted": true,
+		}},
+		ReturnNew: true,
+	}
+}
+
+// ----------------------------------------
+func (u User) RemoveAuthCode() mgo.Change {
+	return mgo.Change{o
+		Update: bson.M{"$set": bson.M{
+			"authCode": "",
 		}},
 		ReturnNew: true,
 	}

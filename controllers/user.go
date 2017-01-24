@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"log"
+	"net/smtp"
 
 	"github.com/pclubiitk/puppy-love/db"
 	"github.com/pclubiitk/puppy-love/models"
+	"github.com/pclubiitk/puppy-love/utils/config"
 
 	"github.com/kataras/iris"
 )
@@ -100,13 +102,58 @@ func (m UserFirst) Serve(ctx *iris.Context) {
 	ctx.JSON(iris.StatusAccepted, "Information set up")
 }
 
+type UserMail struct {
+	Db db.PuppyDb
+}
+
 // User asking for email
 // ---------------------
-func UserMail(ctx *iris.Context) {
-	id := ctx.Param("id")
-	ctx.JSON(iris.StatusAccepted, "Sending email for user:"+id)
+func (m UserMail) Serve(ctx *iris.Context) {
+	id, err := SessionId(ctx)
+	if err != nil || id == "admin" {
+		ctx.EmitError(iris.StatusForbidden)
+		return
+	}
+
+	type mailData struct {
+		Email string `json:"email" bson:"email"`
+		AuthC string `json:"authCode" bson:"authCode"`
+	}
+
+	u := mailData{}
+
+	if err := m.Db.GetById("user", id).One(&u); err != nil {
+		ctx.EmitError(iris.StatusNotFound)
+		return
+	}
+
+	if u.AuthC == "" {
+		ctx.EmitError(iris.StatusBadRequest)
+		return
+	}
 
 	// TODO Missing
+	auth := smtp.PlainAuth("", config.EmailUser, config.EmailPass,
+		"smtp.cc.iitk.ac.in")
+	to := []string{u.Email + "@iitk.ac.in"}
+	msg := []byte("To: " + u.Email + "@iitk.ac.in" + "\r\n" +
+		"Subject: Puppy-Love authentication code\r\n" +
+		"\r\n" +
+		"Use this token while signing up, and don't share it with anyone.\n" +
+		"Token: " + u.AuthC + "\n" +
+		".\r\n")
+	smtp.SendMail("smtp.cc.iitk.ac.in:25", auth,
+		config.EmailUser+"@iitk.ac.in", to, msg)
+
+	user := models.User{}
+	if _, err := m.Db.GetById("user", id).
+		Apply(user.RemoveAuthCode(), &user); err != nil {
+
+		ctx.EmitError(iris.StatusInternalServerError)
+		log.Fatal(err)
+		return
+	}
+	ctx.JSON(iris.StatusAccepted, "Mail sent to "+u.Email)
 }
 
 // Get user's information

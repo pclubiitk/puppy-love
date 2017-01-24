@@ -7,6 +7,7 @@ import (
 
 	"github.com/pclubiitk/puppy-love/db"
 	"github.com/pclubiitk/puppy-love/router"
+	"github.com/pclubiitk/puppy-love/utils"
 	"github.com/pclubiitk/puppy-love/utils/config"
 
 	"github.com/kataras/iris"
@@ -20,6 +21,8 @@ func main() {
 		fmt.Print("[Error] Could not connect to MongoDB")
 		os.Exit(1)
 	}
+
+	utils.Randinit()
 
 	iris.UseSessionDB(sessionDb)
 
