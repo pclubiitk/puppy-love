@@ -95,7 +95,7 @@ func (u User) HasSubmitted() mgo.Change {
 
 // ----------------------------------------
 func (u User) RemoveAuthCode() mgo.Change {
-	return mgo.Change{o
+	return mgo.Change{
 		Update: bson.M{"$set": bson.M{
 			"authCode": "",
 		}},
