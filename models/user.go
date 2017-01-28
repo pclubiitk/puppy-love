@@ -22,7 +22,7 @@ type (
 		Data    string `json:"data" bson:"data"`
 		Submit  bool   `json:"submitted" bson:"submitted"`
 		Matches string `json:"matches" bson:"matches"`
-		State   int32  `json:"state" bson:"state"`
+		Vote    int    `json:"voted" bson:"voted"`
 	}
 )
 
@@ -50,7 +50,7 @@ func NewUser(info *TypeUserNew) User {
 		Data:    "",
 		Submit:  false,
 		Matches: "",
-		State:   0,
+		Vote:    0,
 	}
 }
 
@@ -88,6 +88,16 @@ func (u User) HasSubmitted() mgo.Change {
 	return mgo.Change{
 		Update: bson.M{"$set": bson.M{
 			"submitted": true,
+		}},
+		ReturnNew: true,
+	}
+}
+
+// ----------------------------------------
+func (u User) HasVoted(more int) mgo.Change {
+	return mgo.Change{
+		Update: bson.M{"$inc": bson.M{
+			"voted": more,
 		}},
 		ReturnNew: true,
 	}

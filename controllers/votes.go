@@ -13,15 +13,13 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// @AUTH @Admin Create the entries in the vote table
-// ----------------------------------------------------
-type VotePrepare struct {
+type VoteSend struct {
 	Db db.PuppyDb
 }
 
-func (m VotePrepare) Serve(ctx *iris.Context) {
+func (m VoteSend) Serve(ctx *iris.Context) {
 	id, err := SessionId(ctx)
-	if err != nil || id != "admin" {
+	if err != nil {
 		ctx.EmitError(iris.StatusForbidden)
 		return
 	}
@@ -30,16 +28,51 @@ func (m VotePrepare) Serve(ctx *iris.Context) {
 		Value string `json:"v" bson:"v"`
 	}
 
-	var votes []VoteVal
-	if len(votes) > 4 {
+	// Check that votes sent are valid
+	// ===============================
+	votes := new([]VoteVal)
+	if err := ctx.ReadJSON(votes); err != nil {
+		ctx.JSON(iris.StatusBadRequest, "Invalid JSON")
+		log.Println(err)
+		return
+	}
+
+	if len(*votes) > 4 {
 		ctx.Error("More than allowed votes", iris.StatusBadRequest)
 		return
 	}
 
+	// Check that user isn't voting more than 4
+	// ========================================
+	user := models.User{}
+
+	if err := m.Db.GetById("user", id).One(&user); err != nil {
+		ctx.EmitError(iris.StatusNotFound)
+		log.Fatal(err)
+		return
+	}
+
+	if user.Vote+len(*votes) > 4 {
+		ctx.EmitError(iris.StatusForbidden)
+		return
+	}
+
+	// Increment user's vote count
+	// ===========================
+	if _, err := m.Db.GetById("user", id).
+		Apply(user.HasVoted(len(*votes)), &user); err != nil {
+		ctx.EmitError(iris.StatusInternalServerError)
+		log.Fatal(err)
+		return
+	}
+
+	// Get latest time
 	t, _ := strconv.ParseUint(time.Now().Format("20060102150405"), 10, 64)
 
+	// Add user's votes to DB
+	// ======================
 	bulk := m.Db.GetCollection("vote").Bulk()
-	for _, vote := range votes {
+	for _, vote := range *votes {
 		bulk.Insert(models.Vote{t, vote.Value})
 	}
 	r, err := bulk.Run()

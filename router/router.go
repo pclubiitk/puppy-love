@@ -41,6 +41,7 @@ func PuppyRoute(db db.PuppyDb) {
 
 	// Votes
 	iris.Handle("GET", "/votes/get/:time", controllers.VoteGet{db})
+	iris.Handle("POST", "/votes/send", controllers.VoteSend{db})
 
 	// Session administration
 	sesPre := "/session"
@@ -53,7 +54,6 @@ func PuppyRoute(db db.PuppyDb) {
 	iris.Handle("GET", aPre+"/compute/list", controllers.ComputeListAdmin{db})
 	iris.Handle("GET", aPre+"/compute/prepare", controllers.ComputePrepare{db})
 	iris.Handle("GET", aPre+"/declare/prepare", controllers.DeclarePrepare{db})
-	iris.Handle("GET", aPre+"/vote/prepare", controllers.VotePrepare{db})
 
 	iris.Handle("GET", aPre+"/user/drop", controllers.UserDelete{db})
 	iris.Handle("POST", aPre+"/user/new", controllers.UserNew{db})
