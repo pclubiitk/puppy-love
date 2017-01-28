@@ -100,22 +100,35 @@ type typeVoteGet struct {
 }
 
 func (m VoteGet) Serve(ctx *iris.Context) {
-	time, err := strconv.ParseUint(ctx.Param("time"), 10, 64)
+	_, err := SessionId(ctx)
+	if err != nil {
+		ctx.EmitError(iris.StatusForbidden)
+		return
+	}
+
+	// Last checked time
+	ltime, err := strconv.ParseUint(ctx.Param("time"), 10, 64)
 	if err != nil {
 		ctx.Error("Bad timestamp value", iris.StatusBadRequest)
 		return
 	}
 
+	// Current time
+	ctime, _ := strconv.ParseUint(time.Now().Format("20060102150405"), 10, 64)
+	var granularity uint64 = 600000 // 10 mins
+	ctime = ctime - ctime%granularity
+
 	votes := []models.Vote{}
 
 	// Fetch user
+	// TODO Time should be restricted to 10 min checks
 	if err := m.Db.GetCollection("vote").
-		Find(bson.M{"time": bson.M{"$gt": time}}).
+		Find(bson.M{"time": bson.M{"$gt": ltime, "$lte": ctime}}).
 		All(&votes); err != nil {
 		ctx.EmitError(iris.StatusNotFound)
 		log.Fatal(err)
 		return
 	}
 
-	ctx.JSON(iris.StatusAccepted, votes)
+	ctx.JSON(iris.StatusAccepted, bson.M{"votes": votes, "time": ctime})
 }
