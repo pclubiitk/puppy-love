@@ -134,5 +134,9 @@ func (m VoteGet) Serve(ctx *iris.Context) {
 		return
 	}
 
+	if *votes == nil {
+		*votes = []AnonymVote{}
+	}
+
 	ctx.JSON(iris.StatusAccepted, bson.M{"votes": *votes, "time": ctime})
 }
