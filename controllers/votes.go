@@ -118,17 +118,21 @@ func (m VoteGet) Serve(ctx *iris.Context) {
 	var granularity uint64 = 600000 // 10 mins
 	ctime = ctime - ctime%granularity
 
-	votes := []models.Vote{}
+	type AnonymVote struct {
+		Value string `json:"v" bson:"v"`
+	}
+
+	votes := new([]AnonymVote)
 
 	// Fetch user
 	// TODO Time should be restricted to 10 min checks
 	if err := m.Db.GetCollection("vote").
 		Find(bson.M{"time": bson.M{"$gt": ltime, "$lte": ctime}}).
-		All(&votes); err != nil {
+		All(votes); err != nil {
 		ctx.EmitError(iris.StatusNotFound)
 		log.Fatal(err)
 		return
 	}
 
-	ctx.JSON(iris.StatusAccepted, bson.M{"votes": votes, "time": ctime})
+	ctx.JSON(iris.StatusAccepted, bson.M{"votes": *votes, "time": ctime})
 }
