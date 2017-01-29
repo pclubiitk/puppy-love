@@ -78,6 +78,14 @@ export class Hearts {
       );
   }
 
+  range(value) {
+    let a = [];
+    for (let i = 0; i < value; ++i) {
+      a.push(i + 1);
+    }
+    return a;
+  }
+
   toast(val: string) {
     this.dataObserver.next(val);
   }

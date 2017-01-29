@@ -1,3 +1,9 @@
 <div style="display: inline-block;">
-  Hearts here
+  Heart-o-meter<br>
+  <ul class="heartlist">
+    <li *ngFor="let i of range(10)" class="heartlistitem">
+      <img class="heartclass" *ngIf="i <= hearts" src="/images/heart-filled.png">
+      <img class="heartclass" *ngIf="i > hearts" src="/images/heart-empty.png">
+    </li>
+  </ul>
 </div>

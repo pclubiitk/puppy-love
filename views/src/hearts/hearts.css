@@ -1,0 +1,13 @@
+.heartclass {
+    max-height: 40px;
+}
+
+.heartlistitem {
+    display: inline;
+}
+
+.heartlist {
+    display: inline;
+    text-align: middle;
+    list-style-type: none;
+}
