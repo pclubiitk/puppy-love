@@ -86,6 +86,16 @@
                     </div>
                 </div>
 
+                <div class="[ text-center ]" style="margin: 15px;">
+                  <hearts [infoloaded]="heartemitter"
+                          [pubkeys]="pubkeys"
+                          [choices]="choices"
+                          [dataObserver]="dataObserver"
+                          [crypto]="crypto"
+                          (infodone)="receivehearts($event)">
+                  </hearts>
+                </div>
+
             </div>
         </div>
 

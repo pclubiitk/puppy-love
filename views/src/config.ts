@@ -17,4 +17,7 @@ export class Config {
   static computeValue: string = Config.baseUrl + '/compute/value';
 
   static declareChoices: string = Config.baseUrl + '/declare/choices';
+
+  static voteGet: string = Config.baseUrl + '/votes/get';
+  static voteSend: string = Config.baseUrl + '/votes/send';
 }

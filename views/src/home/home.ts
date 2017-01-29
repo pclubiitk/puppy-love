@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 import { Http } from '@angular/http';
 import { Router } from '@angular/router';
 import { AuthHttp } from 'angular2-jwt';
@@ -7,6 +7,7 @@ import { Search } from '../search';
 import { Crypto } from '../common/crypto';
 import { Person } from '../common/person';
 import { Toasts } from '../toasts';
+import { NumPair } from '../hearts';
 import { Observable, Observer } from 'rxjs';
 
 const styles = require('./home.css');
@@ -39,6 +40,8 @@ export class Home {
 
   people: Person[];
 
+  heartemitter: EventEmitter<NumPair> = new EventEmitter<NumPair>();
+
   // Safeguard to let people think a bit before locking
   canyousubmitrightnow: boolean = false;
   submittimeron: boolean = false;
@@ -47,7 +50,7 @@ export class Home {
   declarevalues = [];
 
   toasthandler: Observable<string>;
-  private dataObserver: Observer<any>;
+  dataObserver: Observer<any>;
 
   private static checker(data): boolean {
     if (!data ||
@@ -80,7 +83,9 @@ export class Home {
     this.choices = [];
 
     this.data = {
-      choices: this.choices
+      choices: this.choices,
+      hearts: 0,
+      lastcheck: 0
     };
 
     this.people = [];
@@ -90,6 +95,17 @@ export class Home {
     this.toasthandler = new Observable<string>(observer => {
       this.dataObserver = observer;
     });
+  }
+
+  receivehearts(info: NumPair) {
+    if (this.data) {
+      this.data.hearts = info.hearts;
+      this.data.lastcheck = info.lastcheck;
+      console.log('Hearts now: ' + info.hearts);
+      this.save();
+    } else {
+      this.toast('Could not persist votes data');
+    }
   }
 
   // Parse user's personal info. Lay bedrock for future actions.
@@ -108,6 +124,10 @@ export class Home {
     // Decrypt stored choices info
     this.data = Crypto.toJson(this.crypto.decryptSym(infoObj.data));
     this.choices = Person.deserialize(this.data.choices);
+
+    let hearts = this.data.hearts || 0;
+    let lastcheck = this.data.lastcheck || 0;
+    this.heartemitter.emit(new NumPair(hearts, lastcheck));
 
     console.log('Choices ==>');
     console.log(this.choices);
@@ -384,7 +404,11 @@ export class Home {
   // Save your (transient and changing) choices on the backend
   // Not for anyone else's eyes
   save() {
-    this.data = {choices: this.choices};
+    this.data = {
+      choices: this.choices,
+      hearts: this.data.hearts,
+      lastcheck: this.data.lastcheck
+    };
     let encData = this.crypto.encryptSym(Crypto.fromJson(this.data));
     this.saving = 'Saving ...';
     this.http.post(Config.dataSaveUrl, {data: encData}, null)
