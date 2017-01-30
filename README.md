@@ -92,8 +92,48 @@ npm run start
 curl https://glide.sh/get | sh
 glide install
 go build
+
+# These are needed for email verification to work
+export EMAIL_USER=<your_iitk_username>
+export EMAIL_PASS=<your_iitk_email_password>
 ./puppy-love
 ```
+
+## Setting up basic services
+### Log in
+You should first log in as admin. A simple way to do that is the following:
+```
+cd scripts
+. login.sh admin passhash
+# Use curl / http normally, but use $CADMIN cookie at the end of your command
+# Example: http get 'localhost:3000/admin/...' $CADMIN
+```
+
+### Add a user
+Note: This requires you to be logged in as $CADMIN
+```
+cd scripts
+./newuser.sh
+# Follow the commands
+# For testing, use your own IITK email address for all users
+```
+
+### Set up compute table
+Do this AFTER setting up all users. Whenever you add a new user, this has to be run.
+```
+http get 'localhost:3000/compute/prepare' $CADMIN
+```
+
+### Using the frontend
+Once you've created the users, you will need to register them.
+
+**Warning**: This has not yet been tested ever since mailer was added. Please mark any bugs as issues.
+
+Open the UI at puppy.pclub.in, and go to register. You can only register for users which you have created. Get your auth token via email, and then fill up the remaining fields.
+
+### Notes
+* You cannot login as admin on the frontend UI.
+* You can also check mongoDB's data for the auth token for the user.
 
 You can open the local website at [puppy.pclub.in](puppy.pclub.in)
 The backend will be listening on the printed port number.
