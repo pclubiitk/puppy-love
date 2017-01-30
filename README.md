@@ -138,11 +138,7 @@ http get 'localhost:3000/compute/prepare' $CADMIN
 ```
 
 ### Using the frontend
-Once you've created the users, you will need to register them.
-
-**Warning**: This has not yet been tested ever since mailer was added. Please mark any bugs as issues.
-
-Open the UI at puppy.pclub.in, and go to register. You can only register for users which you have created. Get your auth token via email, and then fill up the remaining fields.
+Once you've created the users, you will need to register them. Open the UI at puppy.pclub.in, and go to signup. You can only register for users which you have created. Get your auth token via email, and then fill up the remaining fields.
 
 ### Notes
 * You cannot login as admin on the frontend UI.

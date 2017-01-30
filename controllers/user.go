@@ -99,6 +99,15 @@ func (m UserFirst) Serve(ctx *iris.Context) {
 		return
 	}
 
+	// Remove user's auth token
+	if _, err := m.Db.GetById("user", info.Id).
+		Apply(user.RemoveAuthCode(), &user); err != nil {
+
+		ctx.EmitError(iris.StatusInternalServerError)
+		log.Print(err)
+		return
+	}
+
 	ctx.JSON(iris.StatusAccepted, "Information set up")
 }
 
@@ -109,11 +118,7 @@ type UserMail struct {
 // User asking for email
 // ---------------------
 func (m UserMail) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
-	if err != nil || id == "admin" {
-		ctx.EmitError(iris.StatusForbidden)
-		return
-	}
+	id := ctx.Param("id")
 
 	type mailData struct {
 		Email string `json:"email" bson:"email"`
@@ -124,6 +129,7 @@ func (m UserMail) Serve(ctx *iris.Context) {
 
 	if err := m.Db.GetById("user", id).One(&u); err != nil {
 		ctx.EmitError(iris.StatusNotFound)
+		log.Print(err)
 		return
 	}
 
@@ -145,14 +151,6 @@ func (m UserMail) Serve(ctx *iris.Context) {
 	smtp.SendMail("smtp.cc.iitk.ac.in:25", auth,
 		config.EmailUser+"@iitk.ac.in", to, msg)
 
-	user := models.User{}
-	if _, err := m.Db.GetById("user", id).
-		Apply(user.RemoveAuthCode(), &user); err != nil {
-
-		ctx.EmitError(iris.StatusInternalServerError)
-		log.Fatal(err)
-		return
-	}
 	ctx.JSON(iris.StatusAccepted, "Mail sent to "+u.Email)
 }
 
@@ -178,7 +176,7 @@ func (m UserGet) Serve(ctx *iris.Context) {
 	// Fetch user
 	if err := m.Db.GetById("user", id).One(&user); err != nil {
 		ctx.EmitError(iris.StatusNotFound)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 
