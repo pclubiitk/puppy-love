@@ -96,7 +96,10 @@ sudo npm install -g yarn
 yarn install
 
 # Run frontend
-npm run start
+yarn start
+
+# IFF production, use
+yarn build && python -m http.serve 8091
 
 ```
 

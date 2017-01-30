@@ -5,3 +5,4 @@ npm-debug.log
 .tern-port
 puppy-love
 vendor
+views/build
