@@ -117,7 +117,7 @@ export EMAIL_PASS=<your_iitk_email_password>
 You should first log in as admin. A simple way to do that is the following:
 ```
 cd scripts
-. login.sh admin passhash
+. ./login.sh admin passhash
 # Use curl / http normally, but use $CADMIN cookie at the end of your command
 # Example: http get 'localhost:3000/admin/...' $CADMIN
 ```
