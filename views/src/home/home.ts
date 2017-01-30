@@ -203,8 +203,8 @@ export class Home {
   //     - d0: Token of 1st person encrypted with his/her own public key
   //     - d1: Token of 1st person encrypted with the other person's public key
   //   + t1: Token sent by 1st person
-  //     - d0: Token of 2nd person encrypted with his/her own public key
-  //     - d1: Token of 2nd person encrypted with the other person's public key
+  //     - d0: Token of 2nd person encrypted with 1st person's public key
+  //     - d1: Token of 2nd person encrypted with 2nd person's public key
   //   + r0: Expected if-matched-hash according to 1st person
   //   + r1: Expected if-matched-hash according to 2nd person
   //   + v0: Value sent finally to server by 1st person
