@@ -27,8 +27,7 @@ Implementation using:
 * golang
 * NPM
 * Nginx
-* Redis
-* MongoDB
+* Docker
 
 # Installation / Setup
 
@@ -67,12 +66,26 @@ sudo service nginx start
 
 ## Running services needed
 ```
+
+# Run docker
+# For people using systemd
+systemctl start docker
+# Or see the internet
+
 # Run Mongodb
-mkdir $HOME/.mongodata
-mongod --dbpath=$HOME/.mongodata
+docker run --name puppy-mongo-db -p 27017:27017 -d mongo 
+# If you want to access the data from mongodb too,
+# create $HOME/.mongodata and then
+docker run --name puppy-mongo-db -p 27017:27017 -v $HOME/.mongodata:/data/db -d mongo 
+
+# On subsequent runs, you just need to do:
+docker start puppy-mongo-db
 
 # Run redis for session management
-redis-server
+docker run --name puppy-redis -p 6379:6379 -d redis
+
+# On subsequent runs,
+docker start puppy-redis
 ```
 
 ## Get frontend dependencies and run
