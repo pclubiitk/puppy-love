@@ -1,0 +1,21 @@
+redis:
+  image: redis
+  ports:
+    - "6379"
+mongo:
+  image: mongo
+  ports:
+    - "27017"
+backend:
+  image: pclub/puppy-love:backend
+  links:
+    - redis
+    - mongo
+  ports:
+    - "3000"
+nginx:
+  image: pclub/puppy-love:frontend
+  links:
+    - backend:backend
+  ports:
+    - "80:80"
