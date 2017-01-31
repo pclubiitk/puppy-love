@@ -1,7 +1,9 @@
 Puppy Love
 ==========
 
-The modern and better avatar of [valentine puppy-love](https://github.com/pclubiitk/valentine) in the making.
+The modern and better avatar of Programming Club's [puppy-love](https://github.com/pclubiitk/valentine) in the making.
+
+![alt tag](https://raw.githubusercontent.com/pclubiitk/puppy-love/master/cover.jpg)
 
 Algorithm designed from the ground up, with a completely secure computation model which guarantees the following:
 
@@ -9,11 +11,12 @@ Algorithm designed from the ground up, with a completely secure computation mode
 * The server, even while matching couples, can *not* know what the choices were.
 * The other person will only know whether you liked him/her or not if that person liked you as well.
 * The server will know whether you matched with some person or not, but no more.
+* The above guarantees are independant of the code running on the server, and can be verified on the browser.
 
-Posts describing the algorithm:
-* [Part 1](https://sakshamsharma.com/2016/10/puppy1/)
-* [Part 2](https://sakshamsharma.com/2016/11/puppy2/)
-* [Part 3](https://sakshamsharma.com/2016/12/puppy3/)
+Blog posts describing the algorithm:
+* [Part 1 - Introduction](https://sakshamsharma.com/2016/10/puppy1/)
+* [Part 2 - Matching choices](https://sakshamsharma.com/2016/11/puppy2/)
+* [Part 3 - Restricting number of choices to 4 anonymously](https://sakshamsharma.com/2016/12/puppy3/)
 
 Implementation using:
 
