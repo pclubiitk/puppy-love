@@ -21,8 +21,8 @@ func CfgInit() {
 	var addr string
 
 	// Signup URL
-	port = os.Getenv("SIGNUP_TCP_PORT")
-	addr = os.Getenv("SIGNUP_TCP_ADDR")
+	port = os.Getenv("SIGNUP_PORT_3001_TCP_PORT")
+	addr = os.Getenv("SIGNUP_PORT_3001_TCP_ADDR")
 	if port != "" && addr != "" {
 		SignupUrl = addr + ":" + port
 	}
@@ -33,15 +33,15 @@ func CfgInit() {
 	}
 
 	// Mongo ENV variables
-	port = os.Getenv("MONGO_PORT")
-	addr = os.Getenv("MONGO_ADDR")
+	port = os.Getenv("MONGO_PORT_27017_PORT")
+	addr = os.Getenv("MONGO_PORT_27017_ADDR")
 	if port != "" && addr != "" {
 		CfgMgoUrl = "mongodb://" + addr + ":" + port + "/puppy"
 	}
 
 	// Redis ENV variables
-	port = os.Getenv("REDIS_PORT")
-	addr = os.Getenv("REDIS_ADDR")
+	port = os.Getenv("REDIS_PORT_6379_PORT")
+	addr = os.Getenv("REDIS_PORT_6379_ADDR")
 	if port != "" && addr != "" {
 		CfgRedisUrl = addr + ":" + port
 	}

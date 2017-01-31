@@ -1,0 +1,28 @@
+redis:
+  image: redis
+  ports:
+    - "6379"
+mongo:
+  image: mongo
+  volumes:
+    - $HOME/.puppydata:/data/db
+  ports:
+    - "27017"
+signup:
+  image: pclub/puppy-love:signup
+  ports:
+    - "3001"
+backend:
+  image: pclub/puppy-love:backend
+  links:
+    - redis
+    - mongo
+    - signup
+  ports:
+    - "3000"
+nginx:
+  image: pclub/puppy-love:frontend
+  links:
+    - backend:backend
+  ports:
+    - "80:80"
