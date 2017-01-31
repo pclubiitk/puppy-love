@@ -11,7 +11,7 @@ Algorithm designed from the ground up, with a completely secure computation mode
 * The server, even while matching couples, can *not* know what the choices were.
 * The other person will only know whether you liked him/her or not if that person liked you as well.
 * The server will know whether you matched with some person or not, but no more.
-* The above guarantees are independant of the code running on the server, and can be verified on the browser.
+* The above guarantees are independent of the code running on the server, and can be verified on the browser.
 
 Blog posts describing the algorithm:
 * [Part 1 - Introduction](https://sakshamsharma.com/2016/10/puppy1/)
