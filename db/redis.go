@@ -1,13 +1,15 @@
 package db
 
 import (
+    "os"
+
 	"gopkg.in/kataras/go-sessions.v0/sessiondb/redis"
 	"gopkg.in/kataras/go-sessions.v0/sessiondb/redis/service"
 )
 
 func RedisSession() *redis.Database {
 	var redisAddr = service.DefaultRedisAddr
-	if (os.Getenv("REDIS_PORT_6379_TCP_PORT") != "" && os.Getenv("REDIS_PORT_6379_TCP_ADDR") != "") {
+	if os.Getenv("REDIS_PORT_6379_TCP_PORT") != "" && os.Getenv("REDIS_PORT_6379_TCP_ADDR") != "" {
 		var port = os.Getenv("REDIS_PORT_6379_TCP_PORT")
 		var addr = os.Getenv("REDIS_PORT_6379_TCP_ADDR")
 		redisAddr = addr + ":" + port
