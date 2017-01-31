@@ -34,91 +34,100 @@ Implementation using:
 
 # Installation / Setup
 
-## Getting the source
-We use `glide` instead of `go get` to maintain dependencies. And thus, `go get` is not recommended.
+## First time setup
+You shall need docker, golang, nodejs, nginx and npm for the following steps.
+
+**Note**: Arch users often have gccgo installed. Please use the package `go` from the main repositories instead.
 
 ```
 mkdir -p $HOME/go/src
-export GOPATH=$HOME/go:$GOPATH  # Include this in .bashrc or .zshrc
-git clone https://github.com/pclubiitk/puppy-love $HOME/go/src/github.com/pclubiitk/puppy-love
 
-# You can later symlink the above folder into your project directory.
-# Just make sure that the actual folder (not symlink) is in the go directory.
+# Change .bashrc to .zshrc depending on your shell
+echo "export GOPATH=$HOME/go:$GOPATH" >> $HOME/.bashrc
+source $HOME/.bashrc
 ```
 
-All remaining steps will be executed in that directory.
+Get the source code.
 
-## Set up nginx
-You need to set up nginx to allow both server and backend to respond to the queries.
+You can later symlink the following folder into a convenient location.
+Just make sure that the actual folder (not symlink) is in the go directory.
+```
+git clone https://github.com/pclubiitk/puppy-love $HOME/go/src/github.com/pclubiitk/puppy-love
+```
+
+Install glide
+We use `glide` to maintain dependencies. `go get` is not recommended.
+```
+curl https://glide.sh/get | sh
+cd $HOME/go/src/github.com/pclubiitk/puppy-love
+```
+
+Set up nginx
 ```
 sudo cp puppy.nginx.conf /etc/nginx/sites_enabled/
+```
 
-# For people using systemd (Ubuntu 16.04 and above, Arch, Gentoo etc)
-sudo systemctl start nginx
-
-# For people using upstart (do not use if you have systemd)
-sudo service nginx start
-
-# Edit /etc/hosts file
+Edit /etc/hosts file
+```
 # Map puppy.pclub.in to 127.0.0.1
 # It should have a line saying:
 # 127.0.0.1 <something> <more> puppy.pclub.in
-
-# Remember to remove the /etc/hosts entry when you want to visit the actual website.
+# Remove this entry when you want to access the actual puppy-love (deployed by pclub)
 ```
 
-## Running services needed
+Get the essential dockers
 ```
-
-# Run docker
-# For people using systemd
-systemctl start docker
-# Or see the internet
-
-# Run Mongodb
-docker run --name puppy-mongo-db -p 27017:27017 -d mongo 
-# If you want to access the data from mongodb too,
-# create $HOME/.mongodata and then
-docker run --name puppy-mongo-db -p 27017:27017 -v $HOME/.mongodata:/data/db -d mongo 
-
-# On subsequent runs, you just need to do:
-docker start puppy-mongo-db
-
-# Run redis for session management
+sudo systemctl start docker
 docker run --name puppy-redis -p 6379:6379 -d redis
+docker run --name puppy-mongo-db -p 27017:27017 -d mongo 
 
-# On subsequent runs,
-docker start puppy-redis
+# Optional (in place of the above command):
+# docker run --name puppy-mongo-db -p 27017:27017 -v $HOME/.mongodata:/data/db -d mongo 
 ```
 
-## Get frontend dependencies and run
+Get dependencies for backend
 ```
-# Get dependencies for frontend
+glide install
+```
+
+Get dependencies for frontend
+```
 cd views
 sudo npm install -g yarn
 yarn install
+```
 
-# Run frontend
+## Run services
+```
+sudo systemctl start nginx
+
+# These are not required if you just finished the above steps
+docker start puppy-mongo-db
+docker start puppy-redis
+```
+
+## Run puppy-love
+### Frontend
+```
+# Run frontend (inside folder views)
 yarn start
 
 # IFF production, use
 yarn build && python -m http.serve 8091
-
 ```
 
-## Get backend dependencies and run
+### Backend
 ```
-curl https://glide.sh/get | sh
-glide install
+# Build (inside puppy-love folder)
 go build
 
-# These are needed for email verification to work
+# Optional: These are needed for email verification to work
 export EMAIL_USER=<your_iitk_username>
 export EMAIL_PASS=<your_iitk_email_password>
 ./puppy-love
 ```
 
-## Setting up basic services
+# Setting up basic services
 ### Log in
 You should first log in as admin. A simple way to do that is the following:
 ```
