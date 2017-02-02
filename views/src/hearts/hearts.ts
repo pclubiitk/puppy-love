@@ -7,6 +7,7 @@ import { Person } from '../common/person';
 import { Crypto } from '../common/crypto';
 import { DataService } from '../data.service';
 import { ToastService } from '../toasts';
+import { PubkeyService } from '../pubkey.service';
 
 const styles   = require('./hearts.css');
 const template = require('./hearts.html');
@@ -17,17 +18,14 @@ const template = require('./hearts.html');
   styles: [ styles ]
 })
 export class Hearts {
-  @Input('infoloaded') infoloaded: EventEmitter<boolean>;
-
-  @Input('pubkeys') pubkeys;
-
   constructor(public http: Http,
               public dataservice: DataService,
-              public t: ToastService) {
+              public t: ToastService,
+              public pks: PubkeyService) {
   }
 
   ngOnInit() {
-    this.infoloaded.subscribe(x => this.getmorehearts());
+    this.dataservice.emitdone.subscribe(x => this.getmorehearts());
   }
 
   getmorehearts() {

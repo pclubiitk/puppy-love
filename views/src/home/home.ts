@@ -9,6 +9,7 @@ import { Person } from '../common/person';
 import { Toasts, ToastService } from '../toasts';
 import { Observable, Observer } from 'rxjs';
 import { DataService } from '../data.service';
+import { PubkeyService } from '../pubkey.service';
 
 const styles = require('./home.css');
 const template = require('./home.html');
@@ -17,7 +18,7 @@ const template = require('./home.html');
   selector: 'home',
   template: template,
   styles: [ styles ],
-  providers: [ DataService, ToastService ]
+  providers: [ DataService, ToastService, PubkeyService ]
 })
 export class Home {
   password: string;
@@ -27,7 +28,6 @@ export class Home {
 
   greeting: string = '';
 
-  pubkeys; // Map from roll number to key
   computetable; // Status of the compute table
 
   people: Person[];
@@ -57,7 +57,8 @@ export class Home {
               public http: Http,
               public authHttp: AuthHttp,
               public dataservice: DataService,
-              public t: ToastService) {
+              public t: ToastService,
+              public pks: PubkeyService) {
 
     this.password = sessionStorage.getItem('password');
     this.id = sessionStorage.getItem('id');
@@ -70,23 +71,27 @@ export class Home {
     // All actions begin here
     // We fetch user's personal info
     this.dataservice.createcrypto(this.password);
-    this.dataservice.callnetwork();
     this.dataservice.emitdone.subscribe(x => {
 
       // 1. Fetch more hearts
-      this.heartemitter.emit(true);
+      // Automatically happens. Hearts component
+      // subscribes to this event.
 
       // 2. Useful for autocompletion
       this.loadPeople();
 
       // 3. Needs to be after the gender has been set
-      this.getallpubkey();
-
+      // Automatically happens. Pubkey service
+      // subscribes to this event.
+    });
+    this.pks.emitdone.subscribe(x => {
+      this.getcomputetable();
     });
 
-    this.people = [];
+    // Start the action!
+    this.dataservice.callnetwork();
 
-    this.pubkeys = {};
+    this.people = [];
   }
 
   // Fetch list of people for autocompletion search from backend
@@ -116,27 +121,6 @@ export class Home {
         error => {
           console.error('Could not get list of people');
           this.toast('Could not get list of people');
-        }
-      );
-  }
-
-  // Populate the public keys list from backend
-  getallpubkey() {
-    this.http.get(Config.listPubkey + '/' +
-                  (this.dataservice.your_gender === 'Male' ? '0' : '1'))
-      .subscribe (
-        response => {
-          let items = JSON.parse(response['_body']);
-          for (let i in items) {
-            this.pubkeys[items[i]['_id']] = items[i]['pubKey'];
-          }
-          // Negotiate compute values with people
-          // Requires the public keys to be in memory
-          this.getcomputetable();
-        },
-        error => {
-          console.error('Error getting public keys');
-          this.toast('Error getting public keys');
         }
       );
   }
@@ -195,7 +179,7 @@ export class Home {
       let ids = item['_id'].split('-');
       let po = (ids[0] === this.id ? 0 : 1);
       let op = (po === 0 ? 1 : 0);
-      let pubk = this.pubkeys[ids[op]];
+      let pubk = this.pks.pubkeys[ids[op]];
 
       if (!pubk) {
         errors.push(ids[op]);
