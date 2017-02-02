@@ -13,7 +13,8 @@ WORKDIR $PUPPYPATH
 
 COPY glide.yaml $PUPPYPATH
 COPY glide.lock $PUPPYPATH
-RUN cd $PUPPYPATH && glide install
+COPY loop.sh $PUPPYPATH
+RUN bash -c "echo 192.30.253.113 github.com >> /etc/hosts" && $PUPPYPATH/loop.sh
 
 COPY . $PUPPYPATH
 RUN cd $PUPPYPATH && go build
