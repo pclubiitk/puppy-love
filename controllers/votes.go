@@ -48,7 +48,7 @@ func (m VoteSend) Serve(ctx *iris.Context) {
 
 	if err := m.Db.GetById("user", id).One(&user); err != nil {
 		ctx.EmitError(iris.StatusNotFound)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 
@@ -62,7 +62,7 @@ func (m VoteSend) Serve(ctx *iris.Context) {
 	if _, err := m.Db.GetById("user", id).
 		Apply(user.HasVoted(len(*votes)), &user); err != nil {
 		ctx.EmitError(iris.StatusInternalServerError)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 
@@ -130,7 +130,7 @@ func (m VoteGet) Serve(ctx *iris.Context) {
 		Find(bson.M{"time": bson.M{"$gt": ltime, "$lte": ctime}}).
 		All(votes); err != nil {
 		ctx.EmitError(iris.StatusNotFound)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 

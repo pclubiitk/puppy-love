@@ -55,7 +55,7 @@ func (m UserNew) Serve(ctx *iris.Context) {
 
 	if err := m.Db.GetCollection("user").Insert(&user); err != nil {
 		ctx.EmitError(iris.StatusInternalServerError)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (m UserFirst) Serve(ctx *iris.Context) {
 	// Fetch user
 	if err := m.Db.GetById("user", info.Id).One(&user); err != nil {
 		ctx.EmitError(iris.StatusNotFound)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 
@@ -95,7 +95,7 @@ func (m UserFirst) Serve(ctx *iris.Context) {
 		Apply(user.FirstLogin(info), &user); err != nil {
 
 		ctx.EmitError(iris.StatusInternalServerError)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 
@@ -221,7 +221,7 @@ func (m UserLoginGet) Serve(ctx *iris.Context) {
 	// Fetch user
 	if err := m.Db.GetById("user", id).One(&user); err != nil {
 		ctx.EmitError(iris.StatusNotFound)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 
@@ -259,7 +259,7 @@ func (m UserSubmitTrue) Serve(ctx *iris.Context) {
 		Apply(user.HasSubmitted(), &user); err != nil {
 
 		ctx.EmitError(iris.StatusInternalServerError)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 
@@ -291,7 +291,7 @@ func (m UserUpdateData) Serve(ctx *iris.Context) {
 		Apply(user.UpdateData(info), &user); err != nil {
 
 		ctx.EmitError(iris.StatusInternalServerError)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 

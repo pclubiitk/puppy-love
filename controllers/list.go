@@ -37,7 +37,7 @@ func (m ListAll) Serve(ctx *iris.Context) {
 		All(&results); err != nil {
 
 		ctx.EmitError(iris.StatusNotFound)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 
@@ -64,7 +64,7 @@ func (m ComputeListAdmin) Serve(ctx *iris.Context) {
 		Find(bson.M{}).All(&results); err != nil {
 
 		ctx.EmitError(iris.StatusNotFound)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 
@@ -107,7 +107,7 @@ func (m ComputeList) Serve(ctx *iris.Context) {
 		All(&query); err != nil {
 
 		ctx.EmitError(iris.StatusNotFound)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 
@@ -138,7 +138,7 @@ func (m PubkeyList) Serve(ctx *iris.Context) {
 		Find(bson.M{"gender": _gender}).All(&query); err != nil {
 
 		ctx.EmitError(iris.StatusNotFound)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 
@@ -159,7 +159,7 @@ func (m DeclareList) Serve(ctx *iris.Context) {
 	var resp models.Declare
 	if err := m.Db.GetById("declare", id).One(&resp); err != nil {
 		ctx.EmitError(iris.StatusNotFound)
-		log.Fatal(err)
+		log.Print(err)
 		return
 	}
 
