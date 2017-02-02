@@ -2,6 +2,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { Http } from '@angular/http';
 import { Person } from './common/person';
 import { Crypto } from './common/crypto';
+import { ToastService } from './toasts';
 import { Config } from './config';
 
 @Injectable()
@@ -23,7 +24,8 @@ export class DataService {
 
   emitdone: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  constructor(public http: Http) { }
+  constructor(public http: Http,
+              public t: ToastService) { }
 
   createcrypto(password: string) {
     this.crypto = new Crypto(password);
@@ -95,6 +97,6 @@ export class DataService {
   }
 
   toast(message: string) {
-    // TODO: Send event to parent
+    this.t.toast(message);
   }
 }

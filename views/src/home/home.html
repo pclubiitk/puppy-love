@@ -87,15 +87,17 @@
                     <div class="[ btn-group ]">
                         <label id="submit_button" class="[ btn btn-default ]"
                         (click)="submitButton()">
-                            <i class="material-icons">sentiment_very_satisfied</i> Submit!
+                          <i class="material-icons">
+                            sentiment_very_satisfied
+                          </i>
+                          Submit!
                         </label>
                     </div>
                 </div>
 
                 <div class="[ text-center ]" style="margin: 15px;">
                   <hearts [infoloaded]="heartemitter"
-                          [pubkeys]="pubkeys"
-                          [dataObserver]="dataObserver">
+                          [pubkeys]="pubkeys">
                   </hearts>
                 </div>
 
@@ -134,4 +136,4 @@
     <!-- End of main content div -->
 
 </div>
-<toasts [toasthandler]="toasthandler"></toasts>
+<toasts [toasthandler]="t.toasthandler"></toasts>

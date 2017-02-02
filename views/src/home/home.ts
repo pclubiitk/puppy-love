@@ -6,7 +6,7 @@ import { Config } from '../config';
 import { Search } from '../search';
 import { Crypto } from '../common/crypto';
 import { Person } from '../common/person';
-import { Toasts } from '../toasts';
+import { Toasts, ToastService } from '../toasts';
 import { Observable, Observer } from 'rxjs';
 import { DataService } from '../data.service';
 
@@ -17,7 +17,7 @@ const template = require('./home.html');
   selector: 'home',
   template: template,
   styles: [ styles ],
-  providers: [ DataService ]
+  providers: [ DataService, ToastService ]
 })
 export class Home {
   password: string;
@@ -56,7 +56,8 @@ export class Home {
   constructor(public router: Router,
               public http: Http,
               public authHttp: AuthHttp,
-              public dataservice: DataService) {
+              public dataservice: DataService,
+              public t: ToastService) {
 
     this.password = sessionStorage.getItem('password');
     this.id = sessionStorage.getItem('id');
@@ -86,10 +87,6 @@ export class Home {
     this.people = [];
 
     this.pubkeys = {};
-
-    this.toasthandler = new Observable<string>(observer => {
-      this.dataObserver = observer;
-    });
   }
 
   // Fetch list of people for autocompletion search from backend
@@ -457,10 +454,6 @@ export class Home {
     }
   }
 
-  toast(val: string) {
-    this.dataObserver.next(val);
-  }
-
   submitsidebutton() {
     if (this.dataservice.submitted === 'check') {
       this.toast('You\'ve submitted, hurray!');
@@ -469,5 +462,9 @@ export class Home {
     } else {
       this.toast('You haven\'t yet submitted..');
     }
+  }
+
+  toast(val: string) {
+    this.t.toast(val);
   }
 }

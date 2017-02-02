@@ -6,6 +6,7 @@ import { Config } from '../config';
 import { Person } from '../common/person';
 import { Crypto } from '../common/crypto';
 import { DataService } from '../data.service';
+import { ToastService } from '../toasts';
 
 const styles   = require('./hearts.css');
 const template = require('./hearts.html');
@@ -19,10 +20,10 @@ export class Hearts {
   @Input('infoloaded') infoloaded: EventEmitter<boolean>;
 
   @Input('pubkeys') pubkeys;
-  @Input('dataObserver') dataObserver: Observer<any>;
 
   constructor(public http: Http,
-              public dataservice: DataService) {
+              public dataservice: DataService,
+              public t: ToastService) {
   }
 
   ngOnInit() {
@@ -45,6 +46,7 @@ export class Hearts {
               try {
                 this.dataservice.crypto.decryptAsym(vote.v);
                 this.dataservice.hearts = this.dataservice.hearts + 1;
+                this.toast('New heart!');
               } catch (err) {
                 console.error('Could not catch this vote');
                 console.log(vote.v);
@@ -73,6 +75,6 @@ export class Hearts {
   }
 
   toast(val: string) {
-    this.dataObserver.next(val);
+    this.t.toast(val);
   }
 }
