@@ -5,16 +5,12 @@ import { contentHeaders } from '../common/headers';
 import { Config } from '../config';
 import { Person } from '../common/person';
 import { Crypto } from '../common/crypto';
+import { DataService } from '../data.service';
+import { ToastService } from '../toasts';
+import { PubkeyService } from '../pubkey.service';
 
 const styles   = require('./hearts.css');
 const template = require('./hearts.html');
-
-export class NumPair {
-  constructor(
-    public hearts: number,
-    public lastcheck: number) {
-  }
-}
 
 @Component({
   selector: 'hearts',
@@ -22,52 +18,42 @@ export class NumPair {
   styles: [ styles ]
 })
 export class Hearts {
-  @Input('infoloaded') infoloaded: EventEmitter<NumPair>;
-  @Output('infodone') infodone: EventEmitter<NumPair> =
-    new EventEmitter<NumPair>();
-
-  @Input('pubkeys') pubkeys;
-  @Input('choices') choices: Person[];
-  @Input('dataObserver') dataObserver: Observer<any>;
-  @Input('crypto') crypto: Crypto;
-
-  hearts: number;
-  lastcheck: number;
-  constructor(public http: Http) {
-    this.hearts = 0;
-    this.lastcheck = 0;
+  constructor(public http: Http,
+              public dataservice: DataService,
+              public t: ToastService,
+              public pks: PubkeyService) {
   }
 
   ngOnInit() {
-    this.infoloaded.subscribe(info => this.getmorehearts(info));
+    this.dataservice.emitdone.subscribe(x => this.getmorehearts());
   }
 
-  getmorehearts(info: NumPair) {
-    this.hearts = info.hearts;
-    this.lastcheck = info.lastcheck;
+  getmorehearts() {
 
     let ctime = new Date().valueOf();
-    console.log('here at ' + ctime);
 
-    this.http.get(Config.voteGet + '/' + this.lastcheck)
+    this.http.get(Config.voteGet + '/' + this.dataservice.lastcheck)
       .subscribe(
         response => {
           try {
             let resp = JSON.parse(response['_body']);
-            this.lastcheck = resp.time;
+            this.dataservice.lastcheck = resp.time;
 
             console.log(resp);
             for (let vote of resp.votes) {
               try {
-                this.crypto.decryptAsym(vote.v);
-                this.hearts = this.hearts + 1;
+                this.dataservice.crypto.decryptAsym(vote.v);
+                this.dataservice.hearts = this.dataservice.hearts + 1;
+                this.toast('New heart!');
               } catch (err) {
                 console.error('Could not catch this vote');
                 console.log(vote.v);
               }
             }
 
-            this.infodone.emit(new NumPair(this.hearts, this.lastcheck));
+            console.log('Hearts now: ' + this.dataservice.hearts);
+            this.dataservice.save();
+
           } catch (err) {
             this.toast('Bad response for votes');
             console.error('Could not parse vote response');
@@ -87,6 +73,6 @@ export class Hearts {
   }
 
   toast(val: string) {
-    this.dataObserver.next(val);
+    this.t.toast(val);
   }
 }

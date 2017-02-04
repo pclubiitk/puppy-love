@@ -6,9 +6,10 @@ import { Config } from '../config';
 import { Search } from '../search';
 import { Crypto } from '../common/crypto';
 import { Person } from '../common/person';
-import { Toasts } from '../toasts';
-import { NumPair } from '../hearts';
+import { Toasts, ToastService } from '../toasts';
 import { Observable, Observer } from 'rxjs';
+import { DataService } from '../data.service';
+import { PubkeyService } from '../pubkey.service';
 
 const styles = require('./home.css');
 const template = require('./home.html');
@@ -16,7 +17,8 @@ const template = require('./home.html');
 @Component({
   selector: 'home',
   template: template,
-  styles: [ styles ]
+  styles: [ styles ],
+  providers: [ DataService, ToastService, PubkeyService ]
 })
 export class Home {
   password: string;
@@ -24,23 +26,13 @@ export class Home {
   response: string;
   api: string;
 
-  your_image: string = '';
-  your_gender: string = '';
-  your_name: string = '';
-  priv_key: string;
-  submitted: string = 'close';
   greeting: string = '';
-  saving: string = 'Fetching ...';
-  crypto: Crypto;
-  choices: Person[];
-  data;
 
-  pubkeys; // Map from roll number to key
   computetable; // Status of the compute table
 
   people: Person[];
 
-  heartemitter: EventEmitter<NumPair> = new EventEmitter<NumPair>();
+  heartemitter: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   // Safeguard to let people think a bit before locking
   canyousubmitrightnow: boolean = false;
@@ -61,85 +53,45 @@ export class Home {
     return true;
   };
 
-  constructor(public router: Router, public http: Http, public authHttp: AuthHttp) {
+  constructor(public router: Router,
+              public http: Http,
+              public authHttp: AuthHttp,
+              public dataservice: DataService,
+              public t: ToastService,
+              public pks: PubkeyService) {
+
     this.password = sessionStorage.getItem('password');
     this.id = sessionStorage.getItem('id');
     if (!this.password || !this.id) {
       this.router.navigate(['login']);
     }
-    this.crypto = new Crypto(this.password);
 
     this.make_greeting();
 
     // All actions begin here
     // We fetch user's personal info
-    this.http.get(Config.loginDataUrl)
-      .subscribe(
-        // Parse the information. Then do other actions from inside parseInfo
-        response => this.parseInfo(response['_body']),
-        error => this.toast('Error loading data')
-      );
+    this.dataservice.createcrypto(this.password);
+    this.dataservice.emitdone.subscribe(x => {
 
-    this.choices = [];
+      // 1. Fetch more hearts
+      // Automatically happens. Hearts component
+      // subscribes to this event.
 
-    this.data = {
-      choices: this.choices,
-      hearts: 0,
-      lastcheck: 0
-    };
+      // 2. Useful for autocompletion
+      this.loadPeople();
+
+      // 3. Needs to be after the gender has been set
+      // Automatically happens. Pubkey service
+      // subscribes to this event.
+    });
+    this.pks.emitdone.subscribe(x => {
+      this.getcomputetable();
+    });
+
+    // Start the action!
+    this.dataservice.callnetwork();
 
     this.people = [];
-
-    this.pubkeys = {};
-
-    this.toasthandler = new Observable<string>(observer => {
-      this.dataObserver = observer;
-    });
-  }
-
-  receivehearts(info: NumPair) {
-    if (this.data) {
-      this.data.hearts = info.hearts;
-      this.data.lastcheck = info.lastcheck;
-      console.log('Hearts now: ' + info.hearts);
-      this.save();
-    } else {
-      this.toast('Could not persist votes data');
-    }
-  }
-
-  // Parse user's personal info. Lay bedrock for future actions.
-  parseInfo(info: string) {
-    var infoObj = JSON.parse(info);
-    console.log(infoObj);
-    this.your_name = infoObj.name;
-    this.your_gender = infoObj.gender === '1' ? 'Male' : 'Female';
-    this.your_image = infoObj.image;
-    this.submitted = infoObj.submitted ? 'check' : 'close';
-
-    // Extract public and private keys of the user
-    this.crypto.deserializePriv(this.crypto.decryptSym(infoObj.privKey));
-    this.crypto.deserializePub(infoObj.pubKey);
-
-    // Decrypt stored choices info
-    this.data = Crypto.toJson(this.crypto.decryptSym(infoObj.data));
-    this.choices = Person.deserialize(this.data.choices);
-
-    let hearts = this.data.hearts || 0;
-    let lastcheck = this.data.lastcheck || 0;
-    this.heartemitter.emit(new NumPair(hearts, lastcheck));
-
-    console.log('Choices ==>');
-    console.log(this.choices);
-
-    this.saving = 'Saved ...';
-
-    // Useful for autocompletion
-    // TODO Typing in box does not do search
-    this.loadPeople();
-
-    // Needs to be after the gender has been set
-    this.getallpubkey();
   }
 
   // Fetch list of people for autocompletion search from backend
@@ -162,34 +114,13 @@ export class Home {
     };
 
     this.http.get(Config.listGender + '/' +
-                  (this.your_gender === 'Male' ? '0' : '1'))
+                  (this.dataservice.your_gender === 'Male' ? '0' : '1'))
       .subscribe(
         // Fetch list and parse
         response => parsePeople(response),
         error => {
           console.error('Could not get list of people');
           this.toast('Could not get list of people');
-        }
-      );
-  }
-
-  // Populate the public keys list from backend
-  getallpubkey() {
-    this.http.get(Config.listPubkey + '/' +
-                  (this.your_gender === 'Male' ? '0' : '1'))
-      .subscribe (
-        response => {
-          let items = JSON.parse(response['_body']);
-          for (let i in items) {
-            this.pubkeys[items[i]['_id']] = items[i]['pubKey'];
-          }
-          // Negotiate compute values with people
-          // Requires the public keys to be in memory
-          this.getcomputetable();
-        },
-        error => {
-          console.error('Error getting public keys');
-          this.toast('Error getting public keys');
         }
       );
   }
@@ -248,7 +179,7 @@ export class Home {
       let ids = item['_id'].split('-');
       let po = (ids[0] === this.id ? 0 : 1);
       let op = (po === 0 ? 1 : 0);
-      let pubk = this.pubkeys[ids[op]];
+      let pubk = this.pks.pubkeys[ids[op]];
 
       if (!pubk) {
         errors.push(ids[op]);
@@ -267,7 +198,7 @@ export class Home {
         // Store the random value for the other person as well as yourself
         let vv = Crypto.getRand();
         item['t' + po] = {};
-        item['t' + po]['d' + po] = this.crypto.encryptAsym(vv);
+        item['t' + po]['d' + po] = this.dataservice.crypto.encryptAsym(vv);
         item['t' + po]['d' + op] = cry.encryptAsym(vv);
 
         token.push({
@@ -281,8 +212,8 @@ export class Home {
       if (Home.checker(item['t' + po]) &&
           Home.checker(item['t' + op])) {
 
-        let v0 = this.crypto.decryptAsym(item['t0']['d' + po]);
-        let v1 = this.crypto.decryptAsym(item['t1']['d' + po]);
+        let v0 = this.dataservice.crypto.decryptAsym(item['t0']['d' + po]);
+        let v1 = this.dataservice.crypto.decryptAsym(item['t1']['d' + po]);
 
         // You haven't sent the result yet
         if (!item['r' + po]) {
@@ -295,7 +226,7 @@ export class Home {
 
         // And if this person is your choice, declare another
         // expected value
-        for (let p of this.choices) {
+        for (let p of this.dataservice.choices) {
           if (p.roll === ids[op]) {
             // This person is a choice
             let expHash = Crypto.hash(v0 + '1231abcdsjklasdla1239042' + v1);
@@ -328,7 +259,7 @@ export class Home {
 
     // Person might have submitted his choices
     // We should probably look at the submission thing again
-    if (this.submitted === 'check') {
+    if (this.dataservice.submitted === 'check') {
       this.submit();
     }
   }
@@ -349,11 +280,12 @@ export class Home {
         // By default random token
         let tosend = Crypto.getRand();
 
-        for (let p of this.choices) {
+        for (let p of this.dataservice.choices) {
           if (p.roll === ids[op]) {
             // This person is a choice
             // We should not send random thing
-            tosend = this.crypto.decryptAsym(item['t' + po]['d' + po]);
+            tosend =
+              this.dataservice.crypto.decryptAsym(item['t' + po]['d' + po]);
             break;
           }
         }
@@ -401,23 +333,6 @@ export class Home {
       );
   }
 
-  // Save your (transient and changing) choices on the backend
-  // Not for anyone else's eyes
-  save() {
-    this.data = {
-      choices: this.choices,
-      hearts: this.data.hearts,
-      lastcheck: this.data.lastcheck
-    };
-    let encData = this.crypto.encryptSym(Crypto.fromJson(this.data));
-    this.saving = 'Saving ...';
-    this.http.post(Config.dataSaveUrl, {data: encData}, null)
-      .subscribe (
-        response => this.saving = 'Saved ...',
-        error => this.saving = 'Error saving your choices!'
-      );
-  }
-
   // ===============================================
   // Handlers for click and user interaction buttons
   // ===============================================
@@ -425,13 +340,13 @@ export class Home {
   // Only used when submit button is pressed
   submitButton() {
     // Only proceed if not already submitted
-    if (this.submitted !== 'check') {
+    if (this.dataservice.submitted !== 'check') {
 
       if (this.canyousubmitrightnow) {
         this.http.post(Config.submitSaveUrl, null, null)
           .subscribe (
             response => {
-              this.submitted = 'check';
+              this.dataservice.submitted = 'check';
               this.submit();
             },
             error => {
@@ -467,25 +382,25 @@ export class Home {
 
   // Called when an entry is clicked in the search box
   personSelected(data: Person) {
-    if (this.submitted === 'check') {
+    if (this.dataservice.submitted === 'check') {
       this.toast('You have already submitted. Cannot change now');
       return;
     }
 
-    this.choices.push(data);
-    this.save();
+    this.dataservice.choices.push(data);
+    this.dataservice.save();
   }
 
   // Called when user removes a saved choice
   personRemoved(data: string) {
-    if (this.submitted === 'check') {
+    if (this.dataservice.submitted === 'check') {
       this.toast('You have already submitted. Cannot change now');
       return;
     }
 
     let remove = null;
-    for (let i = 0; i < this.choices.length; i++) {
-      if (this.choices[i].roll === data) {
+    for (let i = 0; i < this.dataservice.choices.length; i++) {
+      if (this.dataservice.choices[i].roll === data) {
         remove = i;
         break;
       }
@@ -495,8 +410,8 @@ export class Home {
       console.error('Unknown person removed: ' + data);
       this.toast('Unknown person removed: ' + data);
     } else {
-      this.choices.splice(remove, 1);
-      this.save();
+      this.dataservice.choices.splice(remove, 1);
+      this.dataservice.save();
     }
   }
 
@@ -523,17 +438,17 @@ export class Home {
     }
   }
 
-  toast(val: string) {
-    this.dataObserver.next(val);
-  }
-
   submitsidebutton() {
-    if (this.submitted === 'check') {
+    if (this.dataservice.submitted === 'check') {
       this.toast('You\'ve submitted, hurray!');
-    } else if (!this.submitted) {
+    } else if (!this.dataservice.submitted) {
       this.toast('Still loading');
     } else {
       this.toast('You haven\'t yet submitted..');
     }
+  }
+
+  toast(val: string) {
+    this.t.toast(val);
   }
 }

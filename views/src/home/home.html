@@ -5,13 +5,17 @@
 
         <div class="panel panel-primary">
             <div id="your_name" class="panel-heading">
-                {{ greeting }} {{ your_name }}
+                {{ greeting }} {{ dataservice.your_name }}
             </div>
             <div class="panel-body">
                 <div class="thumbnail text-center">
-                    <img id="your_image" src="{{ your_image }}" alt="You?">
+                  <img id="your_image"
+                       src="{{ dataservice.your_image }}"
+                       alt="You?">
                 </div>
-                <div class="text-center" id="your_gender">{{ your_gender }}</div>
+                <div class="text-center" id="your_gender">
+                  {{ dataservice.your_gender }}
+                </div>
             </div>
 
 
@@ -20,7 +24,9 @@
                 <div class="[ btn-group ]">
                     <label (click)="submitsidebutton()" id="label_submitted"
                            class="[ btn btn-default ]">
-                        <i class="material-icons">{{ submitted }}</i> Submitted?
+                      <i class="material-icons">
+                        {{ dataservice.submitted }}
+                      </i> Submitted?
                     </label>
                 </div>
             </div>
@@ -57,7 +63,7 @@
                             <div class="panel-heading">
                                 Your choices
                                 <span style="float: right;">
-                                    {{ saving }}
+                                    {{ dataservice.saving }}
                                 </span>
                             </div>
                             <div class="panel-body">
@@ -65,7 +71,7 @@
                                 <!-- Choices -->
                                 <div class="row" id="choices-row">
                                     <choices
-                                        [people]="choices"
+                                        [people]="dataservice.choices"
                                         (person-remove)="personRemoved($event)">
                                     </choices>
                                 </div>
@@ -81,19 +87,16 @@
                     <div class="[ btn-group ]">
                         <label id="submit_button" class="[ btn btn-default ]"
                         (click)="submitButton()">
-                            <i class="material-icons">sentiment_very_satisfied</i> Submit!
+                          <i class="material-icons">
+                            sentiment_very_satisfied
+                          </i>
+                          Submit!
                         </label>
                     </div>
                 </div>
 
                 <div class="[ text-center ]" style="margin: 15px;">
-                  <hearts [infoloaded]="heartemitter"
-                          [pubkeys]="pubkeys"
-                          [choices]="choices"
-                          [dataObserver]="dataObserver"
-                          [crypto]="crypto"
-                          (infodone)="receivehearts($event)">
-                  </hearts>
+                  <hearts> </hearts>
                 </div>
 
             </div>
@@ -131,4 +134,4 @@
     <!-- End of main content div -->
 
 </div>
-<toasts [toasthandler]="toasthandler"></toasts>
+<toasts [toasthandler]="t.toasthandler"></toasts>
