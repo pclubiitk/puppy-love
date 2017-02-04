@@ -53,7 +53,7 @@ func (m VoteSend) Serve(ctx *iris.Context) {
 	}
 
 	if user.Vote+len(*votes) > 4 {
-		ctx.EmitError(iris.StatusForbidden)
+		ctx.Error("More than allowed votes", iris.StatusBadRequest)
 		return
 	}
 

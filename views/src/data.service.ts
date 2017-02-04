@@ -23,6 +23,7 @@ export class DataService {
   crypto: Crypto;
 
   emitdone: EventEmitter<boolean> = new EventEmitter<boolean>();
+  emitsend: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(public http: Http,
               public t: ToastService) { }

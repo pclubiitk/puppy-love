@@ -182,7 +182,7 @@ export class Home {
       let pubk = this.pks.pubkeys[ids[op]];
 
       if (!pubk) {
-        errors.push(ids[op]);
+        // TODO remove
         console.error('No public key for ' + ids[op]);
         continue;
       }
@@ -266,6 +266,8 @@ export class Home {
 
   // Goes over the compute table, and sends final value messages to server
   submit() {
+    this.dataservice.emitsend.emit(true);
+
     let values = [];
     for (let item of this.computetable) {
 

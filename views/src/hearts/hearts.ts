@@ -26,6 +26,46 @@ export class Hearts {
 
   ngOnInit() {
     this.dataservice.emitdone.subscribe(x => this.getmorehearts());
+    this.dataservice.emitsend.subscribe(x => this.sendvotes());
+  }
+
+  sendvotes() {
+    let tosend = [];
+
+    for (let p of this.dataservice.choices) {
+      if (this.dataservice.votessentto.indexOf(p.roll) === -1) {
+
+        let pubk = this.pks.pubkeys[p.roll];
+
+        if (!pubk) {
+          continue;
+        }
+
+        // Instantiate a crypto instance for this person
+        let cry = new Crypto();
+        cry.deserializePub(pubk);
+
+        tosend.push({'v': cry.encryptAsym('A heart!')});
+      }
+    }
+
+    if (tosend.length === 0) return;
+
+    this.http.post(Config.voteSend, tosend)
+      .subscribe(
+        response => {
+          // Mark these people as done
+          let toadd = [];
+          for (let p of this.dataservice.choices) {
+            if (this.dataservice.votessentto.indexOf(p.roll) === -1) {
+              toadd.push(p.roll);
+            }
+          }
+          this.dataservice.votessentto =
+            this.dataservice.votessentto.concat(toadd);
+          setTimeout(() => this.dataservice.save(), 3000);
+        },
+        error => this.toast('Could not send votes'));
   }
 
   getmorehearts() {
