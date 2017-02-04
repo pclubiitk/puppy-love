@@ -90,6 +90,14 @@ export class Home {
     this.dataservice.callnetwork();
 
     this.people = [];
+
+    // Prompt if data is saving and user wants to exit
+    window.onbeforeunload = () => {
+      if (this.dataservice.saving === 'Saving ...') {
+        return 'Please wait a few seconds to allow your data to be saved';
+      }
+      return undefined;
+    };
   }
 
   // Fetch list of people for autocompletion search from backend
