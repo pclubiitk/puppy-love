@@ -1,5 +1,45 @@
 /// <reference path="../../sjcl/sjcl.d.ts" />
 
+export class Option<T> {
+  static Some<T>(item: T): Option<T> {
+    return new Option<T>(item);
+  }
+
+  static None<T>(): Option<T> {
+    return new Option<T>(undefined);
+  }
+
+  constructor(public item: T) {}
+
+  get(): T {
+    return this.item;
+  }
+
+  getOrElse(it: T): T {
+    if (this.item) {
+      return this.item;
+    } else {
+      return it;
+    }
+  }
+
+  isNone(): boolean {
+    if (this.item) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  getOrElseCall(callback: () => void) {
+    if (this.item) {
+      return this.item;
+    } else {
+      callback();
+    }
+  }
+}
+
 export class Crypto {
   private pubK: sjcl.SjclElGamalPublicKey;
   private priK: sjcl.SjclElGamalSecretKey;
@@ -27,18 +67,6 @@ export class Crypto {
               priK?: sjcl.SjclElGamalSecretKey) {
     this.pubK = pubK;
     this.priK = priK;
-  }
-
-  test() {
-    let ct = sjcl.encrypt(this.pubK, 'Hello World!');
-    let pt = sjcl.decrypt(this.priK, ct);
-    console.log(ct);
-    console.log(pt);
-
-    ct = this.encryptAsym('Hello dude');
-    pt = this.decryptAsym(ct);
-    console.log(ct);
-    console.log(pt);
   }
 
   // Key creation and storage
@@ -100,12 +128,16 @@ export class Crypto {
   }
 
 
-  decryptAsym(data: sjcl.SjclCipherEncrypted) {
+  decryptAsym(data: sjcl.SjclCipherEncrypted): Option<string> {
     if (!this.priK) {
       console.error('Decryption requires private key');
-      return;
+      return Option.None<string>();
     }
 
-    return sjcl.decrypt(this.priK, data);
+    try {
+      return Option.Some<string>(sjcl.decrypt(this.priK, data));
+    } catch (e) {
+      return Option.None<string>();
+    }
   }
 }

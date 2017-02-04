@@ -4,7 +4,7 @@ import { Http } from '@angular/http';
 import { contentHeaders } from '../common/headers';
 import { Config } from '../config';
 import { Person } from '../common/person';
-import { Crypto } from '../common/crypto';
+import { Option, Crypto } from '../common/crypto';
 import { DataService } from '../data.service';
 import { ToastService } from '../toasts';
 import { PubkeyService } from '../pubkey.service';
@@ -79,15 +79,18 @@ export class Hearts {
             let resp = JSON.parse(response['_body']);
             this.dataservice.lastcheck = resp.time;
 
+            console.log('New votes since last time =>');
             console.log(resp);
+
             for (let vote of resp.votes) {
-              try {
+              let dec_res: Option<string> =
                 this.dataservice.crypto.decryptAsym(vote.v);
+
+              if (dec_res.getOrElse('') !== 'A heart!') {
+                console.log('Could not catch vote');
+              } else {
                 this.dataservice.hearts = this.dataservice.hearts + 1;
                 this.toast('New heart!');
-              } catch (err) {
-                console.error('Could not catch this vote');
-                console.log(vote.v);
               }
             }
 

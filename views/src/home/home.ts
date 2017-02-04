@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { AuthHttp } from 'angular2-jwt';
 import { Config } from '../config';
 import { Search } from '../search';
-import { Crypto } from '../common/crypto';
+import { Option, Crypto } from '../common/crypto';
 import { Person } from '../common/person';
 import { Toasts, ToastService } from '../toasts';
 import { Observable, Observer } from 'rxjs';
@@ -31,8 +31,6 @@ export class Home {
   computetable; // Status of the compute table
 
   people: Person[];
-
-  heartemitter: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   // Safeguard to let people think a bit before locking
   canyousubmitrightnow: boolean = false;
@@ -215,9 +213,16 @@ export class Home {
         let v0 = this.dataservice.crypto.decryptAsym(item['t0']['d' + po]);
         let v1 = this.dataservice.crypto.decryptAsym(item['t1']['d' + po]);
 
+        if (v0.isNone() || v1.isNone()) {
+          let msg = 'Error decrypting tokens for ' + ids[op];
+          console.error(msg);
+          this.toast(msg);
+          continue;
+        }
+
         // You haven't sent the result yet
         if (!item['r' + po]) {
-          let expRes = Crypto.hash(v0 + '-' + v1);
+          let expRes = Crypto.hash(v0.get() + '-' + v1.get());
           res.push({
             id: item['_id'],
             v: expRes
@@ -280,14 +285,23 @@ export class Home {
       if (Home.checker(item['t' + po]) && item['v' + po] === '') {
 
         // By default random token
-        let tosend = Crypto.getRand();
+        let tosend: string = Crypto.getRand();
 
         for (let p of this.dataservice.choices) {
           if (p.roll === ids[op]) {
             // This person is a choice
             // We should not send random thing
-            tosend =
+            let token: Option<string> =
               this.dataservice.crypto.decryptAsym(item['t' + po]['d' + po]);
+
+            if (token.isNone()) {
+              let msg = 'Error retrieving value to send for user ' + p.roll;
+              console.error(msg);
+              this.toast(msg);
+              continue;
+            }
+
+            tosend = token.get();
             break;
           }
         }
