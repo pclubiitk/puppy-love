@@ -61,22 +61,17 @@ func (m ComputePrepare) Serve(ctx *iris.Context) {
 		return
 	}
 
-	// var toInsert []interface{}
-	bulk := m.Db.GetCollection("compute").Bulk()
+	cnt := 0
+	compute_coll := m.Db.GetCollection("compute")
 	for _, fe := range females {
 		for _, ma := range males {
+			log.Println(fe.Id, "-", ma.Id, "-", cnt)
+			cnt = cnt + 1
 			res := models.UpsertEntry(fe.Id, ma.Id)
-			bulk.Upsert(res.Selector, res.Change)
+			compute_coll.Upsert(res.Selector, res.Change)
 		}
 	}
-	r, err := bulk.Run()
-
-	if err != nil {
-		ctx.EmitError(iris.StatusInternalServerError)
-		log.Println(err)
-		return
-	}
-	ctx.JSON(iris.StatusOK, r)
+	ctx.JSON(iris.StatusOK, string(cnt)+" entries created!")
 }
 
 type ComputeStep struct {

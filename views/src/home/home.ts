@@ -149,6 +149,7 @@ export class Home {
 
   // Get the complete compute table from backend
   getcomputetable() {
+    if (this.router.url !== '/home') return;
     this.http.get(Config.listCompute)
       .subscribe (
         response => {
@@ -196,8 +197,6 @@ export class Home {
       let pubk = this.pks.pubkeys[ids[op]];
 
       if (!pubk) {
-        // TODO remove
-        console.error('No public key for ' + ids[op]);
         continue;
       }
 
