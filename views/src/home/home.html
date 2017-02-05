@@ -9,8 +9,9 @@
             </div>
             <div class="panel-body">
                 <div class="thumbnail text-center">
+
                   <img id="your_image"
-                       src="{{ dataservice.your_image }}"
+                       [src]="dataservice.your_image"
                        alt="You?">
                 </div>
                 <div class="text-center" id="your_gender">
@@ -115,7 +116,7 @@
                           <i class="material-icons">
                             sentiment_very_satisfied
                           </i>
-                          Submit!
+                          Lock and submit!
                         </label>
                     </div>
                 </div>

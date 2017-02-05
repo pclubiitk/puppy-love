@@ -53,7 +53,7 @@ export class Search {
   }
 
   shortlist() {
-    let searchterm = this.content;
+    let searchterm = this.content.toLowerCase();
 
     // Small search => Show no one
     if (searchterm.length < 3) {
@@ -64,8 +64,8 @@ export class Search {
     }
 
     for (let p of this.suggestions) {
-      if (p.name.indexOf(searchterm) !== -1 ||
-          p.roll.indexOf(searchterm) !== -1) {
+      if (p.name.toLowerCase().indexOf(searchterm) !== -1 ||
+          p.roll.toLowerCase().indexOf(searchterm) !== -1) {
         p.display = true;
       } else {
         p.display = false;
