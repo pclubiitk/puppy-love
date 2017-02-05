@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/pclubiitk/puppy-love/db"
@@ -71,7 +72,53 @@ func (m ComputePrepare) Serve(ctx *iris.Context) {
 			compute_coll.Upsert(res.Selector, res.Change)
 		}
 	}
-	ctx.JSON(iris.StatusOK, string(cnt)+" entries created!")
+	ctx.JSON(iris.StatusOK, strconv.Itoa(cnt)+" entries created!")
+}
+
+// @AUTH @Admin Create the entries in the compute table for given user
+// -------------------------------------------------------------------
+type ComputePrepareSmall struct {
+	Db db.PuppyDb
+}
+
+func (m ComputePrepareSmall) Serve(ctx *iris.Context) {
+	id, err := SessionId(ctx)
+	if err != nil || id != "admin" {
+		ctx.EmitError(iris.StatusForbidden)
+		return
+	}
+
+	type typeIds struct {
+		Id string `json:"_id" bson:"_id"`
+	}
+
+	var people []typeIds
+
+	uid := ctx.Param("id")
+	req_gender := ctx.Param("gender")
+	if id == "" || req_gender == "" {
+		ctx.Error("Id or gender not provided /:id/:gender", iris.StatusBadRequest)
+		return
+	}
+
+	collection := m.Db.GetCollection("user")
+	err = collection.Find(bson.M{"gender": req_gender}).All(&people)
+
+	if err != nil {
+		ctx.EmitError(iris.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+
+	cnt := 0
+	compute_coll := m.Db.GetCollection("compute")
+	for _, fe := range people {
+		log.Println(fe.Id, "-", uid, "-", cnt)
+		cnt = cnt + 1
+		res := models.UpsertEntry(fe.Id, uid)
+		compute_coll.Upsert(res.Selector, res.Change)
+	}
+	ctx.JSON(iris.StatusOK, strconv.Itoa(cnt)+" entries created!")
 }
 
 type ComputeStep struct {

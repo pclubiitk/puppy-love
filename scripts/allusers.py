@@ -33,7 +33,7 @@ if resp.status_code != 200:
     print("Could not login")
     exit()
 
-for person in text[1:]:
+for person in text:
     data = list(map(lambda x: x.strip(), person.split(',')))
 
     payload = {}

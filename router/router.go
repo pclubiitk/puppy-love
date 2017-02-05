@@ -53,6 +53,8 @@ func PuppyRoute(db db.PuppyDb) {
 	iris.Handle("GET", aPre+"/compute/drop", controllers.ComputeDelete{db})
 	iris.Handle("GET", aPre+"/compute/list", controllers.ComputeListAdmin{db})
 	iris.Handle("GET", aPre+"/compute/prepare", controllers.ComputePrepare{db})
+	iris.Handle("GET", aPre+"/compute/preparesmall/:id/:gender",
+		controllers.ComputePrepareSmall{db})
 	iris.Handle("GET", aPre+"/declare/prepare", controllers.DeclarePrepare{db})
 
 	iris.Handle("GET", aPre+"/user/drop", controllers.UserDelete{db})
