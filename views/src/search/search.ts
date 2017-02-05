@@ -36,7 +36,9 @@ export class Search {
   // http://stackoverflow.com/questions/37034625/
   @HostListener('focusout', ['$event'])
   focusout(event) {
-    setTimeout(() => this.displayCompletions = false, 300);
+    setTimeout(() => {
+      this.displayCompletions = false;
+    }, 300);
   }
 
   constructor() {

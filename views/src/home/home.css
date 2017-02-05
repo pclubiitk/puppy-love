@@ -5,3 +5,13 @@
 .wide {
     width: 100%;
 }
+
+.greenbt {
+    -webkit-transition: background-color 1000ms linear;
+    -ms-transition: background-color 1000ms linear;
+    transition: background-color 1000ms linear;
+}
+
+.greener {
+    background-color: palegreen;
+}

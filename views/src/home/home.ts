@@ -406,8 +406,7 @@ export class Home {
         }
       }
     } else {
-      // TODO Some way of showing an error
-      this.toast('You have already submitted! Do not be desperate :)');
+      this.toast('You have already submitted!');
     }
   }
 
@@ -418,8 +417,18 @@ export class Home {
       return;
     }
 
-    this.dataservice.choices.push(data);
-    this.dataservice.save();
+    if (this.dataservice.choices.length <= 3) {
+      for (let choice of this.dataservice.choices) {
+        if (choice.roll === data.roll) {
+          this.toast('You have already added this person.');
+          return;
+        }
+      }
+      this.dataservice.choices.push(data);
+      this.dataservice.save();
+    } else {
+      this.toast('You cannot select more than 4 choices.');
+    }
   }
 
   // Called when user removes a saved choice

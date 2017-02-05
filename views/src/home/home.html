@@ -110,15 +110,16 @@
                 <!-- End of choices panel row -->
 
                 <div class="[ form-group text-center ]" style="margin: 15px;">
-                    <div class="[ btn-group ]">
-                        <label id="submit_button" class="[ btn btn-default ]"
-                        (click)="submitButton()">
-                          <i class="material-icons">
-                            sentiment_very_satisfied
-                          </i>
-                          Lock and submit!
-                        </label>
-                    </div>
+                  <div class="[ btn-group ]">
+                    <label id="submit_button" class="[ btn btn-default greenbt ]"
+                           [class.greener]="this.canyousubmitrightnow"
+                           (click)="submitButton()">
+                      <i class="material-icons">
+                        sentiment_very_satisfied
+                      </i>
+                      Lock and submit!
+                    </label>
+                  </div>
                 </div>
 
                 <div class="[ text-center ]" style="margin: 15px;">
