@@ -27,6 +27,7 @@ func (m SessionLogin) Serve(ctx *iris.Context) {
 	u := new(LoginInfo)
 	if err := ctx.ReadJSON(u); err != nil {
 		ctx.EmitError(iris.StatusBadRequest)
+		log.Println(err)
 		return
 	}
 

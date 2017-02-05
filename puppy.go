@@ -13,6 +13,11 @@ import (
 	"github.com/kataras/iris"
 )
 
+func executeFirst(ctx *iris.Context) {
+	fmt.Println(string(ctx.Path()[:]))
+	ctx.Next()
+}
+
 func main() {
 	sessionDb := db.RedisSession()
 
@@ -26,6 +31,7 @@ func main() {
 
 	iris.UseSessionDB(sessionDb)
 	iris.Config.Gzip = true
+	iris.UseFunc(executeFirst)
 
 	router.PuppyRoute(mongoDb)
 
