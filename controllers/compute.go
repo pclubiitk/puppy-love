@@ -177,6 +177,10 @@ func (m ComputeStep) Serve(ctx *iris.Context) {
 	// Bulk update all entries
 	// dbUpdate+"1" means t1 in case of tokens, r1 in case of results, v1 too
 	bulk := m.Db.GetCollection("compute").Bulk()
+
+	// See http://stackoverflow.com/questions/24237887/what-is-mongodb-batch-operation-max-size
+	bulk.Unordered()
+
 	var chunks []string
 	var update bson.M
 	for _, pInfo := range *info {
