@@ -1,4 +1,17 @@
 <div class="signup center-block jumbotron">
+    <h2>Send verification mail</h2>
+    <form role="form" (submit)="mailer($event, roller.value)">
+        <div class="form-group">
+            <label for="roller">Roll Number</label>
+            <input type="text" #roller class="form-control" id="roller" placeholder="Your roll number">
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-default">Send mail</button>
+        </div>
+    </form>
+
+    <br/>
+
     <h2>Signup</h2>
     <form role="form" (submit)="signup($event, roll.value, password.value, authCode.value)">
         <div class="form-group">
@@ -18,21 +31,12 @@
         </div>
     </form>
 
-    <h2>Send verification mail</h2>
-    <form role="form" (submit)="mailer($event, roller.value)">
-        <div class="form-group">
-            <label for="roller">Roll Number</label>
-            <input type="text" #roller class="form-control" id="roller" placeholder="Your roll number">
-        </div>
-        <div class="text-center">
-            <button type="submit" class="btn btn-default">Send mail</button>
-        </div>
-    </form>
-
     <br/>
 
     <div class="text-center">
-        {{ message }}
+      {{ message }}
+      <br/>
+      <button (click)="login($event)" class="btn btn-default">Login page</button>
     </div>
 
 </div>

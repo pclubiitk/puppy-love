@@ -1,5 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { Http } from '@angular/http';
+import { Router } from '@angular/router';
 import { Person } from './common/person';
 import { Crypto } from './common/crypto';
 import { ToastService } from './toasts';
@@ -26,6 +27,7 @@ export class DataService {
   emitsend: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(public http: Http,
+              public router: Router,
               public t: ToastService) { }
 
   createcrypto(password: string) {
@@ -37,7 +39,18 @@ export class DataService {
       .subscribe(
         // Parse the information. Then do other actions from inside parseInfo
         response => this.parseinfo(response['_body']),
-        error => this.toast('Error loading data')
+        error => {
+          this.toast('Error loading data: ' + error.status);
+
+          try {
+            if (error.code === 403) {
+              this.router.navigate(['login']);
+            }
+          } catch (e) {
+            console.error(e);
+            console.log(error);
+          }
+        }
       );
   }
 

@@ -23,10 +23,11 @@
             <div class="[ form-group text-center ]" style="margin: 15px;">
                 <div class="[ btn-group ]">
                     <label (click)="submitsidebutton()" id="label_submitted"
-                           class="[ btn btn-default ]">
+                           class="[ btn btn-default wide ]">
                       <i class="material-icons">
                         {{ dataservice.submitted }}
-                      </i> Submitted?
+                      </i>
+                      {{dataservice.submitted == 'check' ? 'Submitted!' : 'Not submitted'}}
                     </label>
                 </div>
             </div>
@@ -34,7 +35,7 @@
             <div class="[ form-group text-center ]" style="margin: 15px;">
                 <div class="[ btn-group ]">
                     <label (click)="logout()" id="label_logout"
-                           class="[ btn btn-default ]">
+                           class="[ btn btn-default wide ]">
                         <i class="material-icons">power_settings_new</i> Logout
                     </label>
                 </div>
@@ -45,12 +46,16 @@
             <div class="[ form-group text-center ]" style="margin: 15px;">
                 <div class="[ btn-group ]">
                     <label (click)="aboutpage()" id="label_logout"
-                           class="[ btn btn-default text-center ]">
-                      About the platform!
+                           class="[ btn btn-default text-center wide ]">
+                      About the platform
+                    </label>
+                    <label (click)="sourcecodepage()" id="label_logout"
+                           class="[ btn btn-default text-center wide ]">
+                      Source code
                     </label>
                     <label (click)="pclubpage()" id="label_logout"
                            class="[ btn btn-default text-center wide ]">
-                      PClub
+                      PClub.in
                     </label>
                     <label (click)="creditspage()" id="label_logout"
                            class="[ btn btn-default text-center wide ]">

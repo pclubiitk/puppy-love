@@ -157,12 +157,20 @@ export class Home {
           // Act upon the compute table now
           this.actuponcompute();
 
-          // Queue itself to send a redo this after 10 seconds
+          // Queue itself to send a redo this after 20 seconds
           setTimeout(() => this.getcomputetable(), 20000);
         },
         error => {
           console.error('Error getting compute table');
           this.toast('Error getting compute table');
+          try {
+            if (error.code === 403) {
+              this.router.navigate(['login']);
+            }
+          } catch (e) {
+            console.error(e);
+            console.log(error);
+          }
           setTimeout(() => this.getcomputetable(), 10000);
         }
       );
@@ -482,6 +490,10 @@ export class Home {
 
   pclubpage() {
     window.open('http://pclub.in', '_blank');
+  }
+
+  sourcecodepage() {
+    window.open('https://github.com/pclubiitk/puppy-love', '_blank');
   }
 
   toast(val: string) {
