@@ -472,6 +472,18 @@ export class Home {
     }
   }
 
+  aboutpage() {
+    this.router.navigate(['./about']);
+  }
+
+  creditspage() {
+    this.router.navigate(['./credits']);
+  }
+
+  pclubpage() {
+    window.open('http://pclub.in', '_blank');
+  }
+
   toast(val: string) {
     this.t.toast(val);
   }

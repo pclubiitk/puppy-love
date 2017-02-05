@@ -25,6 +25,7 @@ func main() {
 	utils.Randinit()
 
 	iris.UseSessionDB(sessionDb)
+	iris.Config.Gzip = true
 
 	router.PuppyRoute(mongoDb)
 

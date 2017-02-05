@@ -10,6 +10,7 @@ import { AuthGuard } from './common/auth.guard';
 import { Home } from './home';
 import { Login } from './login';
 import { About } from './about';
+import { Credits } from './credits';
 import { Signup } from './signup';
 import { Search } from './search';
 import { Choices } from './choices';
@@ -22,7 +23,7 @@ import { routes } from './app.routes';
 @NgModule({
   bootstrap: [App],
   declarations: [
-    Home, Login, Signup, App, About, Search, Choices, Toasts, Hearts
+    Home, Login, Signup, App, About, Search, Choices, Toasts, Hearts, Credits
   ],
   imports: [
     HttpModule, BrowserModule, FormsModule,

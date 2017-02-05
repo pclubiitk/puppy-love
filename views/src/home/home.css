@@ -1,3 +1,7 @@
 .red {
-  color: red;
+    color: red;
+}
+
+.wide {
+    width: 100%;
 }

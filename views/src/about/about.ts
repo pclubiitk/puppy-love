@@ -42,4 +42,8 @@ export class About {
     event.preventDefault();
     this.router.navigate(['signup']);
   }
+
+  homepage() {
+    this.router.navigate(['home']);
+  }
 }
