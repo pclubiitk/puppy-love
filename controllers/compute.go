@@ -63,16 +63,41 @@ func (m ComputePrepare) Serve(ctx *iris.Context) {
 	}
 
 	cnt := 0
-	compute_coll := m.Db.GetCollection("compute")
-	for _, fe := range females {
-		for _, ma := range males {
-			log.Println(fe.Id, "-", ma.Id, "-", cnt)
-			cnt = cnt + 1
-			res := models.UpsertEntry(fe.Id, ma.Id)
-			compute_coll.Upsert(res.Selector, res.Change)
+
+	// Whether to enable experimental bulk calls
+	experimentalBulk := ctx.Param("bulk")
+
+	if experimentalBulk == "1" {
+		bulk := m.Db.GetCollection("compute").Bulk()
+		bulk.Unordered()
+		for _, fe := range females {
+			for _, ma := range males {
+				log.Println(fe.Id, "-", ma.Id, "-", cnt)
+				cnt = cnt + 1
+				res := models.UpsertEntry(fe.Id, ma.Id)
+				bulk.Upsert(res.Selector, res.Change)
+			}
 		}
+		r, err := bulk.Run()
+		if err != nil {
+			ctx.Error("Something failed", iris.StatusInternalServerError)
+			log.Println("Bulk call failed")
+			log.Println(err)
+			return
+		}
+		ctx.JSON(iris.StatusOK, r)
+	} else {
+		compute_coll := m.Db.GetCollection("compute")
+		for _, fe := range females {
+			for _, ma := range males {
+				log.Println(fe.Id, "-", ma.Id, "-", cnt)
+				cnt = cnt + 1
+				res := models.UpsertEntry(fe.Id, ma.Id)
+				compute_coll.Upsert(res.Selector, res.Change)
+			}
+		}
+		ctx.JSON(iris.StatusOK, strconv.Itoa(cnt)+" entries created!")
 	}
-	ctx.JSON(iris.StatusOK, strconv.Itoa(cnt)+" entries created!")
 }
 
 // @AUTH @Admin Create the entries in the compute table for given user
