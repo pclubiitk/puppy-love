@@ -33,6 +33,9 @@ services:
       image: pclub/puppy-love:backend
       env_file:
         - .backend.env
+      environment:
+        - VIRTUAL_HOST=puppy.pclub.in
+        - VIRTUAL_PROTO=http
       ports:
         - "3000"
       links:
@@ -46,6 +49,8 @@ services:
       image: pclub/puppy-love:frontend
       ports:
         - "80:80"
+      environment:
+        - VIRTUAL_PORT=3000
       networks:
         - mynet
       links:
