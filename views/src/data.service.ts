@@ -43,7 +43,7 @@ export class DataService {
           this.toast('Error loading data: ' + error.status);
 
           try {
-            if (error.code === 403) {
+            if (error.status === 403) {
               this.router.navigate(['login']);
             }
           } catch (e) {

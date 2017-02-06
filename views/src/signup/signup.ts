@@ -17,7 +17,8 @@ export class Signup {
   message: string = '';
   crypto: Crypto;
 
-  constructor(public router: Router, public http: Http) {
+  constructor(public router: Router,
+              public http: Http) {
   }
 
   signup(event, roll, password, authCode) {
@@ -67,7 +68,13 @@ export class Signup {
           this.message = 'Mail sent to your @iitk ID !';
         },
         error => {
-          this.message = 'There was an error. Please tell us at pclubiitk@gmail';
+          if (error.status === 404) {
+            this.message =
+              'Your information was not found in our database. ' +
+              'Please send us a mail at pclubiitk@gmail.com';
+          } else {
+            this.message = 'There was an error. Let us know at pclubiitk@gmail';
+          }
         }
       );
   }
