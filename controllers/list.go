@@ -135,7 +135,7 @@ func (m PubkeyList) Serve(ctx *iris.Context) {
 	})
 
 	if err := m.Db.GetCollection("user").
-		Find(bson.M{"gender": _gender}).All(&query); err != nil {
+		Find(bson.M{"gender": _gender, "dirty": false}).All(&query); err != nil {
 
 		ctx.EmitError(iris.StatusNotFound)
 		log.Print(err)

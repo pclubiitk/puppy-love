@@ -23,6 +23,7 @@ type (
 		Submit  bool   `json:"submitted" bson:"submitted"`
 		Matches string `json:"matches" bson:"matches"`
 		Vote    int    `json:"voted" bson:"voted"`
+		Dirty   bool   `json:"dirty" bson:"dirty"`
 	}
 )
 
@@ -51,6 +52,7 @@ func NewUser(info *TypeUserNew) User {
 		Submit:  false,
 		Matches: "",
 		Vote:    0,
+		Dirty:   true,
 	}
 }
 
@@ -108,6 +110,16 @@ func (u User) RemoveAuthCode() mgo.Change {
 	return mgo.Change{
 		Update: bson.M{"$set": bson.M{
 			"authCode": "",
+		}},
+		ReturnNew: true,
+	}
+}
+
+// ----------------------------------------
+func (u User) MarkNotDirty() mgo.Change {
+	return mgo.Change{
+		Update: bson.M{"$set": bson.M{
+			"dirty": false,
 		}},
 		ReturnNew: true,
 	}

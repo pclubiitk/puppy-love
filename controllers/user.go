@@ -2,11 +2,9 @@ package controllers
 
 import (
 	"log"
-	"net/smtp"
 
 	"github.com/pclubiitk/puppy-love/db"
 	"github.com/pclubiitk/puppy-love/models"
-	"github.com/pclubiitk/puppy-love/utils/config"
 
 	"github.com/kataras/iris"
 )
@@ -112,7 +110,8 @@ func (m UserFirst) Serve(ctx *iris.Context) {
 }
 
 type UserMail struct {
-	Db db.PuppyDb
+	Db      db.PuppyDb
+	Channel chan string
 }
 
 // User asking for email
@@ -138,20 +137,10 @@ func (m UserMail) Serve(ctx *iris.Context) {
 		return
 	}
 
-	// TODO Missing
-	auth := smtp.PlainAuth("", config.EmailUser, config.EmailPass,
-		"smtp.cc.iitk.ac.in")
-	to := []string{u.Email + "@iitk.ac.in"}
-	msg := []byte("To: " + u.Email + "@iitk.ac.in" + "\r\n" +
-		"Subject: Puppy-Love authentication code\r\n" +
-		"\r\n" +
-		"Use this token while signing up, and don't share it with anyone.\n" +
-		"Token: " + u.AuthC + "\n" +
-		".\r\n")
-	smtp.SendMail("smtp.cc.iitk.ac.in:25", auth,
-		config.EmailUser+"@iitk.ac.in", to, msg)
+	// Queue this request in service
+	m.Channel <- id
 
-	ctx.JSON(iris.StatusAccepted, "Mail sent to "+u.Email)
+	ctx.JSON(iris.StatusAccepted, "Mail will be sent to "+u.Email)
 }
 
 // Get user's information
