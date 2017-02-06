@@ -1,0 +1,5 @@
+package: github.com/pclubiitk/puppy-love/service/service
+import:
+- package: gopkg.in/mgo.v2
+  subpackages:
+  - bson

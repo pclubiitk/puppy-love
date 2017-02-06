@@ -2,3 +2,4 @@ views/
 vendor/
 Dockerfile
 cover.jpg
+service/service
