@@ -27,21 +27,16 @@ func CfgInit() {
 		SignupUrl = addr + ":" + port
 	}
 
-	// Email ENV variables
-	if EmailUser == "" || EmailPass == "" {
-		log.Println("WARNING: Email variables are not in scope")
-	}
-
 	// Mongo ENV variables
-	port = os.Getenv("MONGO_PORT_27017_PORT")
-	addr = os.Getenv("MONGO_PORT_27017_ADDR")
+	port = os.Getenv("MONGO_PORT_27017_TCP_PORT")
+	addr = os.Getenv("MONGO_PORT_27017_TCP_ADDR")
 	if port != "" && addr != "" {
 		CfgMgoUrl = "mongodb://" + addr + ":" + port + "/puppy"
-	}
+        }
 
 	// Redis ENV variables
-	port = os.Getenv("REDIS_PORT_6379_PORT")
-	addr = os.Getenv("REDIS_PORT_6379_ADDR")
+	port = os.Getenv("REDIS_PORT_6379_TCP_PORT")
+	addr = os.Getenv("REDIS_PORT_6379_TCP_ADDR")
 	if port != "" && addr != "" {
 		CfgRedisUrl = addr + ":" + port
 	}

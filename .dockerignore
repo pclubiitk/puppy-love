@@ -1,5 +1,6 @@
 views/
 vendor/
 Dockerfile
+.dockerignore
 cover.jpg
 service/service

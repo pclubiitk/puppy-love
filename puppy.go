@@ -26,6 +26,8 @@ func main() {
 	mongoDb, error := db.MongoConnect()
 	if error != nil {
 		fmt.Print("[Error] Could not connect to MongoDB")
+		fmt.Print("[Error] " + config.CfgMgoUrl)
+		fmt.Print(os.Environ())
 		os.Exit(1)
 	}
 
