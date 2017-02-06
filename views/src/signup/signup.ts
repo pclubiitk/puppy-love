@@ -4,6 +4,7 @@ import { Http } from '@angular/http';
 import { contentHeaders } from '../common/headers';
 import { Config } from '../config';
 import { Crypto } from '../common/crypto';
+import { Toasts, ToastService } from '../toasts';
 
 const styles   = require('./signup.css');
 const template = require('./signup.html');
@@ -18,6 +19,7 @@ export class Signup {
   crypto: Crypto;
 
   constructor(public router: Router,
+              public t: ToastService,
               public http: Http) {
   }
 
@@ -75,6 +77,7 @@ export class Signup {
           } else {
             this.message = 'There was an error. Let us know at pclubiitk@gmail';
           }
+          this.t.toast(this.message);
         }
       );
   }

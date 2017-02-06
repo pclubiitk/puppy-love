@@ -39,8 +39,7 @@ export class Home {
   // Will be sent if you've submitted your choices
   declarevalues = [];
 
-  toasthandler: Observable<string>;
-  dataObserver: Observer<any>;
+
 
   private static checker(data): boolean {
     if (!data ||
