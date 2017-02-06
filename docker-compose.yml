@@ -21,6 +21,7 @@ services:
       image: pclub/puppy-love:signup
       env_file:
         - .backend.env
+        - .mail.env
       ports:
         - "3001"
       links:

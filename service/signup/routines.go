@@ -109,7 +109,7 @@ func MailerService(Db PuppyDb, mail_channel chan User) {
 
 	for u := range mail_channel {
 		auth := smtp.PlainAuth("", EmailUser, EmailPass,
-			"smtp.cc.iitk.ac.in")
+			"smtp.gmail.com")
 		to := []string{u.Email + "@iitk.ac.in"}
 		msg := []byte("To: " + u.Email + "@iitk.ac.in" + "\r\n" +
 			"Subject: Puppy-Love authentication code\r\n" +
@@ -117,9 +117,14 @@ func MailerService(Db PuppyDb, mail_channel chan User) {
 			"Use this token while signing up, and don't share it with anyone.\n" +
 			"Token: " + u.AuthC + "\n" +
 			".\r\n")
-		smtp.SendMail("smtp.cc.iitk.ac.in:25", auth,
-			EmailUser+"@iitk.ac.in", to, msg)
+		err := smtp.SendMail("smtp.gmail.com:587", auth,
+			EmailUser, to, msg)
 
+		if err != nil {
+			log.Println("Error while mailing")
+			log.Println(err)
+			return
+		}
 		log.Println("Mailed " + u.Id)
 	}
 }

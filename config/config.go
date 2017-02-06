@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"os"
 )
 
@@ -24,7 +23,7 @@ func CfgInit() {
 	port = os.Getenv("SIGNUP_PORT_3001_TCP_PORT")
 	addr = os.Getenv("SIGNUP_PORT_3001_TCP_ADDR")
 	if port != "" && addr != "" {
-		SignupUrl = addr + ":" + port
+		SignupUrl = "http://" + addr + ":" + port
 	}
 
 	// Mongo ENV variables
@@ -32,7 +31,7 @@ func CfgInit() {
 	addr = os.Getenv("MONGO_PORT_27017_TCP_ADDR")
 	if port != "" && addr != "" {
 		CfgMgoUrl = "mongodb://" + addr + ":" + port + "/puppy"
-        }
+	}
 
 	// Redis ENV variables
 	port = os.Getenv("REDIS_PORT_6379_TCP_PORT")

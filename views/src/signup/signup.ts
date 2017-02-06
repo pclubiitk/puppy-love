@@ -68,6 +68,7 @@ export class Signup {
       .subscribe(
         response => {
           this.message = 'Mail sent to your @iitk ID !';
+          this.t.toast(this.message);
         },
         error => {
           if (error.status === 404) {

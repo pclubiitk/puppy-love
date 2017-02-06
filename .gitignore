@@ -6,3 +6,4 @@ npm-debug.log
 puppy-love
 vendor
 views/build
+.mail.env
