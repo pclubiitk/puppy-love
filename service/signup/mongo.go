@@ -1,8 +1,6 @@
-package db
+package main
 
 import (
-	"github.com/pclubiitk/puppy-love/config"
-
 	"gopkg.in/mgo.v2"
 )
 
@@ -11,7 +9,7 @@ type PuppyDb struct {
 }
 
 func MongoConnect() (PuppyDb, error) {
-	S, err := mgo.Dial(config.CfgMgoUrl)
+	S, err := mgo.Dial(CfgMgoUrl)
 	return PuppyDb{S}, err
 }
 

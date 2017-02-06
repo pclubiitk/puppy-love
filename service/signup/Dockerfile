@@ -7,9 +7,9 @@ RUN curl https://glide.sh/get | sh
 
 ENV GOPATH /go
 ENV PUPPYPATH /go/src/github.com/pclubiitk/puppy-love
-ENV SERVPATH /go/src/github.com/pclubiitk/puppy-love/service/service
+ENV SERVPATH /go/src/github.com/pclubiitk/puppy-love/service/signup
 
-RUN git clone https://github.com/pclubiitk/puppy-love $PUPPYPATH
+#RUN git clone https://github.com/pclubiitk/puppy-love $PUPPYPATH
 
 RUN mkdir -p $SERVPATH
 WORKDIR $SERVPATH
@@ -23,4 +23,4 @@ RUN cd $SERVPATH && go build
 
 EXPOSE 3001
 
-ENTRYPOINT ["/go/src/github.com/pclubiitk/puppy-love/service/service/service"]
+ENTRYPOINT ["/go/src/github.com/pclubiitk/puppy-love/service/signup/signup"]

@@ -5,6 +5,7 @@ import (
 
 	"github.com/pclubiitk/puppy-love/db"
 	"github.com/pclubiitk/puppy-love/models"
+	"github.com/pclubiitk/puppy-love/utils"
 
 	"github.com/kataras/iris"
 )
@@ -110,8 +111,7 @@ func (m UserFirst) Serve(ctx *iris.Context) {
 }
 
 type UserMail struct {
-	Db      db.PuppyDb
-	Channel chan string
+	Db db.PuppyDb
 }
 
 // User asking for email
@@ -133,12 +133,15 @@ func (m UserMail) Serve(ctx *iris.Context) {
 	}
 
 	if u.AuthC == "" {
-		ctx.EmitError(iris.StatusBadRequest)
+		ctx.Error("You have already signed up", iris.StatusBadRequest)
 		return
 	}
 
 	// Queue this request in service
-	m.Channel <- id
+	err := utils.SignupRequest(id)
+	if err != nil {
+		ctx.Error("Something went wrong", iris.StatusInternalServerError)
+	}
 
 	ctx.JSON(iris.StatusAccepted, "Mail will be sent to "+u.Email)
 }

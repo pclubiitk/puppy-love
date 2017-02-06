@@ -1,4 +1,4 @@
-package: github.com/pclubiitk/puppy-love/service/service
+package: github.com/pclubiitk/puppy-love/service/signup
 import:
 - package: gopkg.in/mgo.v2
   subpackages:

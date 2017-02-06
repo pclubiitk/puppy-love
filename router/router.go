@@ -7,7 +7,7 @@ import (
 	"github.com/kataras/iris"
 )
 
-func PuppyRoute(db db.PuppyDb, channel chan string) {
+func PuppyRoute(db db.PuppyDb) {
 
 	iris.Get("/", func(ctx *iris.Context) {
 		ctx.JSON(iris.StatusAccepted, "Hello from the other side!")
@@ -21,7 +21,7 @@ func PuppyRoute(db db.PuppyDb, channel chan string) {
 
 	iris.Handle("GET", uPre+"/data/info", controllers.UserLoginGet{db})
 	iris.Handle("GET", uPre+"/get/:id", controllers.UserGet{db})
-	iris.Handle("GET", uPre+"/mail/:id", controllers.UserMail{db, channel})
+	iris.Handle("GET", uPre+"/mail/:id", controllers.UserMail{db})
 
 	// Listing users
 	lPre := "/list"

@@ -1,13 +1,15 @@
 package db
 
 import (
+	"github.com/pclubiitk/puppy-love/config"
+
 	"gopkg.in/kataras/go-sessions.v0/sessiondb/redis"
 	"gopkg.in/kataras/go-sessions.v0/sessiondb/redis/service"
 )
 
 func RedisSession() *redis.Database {
 	return redis.New(service.Config{Network: service.DefaultRedisNetwork,
-		Addr:          service.DefaultRedisAddr,
+		Addr:          config.CfgRedisUrl,
 		Password:      "",
 		Database:      "",
 		MaxIdle:       0,

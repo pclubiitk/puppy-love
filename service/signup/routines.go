@@ -1,35 +1,41 @@
-package service
+package main
 
 import (
 	"log"
 	"net/smtp"
 	"time"
 
-	"github.com/pclubiitk/puppy-love/db"
-	"github.com/pclubiitk/puppy-love/models"
-	"github.com/pclubiitk/puppy-love/utils/config"
-
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
+
+func MarkNotDirtyAlt(u User) mgo.Change {
+	return mgo.Change{
+		Update: bson.M{"$set": bson.M{
+			"dirty": false,
+		}},
+		ReturnNew: true,
+	}
+}
 
 func QueueService(listen_channel chan string, signup_channel chan string) {
 	for request := range listen_channel {
 		go func(request string) {
-			signup_channel <- request
+			signup_channel <- request[1:]
 		}(request)
 	}
 }
 
 func SignupService(
-	Db db.PuppyDb,
+	Db PuppyDb,
 	signup_channel chan string,
-	mail_channel chan models.User) {
+	mail_channel chan User) {
 
 	for id := range signup_channel {
 		time.Sleep(3000 * time.Millisecond)
 		log.Println("Signing up: " + id)
 
-		u := models.User{}
+		u := User{}
 
 		// If no such user
 		if err := Db.GetById("user", id).One(&u); err != nil {
@@ -42,7 +48,7 @@ func SignupService(
 			log.Print("User ", id, " is not dirty. Skipping.")
 
 			// Mailing should be async
-			go func(user models.User) {
+			go func(user User) {
 				mail_channel <- user
 			}(u)
 
@@ -63,7 +69,8 @@ func SignupService(
 
 		var people []typeIds
 		collection := Db.GetCollection("user")
-		err := collection.Find(bson.M{"gender": req_gender, "dirty": false}).All(&people)
+		err := collection.Find(bson.M{"gender": req_gender, "dirty": false}).
+			All(&people)
 
 		if err != nil {
 			log.Println("SignupService: Cannot fetch gender list: ", req_gender)
@@ -76,7 +83,7 @@ func SignupService(
 		for _, fe := range people {
 			log.Println("SignupService: "+fe.Id, "-", id, "-", cnt)
 			cnt = cnt + 1
-			res := models.UpsertEntry(fe.Id, id)
+			res := UpsertEntry(fe.Id, id)
 			compute_coll.Upsert(res.Selector, res.Change)
 		}
 
@@ -84,7 +91,7 @@ func SignupService(
 
 		// Mark user as not dirty
 		if _, err := Db.GetById("user", id).
-			Apply(u.MarkNotDirty(), &u); err != nil {
+			Apply(MarkNotDirtyAlt(u), &u); err != nil {
 
 			log.Println("SignupService: Could not mark ", id, " as not dirty")
 			log.Println(err)
@@ -92,16 +99,16 @@ func SignupService(
 		}
 
 		// Mailing should be async
-		go func(user models.User) {
+		go func(user User) {
 			mail_channel <- user
 		}(u)
 	}
 }
 
-func MailerService(Db db.PuppyDb, mail_channel chan models.User) {
+func MailerService(Db PuppyDb, mail_channel chan User) {
 
 	for u := range mail_channel {
-		auth := smtp.PlainAuth("", config.EmailUser, config.EmailPass,
+		auth := smtp.PlainAuth("", EmailUser, EmailPass,
 			"smtp.cc.iitk.ac.in")
 		to := []string{u.Email + "@iitk.ac.in"}
 		msg := []byte("To: " + u.Email + "@iitk.ac.in" + "\r\n" +
@@ -111,7 +118,7 @@ func MailerService(Db db.PuppyDb, mail_channel chan models.User) {
 			"Token: " + u.AuthC + "\n" +
 			".\r\n")
 		smtp.SendMail("smtp.cc.iitk.ac.in:25", auth,
-			config.EmailUser+"@iitk.ac.in", to, msg)
+			EmailUser+"@iitk.ac.in", to, msg)
 
 		log.Println("Mailed " + u.Id)
 	}
