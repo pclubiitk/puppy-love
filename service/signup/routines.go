@@ -49,6 +49,7 @@ func SignupService(
 
 			// Mailing should be async
 			go func(user User) {
+				log.Print("Sending mail now")
 				mail_channel <- user
 			}(u)
 
@@ -107,9 +108,12 @@ func SignupService(
 
 func MailerService(Db PuppyDb, mail_channel chan User) {
 
+	auth := smtp.PlainAuth("", EmailUser, EmailPass,
+			      "smtp.gmail.com")
+
 	for u := range mail_channel {
-		auth := smtp.PlainAuth("", EmailUser, EmailPass,
-			"smtp.gmail.com")
+		log.Println("Setting up smtp")
+
 		to := []string{u.Email + "@iitk.ac.in"}
 		msg := []byte("To: " + u.Email + "@iitk.ac.in" + "\r\n" +
 			"Subject: Puppy-Love authentication code\r\n" +
@@ -123,8 +127,8 @@ func MailerService(Db PuppyDb, mail_channel chan User) {
 		if err != nil {
 			log.Println("Error while mailing")
 			log.Println(err)
-			return
+		} else {
+			log.Println("Mailed " + u.Id)
 		}
-		log.Println("Mailed " + u.Id)
 	}
 }
