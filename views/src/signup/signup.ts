@@ -67,7 +67,7 @@ export class Signup {
     this.http.get(Config.loginMailUrl + roll)
       .subscribe(
         response => {
-          this.message = 'Mail sent to your @iitk ID !';
+          this.message = 'Mail sent to your @iitk ID ! Please check your mail for the authentication token, and use it in the signup form below.';
           this.t.toast(this.message);
         },
         error => {

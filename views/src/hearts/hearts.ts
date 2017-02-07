@@ -101,7 +101,6 @@ export class Hearts {
               }
             }
 
-            console.log('Hearts now: ' + this.dataservice.hearts);
             this.dataservice.save();
 
           } catch (err) {

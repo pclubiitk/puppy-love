@@ -63,7 +63,7 @@ export class Toasts {
     }, 100);
     setTimeout(() => {
       this.removeItem(nt);
-    }, 3000);
+    }, 6000);
   }
 
   removeItem(value: Toast) {
