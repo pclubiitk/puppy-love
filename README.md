@@ -69,10 +69,9 @@ sudo cp puppy.nginx.conf /etc/nginx/sites_enabled/
 
 Edit /etc/hosts file
 ```
-# Map puppy.pclub.in to 127.0.0.1
+# Map dev.puppy.pclub.in to 127.0.0.1
 # It should have a line saying:
-# 127.0.0.1 <something> <more> puppy.pclub.in
-# Remove this entry when you want to access the actual puppy-love (deployed by pclub)
+# 127.0.0.1 <something> <more> dev.puppy.pclub.in
 ```
 
 Get the essential dockers
@@ -153,13 +152,13 @@ http get 'localhost:3000/compute/prepare' $CADMIN
 ```
 
 ### Using the frontend
-Once you've created the users, you will need to register them. Open the UI at puppy.pclub.in, and go to signup. You can only register for users which you have created. Get your auth token via email, and then fill up the remaining fields.
+Once you've created the users, you will need to register them. Open the UI at dev.puppy.pclub.in, and go to signup. You can only register for users which you have created. Get your auth token via email, and then fill up the remaining fields.
 
 ### Notes
 * You cannot login as admin on the frontend UI.
 * You can also check mongoDB's data for the auth token for the user.
 
-You can open the local website at [puppy.pclub.in](puppy.pclub.in)
+You can open the local website at [dev.puppy.pclub.in](dev.puppy.pclub.in)
 The backend will be listening on the printed port number.
 
 **Note**: Course project for CS252, by [Saksham Sharma](https://github.com/sakshamsharma/) and [Vinayak Tantia](https://github.com/vtantia).
