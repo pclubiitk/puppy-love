@@ -9,6 +9,7 @@ import (
 	"github.com/pclubiitk/puppy-love/models"
 
 	"github.com/kataras/iris"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -208,6 +209,9 @@ func (m ComputeStep) Serve(ctx *iris.Context) {
 
 	var chunks []string
 	var update bson.M
+
+	cnt := 0
+	res := []*mgo.BulkResult{}
 	for _, pInfo := range *info {
 		chunks = strings.Split(pInfo.Id, "-")
 		if chunks[0] == id {
@@ -216,14 +220,23 @@ func (m ComputeStep) Serve(ctx *iris.Context) {
 			update = bson.M{"$set": bson.M{dbUpdate + "1": pInfo.Value}}
 		}
 		bulk.Update(bson.M{"_id": pInfo.Id}, update)
+
+		if cnt > 950 {
+			r, err := bulk.Run()
+			bulk = m.Db.GetCollection("compute").Bulk()
+			res = append(res, r)
+			if err != nil {
+				log.Println(err)
+			}
+			cnt = 0
+		}
 	}
 
 	r, err := bulk.Run()
+	res = append(res, r)
 	if err != nil {
-		ctx.EmitError(iris.StatusInternalServerError)
 		log.Println(err)
-		return
 	}
 
-	ctx.JSON(iris.StatusOK, r)
+	ctx.JSON(iris.StatusOK, res)
 }
