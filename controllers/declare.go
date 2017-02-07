@@ -30,7 +30,7 @@ func (m DeclarePrepare) Serve(ctx *iris.Context) {
 
 	var people []typeIds
 
-	if err := m.Db.GetCollection("user").Find(bson.M{}).
+	if err := m.Db.GetCollection("user").Find(bson.M{"dirty": false}).
 		All(&people); err != nil {
 		ctx.EmitError(iris.StatusInternalServerError)
 		return

@@ -67,7 +67,7 @@ func (m VoteSend) Serve(ctx *iris.Context) {
 	}
 
 	// Get latest time
-	t, _ := strconv.ParseUint(time.Now().Format("20060102150405"), 10, 64)
+	t := uint64(time.Now().UnixNano() / 1000000)
 
 	// Add user's votes to DB
 	// ======================
@@ -114,9 +114,12 @@ func (m VoteGet) Serve(ctx *iris.Context) {
 	}
 
 	// Current time
-	ctime, _ := strconv.ParseUint(time.Now().Format("20060102150405"), 10, 64)
+	ctime := uint64(time.Now().UnixNano() / 1000000)
 	var granularity uint64 = 600000 // 10 mins
+	log.Print("Ctime: ", ctime)
 	ctime = ctime - ctime%granularity
+	log.Print("Ctimf: ", ctime)
+	log.Print("Ltime: ", ltime)
 
 	type AnonymVote struct {
 		Value string `json:"v" bson:"v"`
@@ -125,7 +128,6 @@ func (m VoteGet) Serve(ctx *iris.Context) {
 	votes := new([]AnonymVote)
 
 	// Fetch user
-	// TODO Time should be restricted to 10 min checks
 	if err := m.Db.GetCollection("vote").
 		Find(bson.M{"time": bson.M{"$gt": ltime, "$lte": ctime}}).
 		All(votes); err != nil {
