@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 
+	"github.com/pclubiitk/puppy-love/config"
 	"github.com/pclubiitk/puppy-love/db"
 	"github.com/pclubiitk/puppy-love/models"
 
@@ -33,7 +34,7 @@ func (m SessionLogin) Serve(ctx *iris.Context) {
 
 	// @TODO @IMPORTANT Move password to env variable
 	if u.Username == "admin" {
-		if u.Passhash == "passhash" {
+		if u.Passhash == config.CfgAdminPass {
 			ctx.Session().Set("Status", "login")
 			ctx.Session().Set("id", u.Username)
 			ctx.Write("Logged in: %s", u.Username)

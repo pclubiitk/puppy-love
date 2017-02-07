@@ -7,6 +7,8 @@ import (
 var EmailUser = os.Getenv("EMAIL_USER")
 var EmailPass = os.Getenv("EMAIL_PASS")
 
+var CfgAdminPass = "passhash"
+
 var CfgAddr = ":3000"
 
 var CfgMgoUrl = "mongodb://0.0.0.0:27017/puppy"
@@ -38,5 +40,11 @@ func CfgInit() {
 	addr = os.Getenv("REDIS_PORT_6379_TCP_ADDR")
 	if port != "" && addr != "" {
 		CfgRedisUrl = addr + ":" + port
+	}
+
+	// Admin pass
+	pass := os.Getenv("ADMIN_PASS")
+	if pass != "" {
+		CfgAdminPass = pass
 	}
 }

@@ -34,6 +34,7 @@ services:
       image: pclub/puppy-love:backend
       env_file:
         - .backend.env
+        - .pass.env
       environment:
         - VIRTUAL_HOST=puppy.pclub.in
         - VIRTUAL_PROTO=http
