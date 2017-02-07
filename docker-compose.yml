@@ -49,13 +49,21 @@ services:
     frontend:
       image: pclub/puppy-love:frontend
       ports:
-        - "8000:80"
+        - "80"
+      networks:
+        - mynet
+
+    nginx:
+      image: pclub/puppy-love:nginx
+      ports:
+        - "80:80"
       environment:
         - VIRTUAL_PORT=3000
       networks:
         - mynet
       links:
         - backend:backend
+        - frontend:frontend
 volumes:
   data:
 

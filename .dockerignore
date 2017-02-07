@@ -3,4 +3,4 @@ vendor/
 Dockerfile
 .dockerignore
 cover.jpg
-service/service
+service/

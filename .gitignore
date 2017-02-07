@@ -7,3 +7,4 @@ puppy-love
 vendor
 views/build
 .mail.env
+.pass.env
