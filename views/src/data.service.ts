@@ -1,6 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { Http } from '@angular/http';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
 import { Person } from './common/person';
 import { Crypto } from './common/crypto';
 import { ToastService } from './toasts';
@@ -21,6 +22,8 @@ export class DataService {
   submitted: string = 'close';
   saving: string = 'Fetching ...';
 
+  dataToBeSent: Subject<any> = new Subject<any>();
+
   crypto: Crypto;
 
   emitdone: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -28,7 +31,13 @@ export class DataService {
 
   constructor(public http: Http,
               public router: Router,
-              public t: ToastService) { }
+              public t: ToastService) {
+    this.dataToBeSent.concatMap(data => this.http.post(Config.dataSaveUrl, {data: data}, null))
+      .subscribe (
+        response => this.saving = 'Saved ...',
+        error => this.saving = 'Error saving your choices!'
+      );
+  }
 
   createcrypto(password: string) {
     this.crypto = new Crypto(password);
@@ -103,11 +112,7 @@ export class DataService {
     };
     let encData = this.crypto.encryptSym(Crypto.fromJson(data));
     this.saving = 'Saving ...';
-    this.http.post(Config.dataSaveUrl, {data: encData}, null)
-      .subscribe (
-        response => this.saving = 'Saved ...',
-        error => this.saving = 'Error saving your choices!'
-      );
+    this.dataToBeSent.next(encData);
   }
 
   toast(message: string) {
