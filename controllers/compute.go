@@ -162,10 +162,10 @@ func (m ComputeStep) Serve(ctx *iris.Context) {
 	var dbUpdate string
 	if m.State == 0 {
 		dbUpdate = "t"
-	} else if m.State == 1 {
-		dbUpdate = "r"
-	} else if m.State == 2 {
-		dbUpdate = "v"
+	} else {
+		log.Print("Something seems wrong here: ", m.State)
+		ctx.Error("Wrong state code", iris.StatusBadRequest)
+		return
 	}
 
 	user := struct {

@@ -33,8 +33,6 @@ func PuppyRoute(db db.PuppyDb) {
 	// Compute
 	cPre := "/compute"
 	iris.Handle("POST", cPre+"/token", controllers.ComputeStep{db, 0})
-	iris.Handle("POST", cPre+"/result", controllers.ComputeStep{db, 1})
-	iris.Handle("POST", cPre+"/value", controllers.ComputeStep{db, 2})
 
 	// Declare
 	iris.Handle("POST", "/declare/choices", controllers.DeclareStep{db})

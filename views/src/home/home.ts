@@ -188,8 +188,6 @@ export class Home {
     let len = this.computetable.length;
 
     let token = [];
-    let res = [];
-    let errors = [];
 
     this.declarevalues = [];
 
@@ -240,15 +238,6 @@ export class Home {
           continue;
         }
 
-        // You haven't sent the result yet
-        if (!item['r' + po]) {
-          let expRes = Crypto.hash(v0.get() + '-' + v1.get());
-          res.push({
-            id: item['_id'],
-            v: expRes
-          });
-        }
-
         // And if this person is your choice, declare another
         // expected value
         for (let p of this.dataservice.choices) {
@@ -273,16 +262,6 @@ export class Home {
         }
       );
 
-    // Tell expected hashes to server
-    this.http.post(Config.computeRes, res, null)
-      .subscribe (
-        response => console.log('Saved compute results: ' + res.length),
-        error => {
-          console.error('Error saving compute results!');
-          this.toast('Error saving compute results!');
-        }
-      );
-
     // Person might have submitted his choices
     // We should probably look at the submission thing again
     if (this.dataservice.submitted === 'check') {
@@ -293,56 +272,6 @@ export class Home {
   // Goes over the compute table, and sends final value messages to server
   submit() {
     this.dataservice.emitsend.emit(true);
-
-    let values = [];
-    for (let item of this.computetable) {
-
-      let ids = item['_id'].split('-');
-      let po = (ids[0] === this.id ? 0 : 1);
-      let op = (po === 0 ? 1 : 0);
-
-      // If you have declared your token, and you have not
-      // yet sent the final value to the backend
-      if (Home.checker(item['t' + po]) && item['v' + po] === '') {
-
-        // By default random token
-        let tosend: string = Crypto.getRand();
-
-        for (let p of this.dataservice.choices) {
-          if (p.roll === ids[op]) {
-            // This person is a choice
-            // We should not send random thing
-            let token: Option<string> =
-              this.dataservice.crypto.decryptAsym(item['t' + po]['d' + po]);
-
-            if (token.isNone()) {
-              let msg = 'Error retrieving value to send for user ' + p.roll;
-              console.error(msg);
-              this.toast(msg);
-              continue;
-            }
-
-            tosend = token.get();
-            break;
-          }
-        }
-
-        values.push({
-          id: item['_id'],
-          v: tosend
-        });
-      }
-    }
-
-    // Send the computed stuff
-    this.http.post(Config.computeValue, values, null)
-      .subscribe (
-        response => console.log('Saved compute values: ' + values.length),
-        error => {
-          console.error('Error saving compute values!');
-          this.toast('Error saving compute values!');
-        }
-      );
 
     // Populate the declare table
     // NO, this does NOT mean you are telling your choices
