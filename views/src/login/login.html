@@ -11,9 +11,12 @@
     <input type="password" #password class="form-control" id="password" placeholder="Password">
   </div>
   <div class="container">
-    <button type="submit" class="btn btn-default col-md-3">Login</button>
-    <button [routerLink]="['/signup']" class="btn btn-default col-md-4" style="text-align: center; padding-left: 5px; padding-right: 5px; width: auto;">Create your account</button>
-    <button [routerLink]="['/about']" class="btn btn-default col-md-3" style="float: right;">About</button>
+    <button type="submit" class="btn btn-default col-sm-4" style="float: left;width:100%">Login</button>
+    <button [routerLink]="['/signup']" class="btn btn-default col-sm-8" style="float: right; width: 100%;">Create your account</button>
+  </div>
+  <div class="container">
+    <button [routerLink]="['/about']" class="btn btn-default col-sm-4" style="float: left; width:100%;">About</button>
+    <button [routerLink]="['/howto']" class="btn btn-default col-sm-8" style="float: right; width:100%;">How to use</button>
   </div>
   </form>
   <p class="text-center note"> Note that you need to create an account before you can log in. </p>
