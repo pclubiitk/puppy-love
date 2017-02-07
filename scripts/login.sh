@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "Username: ${1}"
-VAL=$(http 'localhost:3000/session/login' username="$1" password="$2" --header | tail -n 2 | head -n1)
+VAL=$(http 'pclub.cse.iitk.ac.in/api/session/login' username="$1" password="$2" --header | tail -n 2 | head -n1)
 echo "Cookie is ${VAL}"
 
 if [ "$1" = "admin" ];

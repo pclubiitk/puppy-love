@@ -39,7 +39,8 @@ export class Home {
   // Will be sent if you've submitted your choices
   declarevalues = [];
 
-
+  // To be cleared on logout
+  timeouts = [];
 
   private static checker(data): boolean {
     if (!data ||
@@ -158,7 +159,9 @@ export class Home {
           this.actuponcompute();
 
           // Queue itself to send a redo this after 20 seconds
-          setTimeout(() => this.getcomputetable(), 20000);
+          this.timeouts.push(
+            setTimeout(() => this.getcomputetable(), 20000)
+          );
         },
         error => {
           console.error('Error getting compute table');
@@ -171,7 +174,10 @@ export class Home {
             console.error(e);
             console.log(error);
           }
-          setTimeout(() => this.getcomputetable(), 10000);
+
+          this.timeouts.push(
+            setTimeout(() => this.getcomputetable(), 10000)
+          );
         }
       );
   }
@@ -454,15 +460,6 @@ export class Home {
     }
   }
 
-  logout() {
-    sessionStorage.removeItem('password');
-    this.http.get(Config.logoutUrl)
-      .subscribe(
-        response => this.router.navigate(['login']),
-        error => this.router.navigate(['login'])
-      );
-  }
-
   make_greeting() {
     var now = new Date().getHours();
 
@@ -487,12 +484,38 @@ export class Home {
     }
   }
 
+  cleartimeouts(callback: () => void): void {
+    for (let event of this.timeouts) {
+      try {
+        clearTimeout(event);
+      } finally {
+        continue;
+      }
+    }
+    callback();
+  }
+
+  logout() {
+    this.cleartimeouts(() => {
+      sessionStorage.removeItem('password');
+      this.http.get(Config.logoutUrl)
+        .subscribe(
+          response => this.router.navigate(['login']),
+          error => this.router.navigate(['login'])
+        );
+    });
+  }
+
   aboutpage() {
-    this.router.navigate(['./about']);
+    this.cleartimeouts(() => {
+      this.router.navigate(['./about']);
+    });
   }
 
   creditspage() {
-    this.router.navigate(['./credits']);
+    this.cleartimeouts(() => {
+      this.router.navigate(['./credits']);
+    });
   }
 
   pclubpage() {
