@@ -18,6 +18,7 @@ services:
         - mynet
 
     signup:
+      build: ./service/signup
       image: pclub/puppy-love:signup
       env_file:
         - .backend.env
@@ -31,6 +32,7 @@ services:
         - mynet
 
     backend:
+      build: .
       image: pclub/puppy-love:backend
       env_file:
         - .backend.env
@@ -48,6 +50,7 @@ services:
         - mynet
 
     frontend:
+      build: ./views
       image: pclub/puppy-love:frontend
       ports:
         - "80"
@@ -58,6 +61,7 @@ services:
         - VIRTUAL_PROTO=http
 
     nginx:
+      build: ./service/nginx
       image: pclub/puppy-love:nginx
       ports:
         - "80:80"
