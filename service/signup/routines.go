@@ -74,7 +74,7 @@ func SignupService(
 			All(&people)
 
 		if err != nil {
-			log.Println("SignupService: Cannot fetch gender list: ", req_gender)
+			log.Println("ERROR: Signup cannot fetch gender list: ", req_gender)
 			log.Println(err)
 			return
 		}
@@ -88,15 +88,22 @@ func SignupService(
 			compute_coll.Upsert(res.Selector, res.Change)
 		}
 
-		log.Println("SignupService: Finished signup for " + id)
+		log.Println("SignupService: Finished compute setting up for " + id)
+
+		newdec := NewDeclareTable(id)
+		_, err = Db.GetCollection("declare").
+			Upsert(newdec.Selector, newdec.Change)
+		if err != nil {
+			log.Println("ERROR: Could not create declare entry for ", id)
+			log.Println(err)
+		}
 
 		// Mark user as not dirty
 		if _, err := Db.GetById("user", id).
 			Apply(MarkNotDirtyAlt(u), &u); err != nil {
 
-			log.Println("SignupService: Could not mark ", id, " as not dirty")
+			log.Println("ERROR: Could not mark ", id, " as not dirty")
 			log.Println(err)
-			return
 		}
 
 		// Mailing should be async
@@ -109,7 +116,7 @@ func SignupService(
 func MailerService(Db PuppyDb, mail_channel chan User) {
 
 	auth := smtp.PlainAuth("", EmailUser, EmailPass,
-			      "smtp.gmail.com")
+		"smtp.gmail.com")
 
 	for u := range mail_channel {
 		log.Println("Setting up smtp")
@@ -125,7 +132,7 @@ func MailerService(Db PuppyDb, mail_channel chan User) {
 			EmailUser, to, msg)
 
 		if err != nil {
-			log.Println("Error while mailing")
+			log.Println("ERROR: while mailing user ", u.Email, " ", u.Id)
 			log.Println(err)
 		} else {
 			log.Println("Mailed " + u.Id)
