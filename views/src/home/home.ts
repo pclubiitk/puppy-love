@@ -254,7 +254,8 @@ export class Home {
         for (let p of this.dataservice.choices) {
           if (p.roll === ids[op]) {
             // This person is a choice
-            let expHash = Crypto.hash(v0 + '1231abcdsjklasdla1239042' + v1);
+            let expHash =
+              Crypto.hash(v0.get() + '1231abcdsjklasdla1239042' + v1.get());
             this.declarevalues.push(expHash);
           }
         }
