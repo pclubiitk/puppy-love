@@ -72,6 +72,13 @@ export class Hearts {
 
     let ctime = new Date().valueOf();
 
+    // Hack of the day
+    if (this.dataservice.lastcheck.toString().substring(0, 4) === '2017') {
+      // You need medication
+      this.dataservice.lastcheck = 0;
+      this.dataservice.save();
+    }
+
     this.http.get(Config.voteGet + '/' + this.dataservice.lastcheck)
       .subscribe(
         response => {
