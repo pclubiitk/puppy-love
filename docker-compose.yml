@@ -36,7 +36,7 @@ services:
         - .backend.env
         - .pass.env
       environment:
-        - VIRTUAL_HOST=puppy.pclub.in
+        - VIRTUAL_HOST=pclub.cse.iitk.ac.in
         - VIRTUAL_PROTO=http
       ports:
         - "3000"
@@ -53,18 +53,21 @@ services:
         - "80"
       networks:
         - mynet
+      environment:
+        - VIRTUAL_HOST=pclub.cse.iitk.ac.in
+        - VIRTUAL_PROTO=http
 
     nginx:
       image: pclub/puppy-love:nginx
       ports:
         - "80:80"
       environment:
-        - VIRTUAL_PORT=3000
+        - VIRTUAL_PORT=3000;80
       networks:
         - mynet
       links:
-        - backend:backend
-        - frontend:frontend
+        - backend
+        - frontend
 volumes:
   data:
 
