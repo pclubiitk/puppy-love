@@ -24,6 +24,7 @@ type (
 		Matches string `json:"matches" bson:"matches"`
 		Vote    int    `json:"voted" bson:"voted"`
 		Dirty   bool   `json:"dirty" bson:"dirty"`
+		SPass   string `json:"savepass" bson:"savepass"`
 	}
 )
 
@@ -53,6 +54,7 @@ func NewUser(info *TypeUserNew) User {
 		Matches: "",
 		Vote:    0,
 		Dirty:   true,
+		SPass:   "",
 	}
 }
 
@@ -143,6 +145,15 @@ func (u User) UpdateImage(info string) mgo.Change {
 	return mgo.Change{
 		Update: bson.M{"$set": bson.M{
 			"image": info,
+		}},
+		ReturnNew: true,
+	}
+}
+
+func (u User) SavePass(info string) mgo.Change {
+	return mgo.Change{
+		Update: bson.M{"$set": bson.M{
+			"savepass": info,
 		}},
 		ReturnNew: true,
 	}

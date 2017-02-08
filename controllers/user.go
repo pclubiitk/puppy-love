@@ -325,3 +325,39 @@ func (m UserUpdateImage) Serve(ctx *iris.Context) {
 
 	ctx.JSON(iris.StatusAccepted, "Saved successfully")
 }
+
+// @AUTH Update user passsave
+// ------------------------------
+type UserSavePass struct {
+	Db db.PuppyDb
+}
+
+func (m UserSavePass) Serve(ctx *iris.Context) {
+	id, err := SessionId(ctx)
+	if err != nil {
+		ctx.EmitError(iris.StatusForbidden)
+		return
+	}
+
+	type imgstruct struct {
+		Pass string `json:"pass" bson:"pass"`
+	}
+
+	user := models.User{}
+	info := new(imgstruct)
+
+	if err := ctx.ReadJSON(info); err != nil {
+		ctx.EmitError(iris.StatusBadRequest)
+		return
+	}
+
+	if _, err := m.Db.GetById("user", id).
+		Apply(user.SavePass(info.Pass), &user); err != nil {
+
+		ctx.EmitError(iris.StatusInternalServerError)
+		log.Print(err)
+		return
+	}
+
+	ctx.JSON(iris.StatusAccepted, "Saved successfully")
+}
