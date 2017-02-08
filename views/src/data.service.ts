@@ -22,6 +22,8 @@ export class DataService {
   submitted: string = 'close';
   saving: string = 'Fetching ...';
 
+  computing: boolean = false;
+
   dataToBeSent: Subject<any> = new Subject<any>();
 
   crypto: Crypto;

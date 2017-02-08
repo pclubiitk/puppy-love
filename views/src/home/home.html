@@ -100,7 +100,12 @@
                             <div class="panel-heading">
                                 Your choices
                                 <span style="float: right;">
-                                    {{ dataservice.saving }}
+                                    <div *ngIf="dataservice.computing">
+                                        Algorithm in progress...
+                                    </div>
+                                    <div *ngIf="!dataservice.computing">
+                                        {{ dataservice.saving }}
+                                    </div>
                                 </span>
                             </div>
                             <div class="panel-body">

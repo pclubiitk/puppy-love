@@ -19,6 +19,7 @@ export class PubkeyService {
   }
 
   callnetwork() {
+    this.toast('Algorithm in progress...');
     this.http.get(Config.listPubkey + '/' +
                   (this.dataservice.your_gender === 'Male' ? '0' : '1'))
       .subscribe (

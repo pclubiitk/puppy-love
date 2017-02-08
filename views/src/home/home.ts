@@ -87,13 +87,16 @@ export class Home {
     });
 
     // Start the action!
+    this.dataservice.computing = true;
     this.dataservice.callnetwork();
 
     this.people = [];
 
     // Prompt if data is saving and user wants to exit
     window.onbeforeunload = () => {
-      if (this.dataservice.saving === 'Saving ...') {
+      if (this.dataservice.saving === 'Saving ...' ||
+          this.dataservice.computing) {
+        this.toast('Please wait a few seconds to allow your data to be saved');
         return 'Please wait a few seconds to allow your data to be saved';
       }
       return undefined;
@@ -150,6 +153,9 @@ export class Home {
   // Get the complete compute table from backend
   getcomputetable() {
     if (this.router.url !== '/home') return;
+
+    this.dataservice.computing = true;
+
     this.http.get(Config.listCompute)
       .subscribe (
         response => {
@@ -255,10 +261,18 @@ export class Home {
     // Save initial token messages
     this.http.post(Config.computeToken, token, null)
       .subscribe (
-        response => console.log('Saved tokens: ' + token.length),
+        response => {
+          console.log('Saved tokens: ' + token.length);
+          if (this.dataservice.submitted !== 'check') {
+            this.dataservice.computing = false;
+          }
+        },
         error => {
           console.error('Error saving tokens!');
           this.toast('Error saving tokens!');
+          if (this.dataservice.submitted !== 'check') {
+            this.dataservice.computing = false;
+          }
         }
       );
 
@@ -271,6 +285,7 @@ export class Home {
 
   // Goes over the compute table, and sends final value messages to server
   submit() {
+    this.dataservice.computing = true;
     this.dataservice.emitsend.emit(true);
 
     // Populate the declare table
@@ -291,10 +306,14 @@ export class Home {
 
     this.http.post(Config.declareChoices, declarePayload, null)
       .subscribe (
-        response => console.log('Saved declare values: ' + count),
+        response => {
+          console.log('Saved declare values: ' + count);
+          this.dataservice.computing = false;
+        },
         error => {
           console.error('Error saving declare values!');
           this.toast('Error saving declare values!');
+          this.dataservice.computing = false;
         }
       );
   }
