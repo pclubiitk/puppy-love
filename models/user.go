@@ -138,3 +138,12 @@ func (u User) UpdateData(info *TypeUserUpdateData) mgo.Change {
 		ReturnNew: true,
 	}
 }
+
+func (u User) UpdateImage(info string) mgo.Change {
+	return mgo.Change{
+		Update: bson.M{"$set": bson.M{
+			"image": info,
+		}},
+		ReturnNew: true,
+	}
+}

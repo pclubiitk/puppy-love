@@ -219,13 +219,17 @@ func (m ComputeStep) Serve(ctx *iris.Context) {
 		} else {
 			update = bson.M{"$set": bson.M{dbUpdate + "1": pInfo.Value}}
 		}
+
 		bulk.Update(bson.M{"_id": pInfo.Id}, update)
+		cnt = cnt + 1
 
 		if cnt > 950 {
 			r, err := bulk.Run()
 			bulk = m.Db.GetCollection("compute").Bulk()
+			bulk.Unordered()
 			res = append(res, r)
 			if err != nil {
+				log.Println("ERROR: Bulk seems broken")
 				log.Println(err)
 			}
 			cnt = 0
@@ -235,6 +239,7 @@ func (m ComputeStep) Serve(ctx *iris.Context) {
 	r, err := bulk.Run()
 	res = append(res, r)
 	if err != nil {
+		log.Println("ERROR: Bulk seems broken")
 		log.Println(err)
 	}
 
