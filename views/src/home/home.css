@@ -29,3 +29,8 @@
 #secure_button:hover {
     background-color: #eeeeee;
 }
+
+.thinn {
+    padding: 0px;
+    margin: 0px !important;
+}

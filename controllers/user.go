@@ -41,6 +41,8 @@ func (m UserNew) Serve(ctx *iris.Context) {
 	id, err := SessionId(ctx)
 	if err != nil || id != "admin" {
 		ctx.EmitError(iris.StatusForbidden)
+		log.Print("Unauthorized creation attempt by: " + id)
+		log.Print(err)
 		return
 	}
 
