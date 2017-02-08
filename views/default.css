@@ -3,7 +3,8 @@ input {
 }
 
 .github-fork-ribbon:before {
-    background-color: #009688 !important;
+    /*background-color: #009688 !important;*/
+    background-color: #ee8888 !important;
     padding-bottom: 25px;
 }
 
