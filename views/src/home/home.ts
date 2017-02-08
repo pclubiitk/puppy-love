@@ -442,6 +442,12 @@ export class Home {
     });
   }
 
+  secure() {
+    this.cleartimeouts(() => {
+      this.router.navigate(['./secure']);
+    });
+  }
+
   creditspage() {
     this.cleartimeouts(() => {
       this.router.navigate(['./credits']);

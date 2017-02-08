@@ -2,7 +2,8 @@ import { Component, Input, trigger, HostListener,
          transition, style, state, animate } from '@angular/core';
 import { Http } from '@angular/http';
 import { Config } from '../config';
-import { Toasts, ToastService } from '../toasts';
+import { ToastService } from '../toasts';
+import { DataService } from '../data.service';
 
 const styles   = require('./editimg.css');
 const template = require('./editimg.html');
@@ -23,6 +24,7 @@ export class Editimg {
   textmode: boolean = false;
 
   constructor(public http: Http,
+              public dataservice: DataService,
               public t: ToastService) {
   }
 
@@ -39,6 +41,7 @@ export class Editimg {
       .subscribe(
         response => {
           this.t.toast('Saved new image');
+          this.dataservice.your_image = newurl;
         },
         error => {
           this.t.toast('There was some issue saving your image');

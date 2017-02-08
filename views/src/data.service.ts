@@ -32,7 +32,8 @@ export class DataService {
   constructor(public http: Http,
               public router: Router,
               public t: ToastService) {
-    this.dataToBeSent.concatMap(data => this.http.post(Config.dataSaveUrl, {data: data}, null))
+    this.dataToBeSent.concatMap(
+      data => this.http.post(Config.dataSaveUrl, {data: data}, null))
       .subscribe (
         response => this.saving = 'Saved ...',
         error => this.saving = 'Error saving your choices!'

@@ -8,6 +8,7 @@ export class Config {
 
   static imageSaveUrl: string = Config.baseUrl + '/users/image/update';
   static dataSaveUrl: string = Config.baseUrl + '/users/data/update';
+  static savePassUrl: string = Config.baseUrl + '/users/pass/update';
   static submitSaveUrl: string = Config.baseUrl + '/users/data/submit';
 
   static listGender: string = Config.baseUrl + '/list/gender';

@@ -15,3 +15,17 @@
 .greener {
     background-color: palegreen;
 }
+
+.middleicon {
+    vertical-align: middle;
+}
+
+#secure_button {
+    padding: 8px;
+    font-size: 18px;
+    vertical-align: middle;
+}
+
+#secure_button:hover {
+    background-color: #eeeeee;
+}
