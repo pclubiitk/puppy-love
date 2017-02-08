@@ -1,0 +1,25 @@
+<div id="editimg"
+     (mouseenter)="textmode=true;"
+     (mouseleave)="textmode=false;">
+
+  <!-- [@visibAnim]="toshowtext" -->
+  <div *ngIf="!textmode">
+    <div class="hoveredit">
+      <div (click)="textmode=true;">
+        Change your image
+      </div>
+    </div>
+  </div>
+  <div *ngIf="textmode">
+    <form role="form" (submit)="setimg($event, newurl.value)"
+    style="margin-top: 0px;">
+      <div class="form-group" style="margin: 0px; padding: 0px;">
+        <input type="text"
+               #newurl
+               autofocus
+               class="form-control"
+               placeholder="Paste link to your DP">
+      </div>
+    </form>
+  </div>
+</div>

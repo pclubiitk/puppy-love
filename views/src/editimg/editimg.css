@@ -1,0 +1,14 @@
+#editimg {
+    text-align: center;
+    margin: 10px;
+    margin-top: 15px;
+    padding: 5px;
+
+    -webkit-transition: height 300ms linear;
+    -ms-transition: height 300ms linear;
+    transition: height 300ms linear;
+}
+
+.hoveredit:hover {
+    background-color: #eeeeee;
+}

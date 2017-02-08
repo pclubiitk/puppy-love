@@ -8,11 +8,13 @@
                 {{ greeting }} {{ dataservice.your_name }}
             </div>
             <div class="panel-body">
-                <div class="thumbnail text-center">
+              <div class="thumbnail text-center">
 
                   <img id="your_image"
                        [src]="dataservice.your_image"
                        alt="You?">
+                  <editimg>
+                  </editimg>
                 </div>
                 <div class="text-center" id="your_gender">
                   {{ dataservice.your_gender }}
