@@ -4,6 +4,7 @@ import { Http } from '@angular/http';
 import { contentHeaders } from '../common/headers';
 import { Config } from '../config';
 import { Crypto } from '../common/crypto';
+import { ToastService } from '../toasts';
 
 const styles   = require('./login.css');
 const template = require('./login.html');
@@ -14,7 +15,9 @@ const template = require('./login.html');
   styles: [ styles ]
 })
 export class Login {
-  constructor(public router: Router, public http: Http) {
+  constructor(public router: Router,
+              public http: Http,
+              public t: ToastService) {
   }
 
   login(event, username, _password) {
@@ -32,8 +35,14 @@ export class Login {
           this.router.navigate(['home']);
         },
         error => {
-          alert(error.text());
-          console.log(error.text());
+          if (error.status === 403) {
+            this.t.toast('It seems you entered a wrong password');
+          } else if (error.status === 404) {
+            this.t.toast('Your username is wrong. Please use your IITK roll no.');
+          } else {
+            this.t.toast('There was an error signing you in');
+          }
+          console.error(error);
         }
       );
   }

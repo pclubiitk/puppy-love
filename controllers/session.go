@@ -50,7 +50,7 @@ func (m SessionLogin) Serve(ctx *iris.Context) {
 	// Fetch user
 	if err := m.Db.GetById("user", u.Username).One(&user); err != nil {
 		SessionLogout(ctx)
-		ctx.Write("Bad user.")
+		ctx.Error("Invalid user", iris.StatusNotFound)
 		log.Println("Invalid user: " + u.Username)
 		return
 	}
@@ -62,7 +62,7 @@ func (m SessionLogin) Serve(ctx *iris.Context) {
 		ctx.Write("Logged in: %s", u.Username)
 	} else {
 		SessionLogout(ctx)
-		ctx.JSON(iris.StatusForbidden, "Invalid username or password")
+		ctx.Error("Invalid password", iris.StatusForbidden)
 	}
 }
 
