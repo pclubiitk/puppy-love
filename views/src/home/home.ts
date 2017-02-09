@@ -83,7 +83,10 @@ export class Home {
       // subscribes to this event.
     });
     this.pks.emitdone.subscribe(x => {
-      this.getcomputetable();
+      this.timeouts.push(
+        setTimeout(() => {
+          this.getcomputetable();
+        }, 2000));
     });
 
     // Start the action!
