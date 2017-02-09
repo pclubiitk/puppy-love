@@ -7,6 +7,7 @@ import (
 
 var EmailUser = os.Getenv("EMAIL_USER")
 var EmailPass = os.Getenv("EMAIL_PASS")
+var EmailHost = os.Getenv("EMAIL_HOST")
 
 var CfgAddr = ":3000"
 
@@ -19,6 +20,11 @@ func CfgInit() {
 	// Email ENV variables
 	if EmailUser == "" || EmailPass == "" {
 		log.Println("WARNING: Email variables are not in scope")
+	}
+
+	if EmailHost == "" {
+		log.Println("No email host")
+		EmailHost = "smtp.gmail.com"
 	}
 
 	// Mongo ENV variables
