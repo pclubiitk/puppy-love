@@ -116,7 +116,7 @@ func SignupService(
 func MailerService(Db PuppyDb, mail_channel chan User) {
 
 	auth := smtp.PlainAuth("", EmailUser, EmailPass,
-		"smtp.gmail.com")
+		"smtp.live.com")
 
 	for u := range mail_channel {
 		log.Println("Setting up smtp")
@@ -128,7 +128,7 @@ func MailerService(Db PuppyDb, mail_channel chan User) {
 			"Use this token while signing up, and don't share it with anyone.\n" +
 			"Token: " + u.AuthC + "\n" +
 			".\r\n")
-		err := smtp.SendMail("smtp.gmail.com:587", auth,
+		err := smtp.SendMail("smtp.live.com:587", auth,
 			EmailUser, to, msg)
 
 		if err != nil {
