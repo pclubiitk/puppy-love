@@ -45,7 +45,7 @@ export class Hearts {
         let cry = new Crypto();
         cry.deserializePub(pubk);
 
-        tosend.push({'v': cry.encryptAsym('A heart!')});
+        tosend.push({'v': cry.encryptAsym(Crypto.getRand(2))});
       }
     }
 
@@ -93,7 +93,7 @@ export class Hearts {
               let dec_res: Option<string> =
                 this.dataservice.crypto.decryptAsym(vote.v);
 
-              if (dec_res.getOrElse('') !== 'A heart!') {
+              if (dec_res.isNone()) {
                 console.log('Could not catch vote');
               } else {
                 this.dataservice.hearts = this.dataservice.hearts + 1;

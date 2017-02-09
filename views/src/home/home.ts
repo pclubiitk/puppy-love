@@ -94,6 +94,7 @@ export class Home {
 
     // Prompt if data is saving and user wants to exit
     window.onbeforeunload = () => {
+      this.cleartimeouts(() => {});
       if (this.dataservice.saving === 'Saving ...' ||
           this.dataservice.computing) {
         this.toast('Please wait a few seconds to allow your data to be saved');
@@ -164,9 +165,9 @@ export class Home {
           // Act upon the compute table now
           this.actuponcompute();
 
-          // Queue itself to send a redo this after 20 seconds
+          // Queue itself to send a redo this after 30 seconds
           this.timeouts.push(
-            setTimeout(() => this.getcomputetable(), 20000)
+            setTimeout(() => this.getcomputetable(), 30000)
           );
         },
         error => {

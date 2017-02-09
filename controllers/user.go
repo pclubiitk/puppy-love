@@ -207,6 +207,8 @@ func (m UserLoginGet) Serve(ctx *iris.Context) {
 	id, err := SessionId(ctx)
 	if err != nil {
 		ctx.EmitError(iris.StatusForbidden)
+		log.Println("Failed on login info: " + id)
+		log.Println(err)
 		return
 	}
 
