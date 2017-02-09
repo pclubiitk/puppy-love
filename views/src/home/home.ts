@@ -213,13 +213,13 @@ export class Home {
         continue;
       }
 
-      // Instantiate a crypto instance for this person
-      let cry = new Crypto();
-      cry.deserializePub(pubk);
-
       // You haven't set a random token for communication
       // with this person
       if (!Home.checker(item['t' + po])) {
+
+        // Instantiate a crypto instance for this person
+        let cry = new Crypto();
+        cry.deserializePub(pubk);
 
         // Store the random value for the other person as well as yourself
         let vv = Crypto.getRand();
@@ -235,24 +235,26 @@ export class Home {
 
       // Both of you have set a random token. Send the expected value to
       // the central server
-      if (Home.checker(item['t' + po]) &&
+      // Only if you have submitted
+      if (this.dataservice.submitted === 'check' &&
+          Home.checker(item['t' + po]) &&
           Home.checker(item['t' + op])) {
-
-        let v0 = this.dataservice.crypto.decryptAsym(item['t0']['d' + po]);
-        let v1 = this.dataservice.crypto.decryptAsym(item['t1']['d' + po]);
-
-        if (v0.isNone() || v1.isNone()) {
-          let msg = 'Error decrypting tokens for ' + ids[op];
-          console.error(msg);
-          this.toast(msg);
-          continue;
-        }
 
         // And if this person is your choice, declare another
         // expected value
         for (let p of this.dataservice.choices) {
           if (p.roll === ids[op]) {
             // This person is a choice
+
+            let v0 = this.dataservice.crypto.decryptAsym(item['t0']['d' + po]);
+            let v1 = this.dataservice.crypto.decryptAsym(item['t1']['d' + po]);
+
+            if (v0.isNone() || v1.isNone()) {
+              let msg = 'Error decrypting tokens for ' + ids[op];
+              console.error(msg);
+              break;
+            }
+
             let expHash =
               Crypto.hash(v0.get() + '1231abcdsjklasdla1239042' + v1.get());
             this.declarevalues.push(expHash);
@@ -263,24 +265,26 @@ export class Home {
     }
 
     // Save initial token messages
-    this.http.post(Config.computeToken, token, null)
-      .subscribe (
-        response => {
-          console.log('Saved tokens: ' + token.length);
-          if (this.dataservice.submitted !== 'check') {
-            this.dataservice.computing = false;
+    if (token.length !== 0) {
+      this.http.post(Config.computeToken, token, null)
+        .subscribe (
+          response => {
+            console.log('Saved tokens: ' + token.length);
+            if (this.dataservice.submitted !== 'check') {
+              this.dataservice.computing = false;
+            }
+          },
+          error => {
+            console.error('Error saving tokens!');
+            this.toast('Error saving tokens!');
+            if (this.dataservice.submitted !== 'check') {
+              this.dataservice.computing = false;
+            }
           }
-        },
-        error => {
-          console.error('Error saving tokens!');
-          this.toast('Error saving tokens!');
-          if (this.dataservice.submitted !== 'check') {
-            this.dataservice.computing = false;
-          }
-        }
-      );
+        );
+    }
 
-    // Person might have submitted his choices
+    // Person might have submitted his/her choices
     // We should probably look at the submission thing again
     if (this.dataservice.submitted === 'check') {
       this.submit();
@@ -336,7 +340,7 @@ export class Home {
           .subscribe (
             response => {
               this.dataservice.submitted = 'check';
-              this.submit();
+              this.actuponcompute();
             },
             error => {
               console.error('Could not submit choices');
