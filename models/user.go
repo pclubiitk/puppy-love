@@ -158,3 +158,12 @@ func (u User) SavePass(info string) mgo.Change {
 		ReturnNew: true,
 	}
 }
+
+func (u User) UpdateName(info string) mgo.Change {
+	return mgo.Change{
+		Update: bson.M{"$set": bson.M{
+			"name": info,
+		}},
+		ReturnNew: true,
+	}
+}
