@@ -15,7 +15,7 @@
 
     <h2>Signup</h2>
     <p>You need a verification mail before this step (see above)</p>
-    <form role="form" (submit)="signup($event, roll.value, password.value, authCode.value)">
+    <form role="form" (submit)="signup($event, roll.value, password.value, password2.value, authCode.value)">
         <div class="form-group">
             <label for="roll">Roll Number</label>
             <input type="text" #roll class="form-control" id="roll" placeholder="Your roll number">
@@ -23,6 +23,10 @@
         <div class="form-group">
             <label for="passHash">Password (we recommend using CC password so you don't forget)</label>
             <input type="password" #password class="form-control" id="password" placeholder="Set a password">
+        </div>
+        <div class="form-group">
+            <label for="passHash2">Enter your password again</label>
+            <input type="password" #password2 class="form-control" id="password2" placeholder="Repeat password">
         </div>
         <div class="form-group">
             <label for="authCode">Auth Code</label>

@@ -23,8 +23,13 @@ export class Signup {
               public http: Http) {
   }
 
-  signup(event, roll, password, authCode) {
+  signup(event, roll, password, password2, authCode) {
     event.preventDefault();
+    if (password !== password2) {
+      this.t.toast('The 2 typed passwords do not match');
+      return;
+    }
+
     let beginData = Crypto.fromJson({
       choices: []
     });

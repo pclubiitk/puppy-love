@@ -1,7 +1,7 @@
 .wrapper {
     display: table-cell;
     vertical-align: bottom;
-    position: absolute;
+    position: fixed;
     bottom: 10px;
     width: 25em;
 }
