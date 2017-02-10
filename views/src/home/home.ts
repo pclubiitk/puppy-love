@@ -147,6 +147,8 @@ export class Home {
         // NO, this does NOT mean you are telling your choices
         this.declareyourchoices();
       });
+    } else {
+        this.dataservice.computing = false;
     }
   }
 
