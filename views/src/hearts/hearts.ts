@@ -73,7 +73,7 @@ export class Hearts {
   }
 
   getmorehearts() {
-    this.toast('Fetching more hearts, just for you..');
+    this.toast('Fetching more hearts, just for you.. Please wait.');
     let ctime = new Date().valueOf();
 
     // Hack of the day

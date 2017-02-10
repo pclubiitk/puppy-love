@@ -36,7 +36,6 @@ export class Home {
   canyousubmitrightnow: boolean = false;
   submittimeron: boolean = false;
 
-  // To be cleared on logout
   timeouts = [];
 
   private static checker(data): boolean {
@@ -177,11 +176,21 @@ export class Home {
         response => {
           console.log('Saved declare values: ' + count);
           this.dataservice.computing = false;
+          this.timeouts.push(
+            setTimeout(() => {
+              this.submit();
+            }, 15000)
+          );
         },
         error => {
           console.error('Error saving declare values!');
           this.toast('Error saving declare values!');
           this.dataservice.computing = false;
+          this.timeouts.push(
+            setTimeout(() => {
+              this.submit();
+            }, 15000)
+          );
         }
       );
   }
