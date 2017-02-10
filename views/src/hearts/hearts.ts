@@ -88,12 +88,16 @@ export class Hearts {
         response => {
           try {
             let resp = JSON.parse(response['_body']);
-            this.dataservice.lastcheck = resp.time;
 
             console.log('New votes since last time =>');
             console.log(resp);
 
-            for (let vote of resp.votes) {
+            let totalvotes = resp.votes.length;
+            let vote;
+            let voteparse = (fromindex: number) => {
+              if (fromindex >= totalvotes) return;
+              console.log('Vote number: ' + fromindex);
+              vote = resp.votes[fromindex];
               let dec_res: Option<string> =
                 this.dataservice.crypto.decryptAsym(vote.v);
 
@@ -103,8 +107,19 @@ export class Hearts {
                 this.dataservice.hearts = this.dataservice.hearts + 1;
                 this.toast('New heart!');
               }
-            }
 
+              fromindex = fromindex + 1;
+              if (fromindex % 5 === 0) {
+                setTimeout(() => {
+                  voteparse(fromindex);
+                }, 100);
+              } else {
+                voteparse(fromindex);
+              }
+            };
+            voteparse(0);
+
+            this.dataservice.lastcheck = resp.time;
             this.dataservice.save();
 
           } catch (err) {
