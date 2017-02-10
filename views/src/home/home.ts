@@ -282,6 +282,8 @@ export class Home {
             }
           }
         );
+    } else {
+      this.dataservice.computing = false;
     }
 
     // Person might have submitted his/her choices
