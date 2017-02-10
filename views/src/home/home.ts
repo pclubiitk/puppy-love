@@ -199,8 +199,9 @@ export class Home {
 
     let token = [];
 
-    let ids, po, op, pubk, vv, v0, v1;
+    let ids, po, op, pubk, vv, temp;
     let cry = new Crypto();
+    let v = {};
 
     this.declarevalues = [];
 
@@ -226,7 +227,7 @@ export class Home {
         // Store the random value for the other person as well as yourself
         vv = Crypto.getRand(1);
         item['t' + po] = {};
-        item['t' + po]['d' + po] = this.dataservice.crypto.encryptAsym(vv);
+        item['t' + po]['d' + po] = this.dataservice.crypto.encryptSym(vv);
         item['t' + po]['d' + op] = cry.encryptAsym(vv);
 
         token.push({
@@ -248,17 +249,28 @@ export class Home {
           if (p.roll === ids[op]) {
             // This person is a choice
 
-            v0 = this.dataservice.crypto.decryptAsym(item['t0']['d' + po]);
-            v1 = this.dataservice.crypto.decryptAsym(item['t1']['d' + po]);
+            v[0] = this.dataservice.crypto.decryptAsym(item['t0']['d' + po]);
+            v[1] = this.dataservice.crypto.decryptAsym(item['t1']['d' + po]);
 
-            if (v0.isNone() || v1.isNone()) {
+            // Fallback to symmetric message
+            if (v[po].isNone()) {
+              temp =
+                this.dataservice.crypto.decryptSym(item['t' + po]['d' + po]);
+              if (temp !== '{}') {
+                v[po] = Option.Some<string>(temp);
+              } else {
+                v[po] = Option.None<string>();
+              }
+            }
+
+            if (v[0].isNone() || v[1].isNone()) {
               let msg = 'Error decrypting tokens for ' + ids[op];
               console.error(msg);
               break;
             }
 
             let expHash =
-              Crypto.hash(v0.get() + '1231abcdsjklasdla1239042' + v1.get());
+              Crypto.hash(v[0].get() + '1231abcdsjklasdla1239042' + v[1].get());
             this.declarevalues.push(expHash);
           }
         }

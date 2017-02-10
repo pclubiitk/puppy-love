@@ -20,7 +20,7 @@ export class PubkeyService {
 
   callnetwork() {
     this.toast('Algorithm in progress... ' +
-               'This may take up to 45 seconds if this is your first time');
+               'This may take up to 30 seconds if this is your first time');
     this.http.get(Config.listPubkey + '/' +
                   (this.dataservice.your_gender === 'Male' ? '0' : '1'))
       .subscribe (
