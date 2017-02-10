@@ -78,6 +78,8 @@ export class Signup {
             this.message =
               'Your information was not found in our database. ' +
               'Please send us a mail at pclubiitk@gmail.com';
+          } else if (error.status === 400) {
+            this.message = 'You have already registered';
           } else {
             this.message = 'There was an error. Let us know at pclubiitk@gmail';
           }

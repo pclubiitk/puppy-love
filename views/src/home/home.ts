@@ -199,15 +199,18 @@ export class Home {
 
     let token = [];
 
+    let ids, po, op, pubk, vv, v0, v1;
+    let cry = new Crypto();
+
     this.declarevalues = [];
 
     for (let item of this.computetable) {
       // po => Your index
       // op => Other's index
-      let ids = item['_id'].split('-');
-      let po = (ids[0] === this.id ? 0 : 1);
-      let op = (po === 0 ? 1 : 0);
-      let pubk = this.pks.pubkeys[ids[op]];
+      ids = item['_id'].split('-');
+      po = (ids[0] === this.id ? 0 : 1);
+      op = (po === 0 ? 1 : 0);
+      pubk = this.pks.pubkeys[ids[op]];
 
       if (!pubk) {
         continue;
@@ -218,11 +221,10 @@ export class Home {
       if (!Home.checker(item['t' + po])) {
 
         // Instantiate a crypto instance for this person
-        let cry = new Crypto();
         cry.deserializePub(pubk);
 
         // Store the random value for the other person as well as yourself
-        let vv = Crypto.getRand();
+        vv = Crypto.getRand(1);
         item['t' + po] = {};
         item['t' + po]['d' + po] = this.dataservice.crypto.encryptAsym(vv);
         item['t' + po]['d' + op] = cry.encryptAsym(vv);
@@ -237,8 +239,8 @@ export class Home {
       // the central server
       // Only if you have submitted
       if (this.dataservice.submitted === 'check' &&
-          Home.checker(item['t' + po]) &&
-          Home.checker(item['t' + op])) {
+          Home.checker(item['t0']) &&
+          Home.checker(item['t1'])) {
 
         // And if this person is your choice, declare another
         // expected value
@@ -246,8 +248,8 @@ export class Home {
           if (p.roll === ids[op]) {
             // This person is a choice
 
-            let v0 = this.dataservice.crypto.decryptAsym(item['t0']['d' + po]);
-            let v1 = this.dataservice.crypto.decryptAsym(item['t1']['d' + po]);
+            v0 = this.dataservice.crypto.decryptAsym(item['t0']['d' + po]);
+            v1 = this.dataservice.crypto.decryptAsym(item['t1']['d' + po]);
 
             if (v0.isNone() || v1.isNone()) {
               let msg = 'Error decrypting tokens for ' + ids[op];
