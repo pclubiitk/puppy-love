@@ -101,9 +101,7 @@ export class DataService {
 
     this.saving = 'Saved ...';
 
-    setTimeout(() => {
-      this.emitdone.emit(true);
-    }, 2000);
+    this.emitdone.emit(true);
   }
 
   // Save your (transient and changing) choices on the backend

@@ -13,13 +13,15 @@
   <div class="SearchResults"
        [ngClass]="{'visible': displayCompletions}">
     <ul style="list-style: none; padding-left: 0px;">
-      <div *ngFor="let item of suggestions">
-        <li class="SearchResultEntry"
-            tabindex="0"
-            *ngIf="item.display"
-            (click)="itemClicked($event)">
-          {{item.name}} - {{item.roll}}
-        </li>
+      <div *ngFor="let item of suggestions; let i=index">
+        <template [ngIf]="i<20">
+          <li class="SearchResultEntry"
+              tabindex="0"
+              *ngIf="item.display"
+              (click)="itemClicked($event)">
+            {{item.name}} - {{item.roll}}
+          </li>
+        </template>
       </div>
     </ul>
   </div>

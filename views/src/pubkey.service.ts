@@ -10,17 +10,12 @@ export class PubkeyService {
 
   pubkeys = {}; // Map from roll number to key
 
-  emitdone: EventEmitter<boolean> = new EventEmitter<boolean>();
-
   constructor(public http: Http,
               public t: ToastService,
               public dataservice: DataService) {
-    this.dataservice.emitdone.subscribe(x => this.callnetwork());
   }
 
-  callnetwork() {
-    this.toast('Algorithm in progress... ' +
-               'This may take up to 30 seconds if this is your first time');
+  callnetwork(callback: () => void) {
     this.http.get(Config.listPubkey + '/' +
                   (this.dataservice.your_gender === 'Male' ? '0' : '1'))
       .subscribe (
@@ -29,9 +24,9 @@ export class PubkeyService {
           for (let i in items) {
             this.pubkeys[items[i]['_id']] = items[i]['pubKey'];
           }
-          // Negotiate compute values with people
-          // Requires the public keys to be in memory
-          this.emitdone.emit(true);
+
+          // Submit values and votes now :)
+          callback();
         },
         error => {
           console.error('Error getting public keys');

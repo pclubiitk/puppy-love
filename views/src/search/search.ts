@@ -38,6 +38,10 @@ export class Search {
   @HostListener('focusout', ['$event'])
   focusout(event) {
     setTimeout(() => {
+      this.content = '';
+      for (let p of this.suggestions) {
+        p.display = false;
+      }
       this.displayCompletions = false;
     }, 300);
   }
@@ -59,7 +63,7 @@ export class Search {
     let searchterm = this.content.toLowerCase();
 
     // Small search => Show no one
-    if (searchterm.length < 3) {
+    if (searchterm.length < 1) {
       for (let p of this.suggestions) {
         p.display = false;
       }

@@ -78,6 +78,14 @@ export class Crypto {
     this.pubK = pair.pub;
   }
 
+  diffieHellman(pub: string): string {
+    let pp = new sjcl.ecc.elGamal.publicKey(
+      sjcl.ecc.curves.c256,
+      sjcl.codec.base64.toBits(pub)
+    );
+    return sjcl.codec.hex.fromBits(this.priK.dh(pp));
+  }
+
   serializePub() {
     let pub = this.pubK.get();
     return sjcl.codec.base64.fromBits(pub.x.concat(pub.y));

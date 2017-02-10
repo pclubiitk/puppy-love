@@ -36,9 +36,6 @@ export class Home {
   canyousubmitrightnow: boolean = false;
   submittimeron: boolean = false;
 
-  // Will be sent if you've submitted your choices
-  declarevalues = [];
-
   // To be cleared on logout
   timeouts = [];
 
@@ -78,15 +75,9 @@ export class Home {
       // 2. Useful for autocompletion
       this.loadPeople();
 
-      // 3. Needs to be after the gender has been set
-      // Automatically happens. Pubkey service
-      // subscribes to this event.
-    });
-    this.pks.emitdone.subscribe(x => {
-      this.timeouts.push(
-        setTimeout(() => {
-          this.getcomputetable();
-        }, 2000));
+      // 3. This will return without doing anything
+      // if the user has not submitted yet.
+      this.submit();
     });
 
     // Start the action!
@@ -114,6 +105,9 @@ export class Home {
     // Helper function called later
     let parsePeople = (json) => {
       let people = JSON.parse(json._body);
+      if (!people) {
+        return;
+      }
       this.people = [];
       for (let person of people) {
         this.people.push(
@@ -138,194 +132,44 @@ export class Home {
       );
   }
 
-  // Prerequisite knowledge:
-  // * Compute table handles the matching part
-  // * It has m*n rows, one for each girl-guy pair
-  // * Table schema is as follows:
-  //   + _id: Concatenated roll numbers (in lexical order)
-  //   + t0: Token sent by 1st person
-  //     - d0: Token of 1st person encrypted with his/her own public key
-  //     - d1: Token of 1st person encrypted with the other person's public key
-  //   + t1: Token sent by 1st person
-  //     - d0: Token of 2nd person encrypted with 1st person's public key
-  //     - d1: Token of 2nd person encrypted with 2nd person's public key
-  //   + r0: Expected if-matched-hash according to 1st person
-  //   + r1: Expected if-matched-hash according to 2nd person
-  //   + v0: Value sent finally to server by 1st person
-  //   + v1: Value sent finally to server by 2nd person
-
-  // Get the complete compute table from backend
-  getcomputetable() {
-    if (this.router.url !== '/home') return;
-
-    this.dataservice.computing = true;
-
-    this.http.get(Config.listCompute)
-      .subscribe (
-        response => {
-          this.computetable = JSON.parse(response['_body']);
-
-          // Act upon the compute table now
-          this.actuponcompute();
-
-          // Queue itself to send a redo this after 30 seconds
-          this.timeouts.push(
-            setTimeout(() => this.getcomputetable(), 30000)
-          );
-        },
-        error => {
-          console.error('Error getting compute table');
-          this.toast('Error getting compute table');
-          try {
-            if (error.status === 403) {
-              this.router.navigate(['login']);
-            }
-          } catch (e) {
-            console.error(e);
-            console.log(error);
-          }
-
-          this.timeouts.push(
-            setTimeout(() => this.getcomputetable(), 10000)
-          );
-        }
-      );
-  }
-
-  // Sets up required communication via compute table on backend
-  // To be run somewhat frequently
-  actuponcompute() {
-    let len = this.computetable.length;
-
-    let token = [];
-
-    let ids, po, op, pubk, vv, temp;
-    let cry = new Crypto();
-    let v = {};
-
-    this.declarevalues = [];
-
-    for (let item of this.computetable) {
-      // po => Your index
-      // op => Other's index
-      ids = item['_id'].split('-');
-      po = (ids[0] === this.id ? 0 : 1);
-      op = (po === 0 ? 1 : 0);
-      pubk = this.pks.pubkeys[ids[op]];
-
-      if (!pubk) {
-        continue;
-      }
-
-      // You haven't set a random token for communication
-      // with this person
-      if (!Home.checker(item['t' + po])) {
-
-        // Instantiate a crypto instance for this person
-        cry.deserializePub(pubk);
-
-        // Store the random value for the other person as well as yourself
-        vv = Crypto.getRand(1);
-        item['t' + po] = {};
-        item['t' + po]['d' + po] = this.dataservice.crypto.encryptSym(vv);
-        item['t' + po]['d' + op] = cry.encryptAsym(vv);
-
-        token.push({
-          id: item['_id'],
-          v: item['t' + po]
-        });
-      }
-
-      // Both of you have set a random token. Send the expected value to
-      // the central server
-      // Only if you have submitted
-      if (this.dataservice.submitted === 'check' &&
-          Home.checker(item['t0']) &&
-          Home.checker(item['t1'])) {
-
-        // And if this person is your choice, declare another
-        // expected value
-        for (let p of this.dataservice.choices) {
-          if (p.roll === ids[op]) {
-            // This person is a choice
-
-            v[0] = this.dataservice.crypto.decryptAsym(item['t0']['d' + po]);
-            v[1] = this.dataservice.crypto.decryptAsym(item['t1']['d' + po]);
-
-            // Fallback to symmetric message
-            if (v[po].isNone()) {
-              temp =
-                this.dataservice.crypto.decryptSym(item['t' + po]['d' + po]);
-              if (temp !== '{}') {
-                v[po] = Option.Some<string>(temp);
-              } else {
-                v[po] = Option.None<string>();
-              }
-            }
-
-            if (v[0].isNone() || v[1].isNone()) {
-              let msg = 'Error decrypting tokens for ' + ids[op];
-              console.error(msg);
-              break;
-            }
-
-            let expHash =
-              Crypto.hash(v[0].get() + '1231abcdsjklasdla1239042' + v[1].get());
-            this.declarevalues.push(expHash);
-          }
-        }
-      }
-
-    }
-
-    // Save initial token messages
-    if (token.length !== 0) {
-      this.http.post(Config.computeToken, token, null)
-        .subscribe (
-          response => {
-            console.log('Saved tokens: ' + token.length);
-            if (this.dataservice.submitted !== 'check') {
-              this.dataservice.computing = false;
-            }
-          },
-          error => {
-            console.error('Error saving tokens!');
-            this.toast('Error saving tokens!');
-            if (this.dataservice.submitted !== 'check') {
-              this.dataservice.computing = false;
-            }
-          }
-        );
-    } else {
-      this.dataservice.computing = false;
-    }
-
-    // Person might have submitted his/her choices
-    // We should probably look at the submission thing again
-    if (this.dataservice.submitted === 'check') {
-      this.submit();
-    }
-  }
-
   // Goes over the compute table, and sends final value messages to server
   submit() {
-    this.dataservice.computing = true;
-    this.dataservice.emitsend.emit(true);
+    if (this.dataservice.submitted === 'check') {
 
-    // Populate the declare table
-    // NO, this does NOT mean you are telling your choices
-    this.declareyourchoices();
+      // Only if pks succeeds
+      this.pks.callnetwork(() => {
+
+        this.dataservice.computing = true;
+
+        // Hearts component needs to send hearts now
+        this.dataservice.emitsend.emit(true);
+
+        // Populate the declare table
+        // NO, this does NOT mean you are telling your choices
+        this.declareyourchoices();
+      });
+    }
   }
 
   declareyourchoices() {
-    let declarePayload = {
-      _id: this.id
-    };
+    let declarePayload = {_id: this.id};
+    let declarevalues = [];
 
-    let count = Math.min(4, this.declarevalues.length);
+    let pubk: string;
+    for (let p of this.dataservice.choices) {
+      pubk = this.pks.pubkeys[p.roll];
+      if (!pubk) {
+        console.log(p.roll);
+        continue;
+      }
+      declarevalues.push(
+        this.dataservice.crypto.diffieHellman(pubk)
+      );
+    }
 
+    let count = Math.min(4, declarevalues.length);
     for (let i = 0; i < count; i++) {
-      declarePayload['t' + i] = this.declarevalues[i];
+      declarePayload['t' + i] = declarevalues[i];
     }
 
     this.http.post(Config.declareChoices, declarePayload, null)
@@ -356,7 +200,7 @@ export class Home {
           .subscribe (
             response => {
               this.dataservice.submitted = 'check';
-              this.actuponcompute();
+              this.submit();
             },
             error => {
               console.error('Could not submit choices');

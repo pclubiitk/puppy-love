@@ -25,7 +25,11 @@ export class Hearts {
   }
 
   ngOnInit() {
-    this.dataservice.emitdone.subscribe(x => this.getmorehearts());
+    this.dataservice.emitdone.subscribe(x => {
+      setTimeout(() => {
+        this.getmorehearts();
+      }, 2000);
+    });
     this.dataservice.emitsend.subscribe(x => this.sendvotes());
   }
 
@@ -69,7 +73,7 @@ export class Hearts {
   }
 
   getmorehearts() {
-
+    this.toast('Fetching more hearts, just for you..');
     let ctime = new Date().valueOf();
 
     // Hack of the day
