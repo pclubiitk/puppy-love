@@ -42,7 +42,9 @@ func PuppyRoute(db db.PuppyDb) {
 
 	// Votes
 	iris.Handle("GET", "/votes/get/:time", controllers.VoteGet{db})
+	iris.Handle("GET", "/hearts/get/:time/:gen", controllers.HeartGet{db})
 	iris.Handle("POST", "/votes/send", controllers.VoteSend{db})
+	iris.Handle("POST", "/hearts/send", controllers.GotHeart{db})
 
 	// Session administration
 	sesPre := "/session"
