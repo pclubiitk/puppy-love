@@ -73,16 +73,25 @@ export class Hearts {
   }
 
   getmorehearts() {
-    this.toast('Fetching more hearts, just for you.. Please wait.');
-    let ctime = new Date().valueOf();
-
     // Hack of the day
     if (this.dataservice.lastcheck.toString().substring(0, 4) === '2017') {
       // You need medication
       this.dataservice.lastcheck = 0;
-      this.dataservice.save();
+      this.dataservice.hearts = 0;
     }
 
+    if (!this.dataservice.rechecked || this.dataservice.rechecked === 0) {
+      this.toast('Recounting your hearts :) This may take a few seconds..');
+      this.dataservice.lastcheck = 0;
+      this.dataservice.hearts = 0;
+    } else {
+      this.toast('Fetching more hearts, just for you.. Please wait.');
+    }
+
+    this.getvotehttp();
+  }
+
+  getvotehttp() {
     this.http.get(Config.voteGet + '/' + this.dataservice.lastcheck)
       .subscribe(
         response => {
@@ -97,6 +106,8 @@ export class Hearts {
             let voteparse = (fromindex: number) => {
               if (fromindex >= totalvotes) {
                 this.dataservice.lastcheck = resp.time;
+                this.dataservice.rechecked = 1;
+                this.toast('Saving your heart count now..');
                 this.dataservice.save();
                 return;
               }
@@ -113,10 +124,10 @@ export class Hearts {
               }
 
               fromindex = fromindex + 1;
-              if (fromindex % 5 === 0) {
+              if (fromindex % 3 === 0) {
                 setTimeout(() => {
                   voteparse(fromindex);
-                }, 100);
+                }, 70);
               } else {
                 voteparse(fromindex);
               }

@@ -31,6 +31,8 @@ export class DataService {
   emitdone: EventEmitter<boolean> = new EventEmitter<boolean>();
   emitsend: EventEmitter<boolean> = new EventEmitter<boolean>();
 
+  rechecked: number;
+
   constructor(public http: Http,
               public router: Router,
               public t: ToastService) {
@@ -97,6 +99,7 @@ export class DataService {
 
     this.hearts = data.hearts || 0;
     this.lastcheck = data.lastcheck || 0;
+    this.rechecked = data.rechecked || 0;
     this.votessentto = data.votessentto || [];
 
     this.saving = 'Saved ...';
@@ -111,7 +114,8 @@ export class DataService {
       choices: this.choices,
       hearts: this.hearts,
       lastcheck: this.lastcheck,
-      votessentto: this.votessentto
+      votessentto: this.votessentto,
+      rechecked: this.rechecked
     };
     let encData = this.crypto.encryptSym(Crypto.fromJson(data));
     this.saving = 'Saving ...';
