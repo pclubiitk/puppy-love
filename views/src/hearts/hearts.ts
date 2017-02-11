@@ -18,6 +18,9 @@ const template = require('./hearts.html');
   styles: [ styles ]
 })
 export class Hearts {
+  findinghearts: boolean = false;
+  findprog: number = 0;
+
   constructor(public http: Http,
               public dataservice: DataService,
               public t: ToastService,
@@ -92,6 +95,8 @@ export class Hearts {
   }
 
   getvotehttp() {
+    this.findinghearts = true;
+    this.findprog = 0;
     this.http.get(Config.voteGet + '/' + this.dataservice.lastcheck)
       .subscribe(
         response => {
@@ -104,11 +109,17 @@ export class Hearts {
             let totalvotes = resp.votes.length;
             let vote;
             let voteparse = (fromindex: number) => {
+              if (totalvotes === 0) {
+                this.findprog = 100;
+              } else {
+                this.findprog = Math.ceil(fromindex / totalvotes * 100);
+              }
               if (fromindex >= totalvotes) {
                 this.dataservice.lastcheck = resp.time;
                 this.dataservice.rechecked = 1;
                 this.toast('Saving your heart count now..');
                 this.dataservice.save();
+                this.findinghearts = false;
                 return;
               }
               console.log('Vote number: ' + fromindex);
@@ -137,10 +148,14 @@ export class Hearts {
           } catch (err) {
             this.toast('Bad response for votes');
             console.error('Could not parse vote response');
+            this.findinghearts = false;
             console.error(err);
           }
         },
-        error => this.toast('Could not get votes')
+        error => {
+          this.toast('Could not get votes');
+          this.findinghearts = false;
+        }
       );
   }
 
