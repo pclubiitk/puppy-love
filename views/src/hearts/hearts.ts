@@ -19,7 +19,10 @@ const template = require('./hearts.html');
 })
 export class Hearts {
   findinghearts: boolean = false;
-  findprog: number = 0;
+  findinghearts2: boolean = false;
+
+  totalstuff = 0;
+  donestuff = 0;
 
   constructor(public http: Http,
               public dataservice: DataService,
@@ -96,55 +99,17 @@ export class Hearts {
 
   getvotehttp() {
     this.findinghearts = true;
-    this.findprog = 0;
+    this.findinghearts2 = true;
+
+    this.totalstuff = 0;
+    this.donestuff = 0;
+
     this.http.get(Config.voteGet + '/' + this.dataservice.lastcheck)
       .subscribe(
         response => {
           try {
             let resp = JSON.parse(response['_body']);
-
-            console.log('New votes since last time =>');
-            console.log(resp);
-
-            let totalvotes = resp.votes.length;
-            let vote;
-            let voteparse = (fromindex: number) => {
-              if (totalvotes === 0) {
-                this.findprog = 100;
-              } else {
-                this.findprog = Math.ceil(fromindex / totalvotes * 100);
-              }
-              if (fromindex >= totalvotes) {
-                this.dataservice.lastcheck = resp.time;
-                this.dataservice.rechecked = 1;
-                this.toast('Saving your heart count now..');
-                this.dataservice.save();
-                this.findinghearts = false;
-                return;
-              }
-              console.log('Vote number: ' + fromindex);
-              vote = resp.votes[fromindex];
-              let dec_res: Option<string> =
-                this.dataservice.crypto.decryptAsym(vote.v);
-
-              if (dec_res.isNone()) {
-                console.log('Could not catch vote');
-              } else {
-                this.dataservice.hearts = this.dataservice.hearts + 1;
-                this.toast('New heart!');
-              }
-
-              fromindex = fromindex + 1;
-              if (fromindex % 3 === 0) {
-                setTimeout(() => {
-                  voteparse(fromindex);
-                }, 70);
-              } else {
-                voteparse(fromindex);
-              }
-            };
-            voteparse(0);
-
+            this.processVotes(resp, 1);
           } catch (err) {
             this.toast('Bad response for votes');
             console.error('Could not parse vote response');
@@ -157,6 +122,78 @@ export class Hearts {
           this.findinghearts = false;
         }
       );
+
+    this.http.get(Config.heartGet + '/' + this.dataservice.lastcheck2)
+      .subscribe(
+        response => {
+          try {
+            let resp = JSON.parse(response['_body']);
+            this.processVotes(resp, 2);
+          } catch (err) {
+            this.toast('Bad response for hearts');
+            console.error('Could not parse hearts response');
+            this.findinghearts2 = false;
+            console.error(err);
+          }
+        },
+        error => {
+          this.toast('Could not get hearts');
+          this.findinghearts2 = false;
+        }
+      );
+  }
+
+  processVotes(resp, index: number) {
+    console.log('New votes since last time =>');
+    console.log(resp);
+
+    this.totalstuff = this.totalstuff + resp.votes.length;
+    let totalvotes = resp.votes.length;
+    let vote;
+    let voteparse = (fromindex: number) => {
+      this.donestuff = this.donestuff + 1;
+      if (fromindex >= totalvotes) {
+
+        if (index === 1) {
+          this.dataservice.lastcheck = resp.time;
+          this.dataservice.rechecked = 1;
+          this.toast('Saving your heart count now..');
+          this.findinghearts = false;
+        } else {
+          this.dataservice.lastcheck2 = resp.time;
+          this.findinghearts2 = false;
+        }
+
+        this.dataservice.save();
+        return;
+      }
+
+      console.log('Vote number: ' + fromindex);
+      vote = resp.votes[fromindex];
+
+      let dec_res: Option<string> =
+        this.dataservice.crypto.decryptAsym(vote.v);
+
+      if (dec_res.isNone()) {
+        console.log('Could not catch vote');
+      } else {
+        this.dataservice.hearts = this.dataservice.hearts + 1;
+
+        if (index === 1) {
+          this.toast('New heart!');
+        }
+      }
+
+      fromindex = fromindex + 1;
+      if (fromindex % 3 === 0) {
+        setTimeout(() => {
+          voteparse(fromindex);
+        }, 70);
+      } else {
+        voteparse(fromindex);
+      }
+    };
+    voteparse(0);
   }
 
   range(value) {

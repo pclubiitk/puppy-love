@@ -23,4 +23,7 @@ export class Config {
 
   static voteGet: string = Config.baseUrl + '/votes/get';
   static voteSend: string = Config.baseUrl + '/votes/send';
+
+  static heartGet: string = Config.baseUrl + '/hearts/get';
+  static heartSend: string = Config.baseUrl + '/hearts/send';
 }

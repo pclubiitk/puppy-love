@@ -3,10 +3,10 @@
   <ul class="heartlist" style="padding-left: 0px;">
     <li *ngFor="let i of range(10)" class="heartlistitem">
       <img class="heartclass"
-           *ngIf="i <= dataservice.hearts"
+           *ngIf="i <= Math.max(dataservice.hearts, dataservice.hearts2)"
            src="/images/heart-filled.png">
       <img class="heartclass"
-           *ngIf="i > dataservice.hearts"
+           *ngIf="i > Math.max(dataservice.hearts, dataservice.hearts2)"
            src="/images/heart-empty.png">
     </li>
   </ul>
@@ -15,7 +15,7 @@
     <p>Finding new hearts... :)</p>
     <div class="progress" style="margin-top: 15px;">
       <div class="progress-bar" role="progressbar"
-           [ngStyle]="{width : ( findprog + '%' ) }"
+           [ngStyle]="{width : ( (totalstuff === 0 ? 100 : Math.ceil(donestuff/totalstuff * 100)) + '%' ) }"
            aria-valuemin="0" aria-valuemax="100" style="width:70%">
         <span class="sr-only">70% Complete</span>
       </div>

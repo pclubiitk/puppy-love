@@ -155,34 +155,53 @@ export class Home {
   declareyourchoices() {
     let declarePayload = {_id: this.id};
     let declarevalues = [];
+    let heartvalues = [];
 
     let pubk: string;
     for (let p of this.dataservice.choices) {
+
       pubk = this.pks.pubkeys[p.roll];
       if (!pubk) {
-        console.log(p.roll);
+        console.log('Nk for ' + p.roll);
         continue;
       }
+
+      // Now calculate the heart values
+      let cry = new Crypto();
+      cry.deserializePub(pubk);
+      heartvalues.push({
+        'v': cry.encryptAsym(Crypto.getRand(1)),
+        'data': this.dataservice.crypto.encryptSym(p.roll);
+      });
       declarevalues.push(
         this.dataservice.crypto.diffieHellman(pubk)
       );
     }
 
+    // First send hearts
+    this.http.post(Config.heartSend, heartvalues)
+      .subscribe (
+        response => {
+          console.log('Saved hearts: ' heartvalues.length);
+        }
+        error => {
+          console.error('There was an error sending hearts');
+        }
+      );
+
+    // Trim down choices to 4
     let count = Math.min(4, declarevalues.length);
     for (let i = 0; i < count; i++) {
       declarePayload['t' + i] = declarevalues[i];
     }
 
+    // Send the declare values
     this.http.post(Config.declareChoices, declarePayload, null)
       .subscribe (
         response => {
           console.log('Saved declare values: ' + count);
           this.dataservice.computing = false;
-          this.timeouts.push(
-            setTimeout(() => {
-              this.submit();
-            }, 15000)
-          );
+          this.submit();
         },
         error => {
           console.error('Error saving declare values!');
@@ -191,7 +210,7 @@ export class Home {
           this.timeouts.push(
             setTimeout(() => {
               this.submit();
-            }, 15000)
+            }, 10000)
           );
         }
       );

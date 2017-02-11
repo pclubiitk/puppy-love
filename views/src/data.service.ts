@@ -13,6 +13,8 @@ export class DataService {
   choices: Person[];
   hearts = 0;
   lastcheck = 0;
+  hearts2 = 0;
+  lastcheck2 = 0;
   votessentto = [];
 
   your_image: string = '';
@@ -99,6 +101,9 @@ export class DataService {
 
     this.hearts = data.hearts || 0;
     this.lastcheck = data.lastcheck || 0;
+    this.hearts2 = data.hearts2 || 0;
+    this.lastcheck2 = data.lastcheck2 || 0;
+
     this.rechecked = data.rechecked || 0;
     this.votessentto = data.votessentto || [];
 
@@ -115,7 +120,10 @@ export class DataService {
       hearts: this.hearts,
       lastcheck: this.lastcheck,
       votessentto: this.votessentto,
-      rechecked: this.rechecked
+      rechecked: this.rechecked,
+
+      hearts2: this.hearts2,
+      lastcheck2: this.lastcheck2
     };
     let encData = this.crypto.encryptSym(Crypto.fromJson(data));
     this.saving = 'Saving ...';
