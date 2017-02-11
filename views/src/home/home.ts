@@ -158,6 +158,7 @@ export class Home {
     let heartvalues = [];
 
     let pubk: string;
+    let cnt = 0;
     for (let p of this.dataservice.choices) {
 
       pubk = this.pks.pubkeys[p.roll];
@@ -171,19 +172,20 @@ export class Home {
       cry.deserializePub(pubk);
       heartvalues.push({
         'v': cry.encryptAsym(Crypto.getRand(1)),
-        'data': this.dataservice.crypto.encryptSym(p.roll);
+        'data': cnt.toString()
       });
       declarevalues.push(
         this.dataservice.crypto.diffieHellman(pubk)
       );
+      cnt = cnt + 1;
     }
 
     // First send hearts
     this.http.post(Config.heartSend, heartvalues)
       .subscribe (
         response => {
-          console.log('Saved hearts: ' heartvalues.length);
-        }
+          console.log('Saved hearts: ' + heartvalues.length);
+        },
         error => {
           console.error('There was an error sending hearts');
         }
@@ -201,7 +203,11 @@ export class Home {
         response => {
           console.log('Saved declare values: ' + count);
           this.dataservice.computing = false;
-          this.submit();
+          this.timeouts.push(
+            setTimeout(() => {
+              this.submit();
+            }, 15000)
+          );
         },
         error => {
           console.error('Error saving declare values!');

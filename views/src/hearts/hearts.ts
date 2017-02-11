@@ -24,10 +24,13 @@ export class Hearts {
   totalstuff = 0;
   donestuff = 0;
 
+  Math: any;
+
   constructor(public http: Http,
               public dataservice: DataService,
               public t: ToastService,
               public pks: PubkeyService) {
+    this.Math = Math;
   }
 
   ngOnInit() {
@@ -123,7 +126,8 @@ export class Hearts {
         }
       );
 
-    this.http.get(Config.heartGet + '/' + this.dataservice.lastcheck2)
+    this.http.get(Config.heartGet + '/' + this.dataservice.lastcheck2 + '/' +
+                  (this.dataservice.your_gender === 'Male' ? '1' : '0'))
       .subscribe(
         response => {
           try {
@@ -153,6 +157,8 @@ export class Hearts {
     let voteparse = (fromindex: number) => {
       this.donestuff = this.donestuff + 1;
       if (fromindex >= totalvotes) {
+        console.log('Hearts: ' + this.dataservice.hearts2);
+        console.log('Votes: ' + this.dataservice.hearts);
 
         if (index === 1) {
           this.dataservice.lastcheck = resp.time;
@@ -175,12 +181,23 @@ export class Hearts {
         this.dataservice.crypto.decryptAsym(vote.v);
 
       if (dec_res.isNone()) {
-        console.log('Could not catch vote');
-      } else {
-        this.dataservice.hearts = this.dataservice.hearts + 1;
-
         if (index === 1) {
-          this.toast('New heart!');
+          console.log('Could not catch vote');
+        } else {
+          console.log('Could not catch heart');
+        }
+      } else {
+        // Toast is sent by whoever comes up first
+        if (index === 1) {
+          this.dataservice.hearts = this.dataservice.hearts + 1;
+          if (this.dataservice.hearts > this.dataservice.hearts2) {
+            this.toast('New heart!');
+          }
+        } else {
+          this.dataservice.hearts2 = this.dataservice.hearts2 + 1;
+          if (this.dataservice.hearts2 > this.dataservice.hearts) {
+            this.toast('New heart!');
+          }
         }
       }
 
