@@ -13,16 +13,16 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func difference(oldVotes *[]models.Heart,
-	newVotes *[]models.GotHeart) []models.GotHeart {
+func difference(oldVotes []models.Heart,
+	newVotes []models.GotHeart) []models.GotHeart {
 
 	diff := []models.GotHeart{}
 	m := map[string]int{}
-	for _, s1val := range *oldVotes {
+	for _, s1val := range oldVotes {
 		m[s1val.Data] = 1
 	}
 
-	for _, s2val := range *newVotes {
+	for _, s2val := range newVotes {
 		if m[s2val.Data] != 1 {
 			diff = append(diff, s2val)
 		}
@@ -68,13 +68,16 @@ func (m GotHeart) Serve(ctx *iris.Context) {
 
 	userVotes := new([]models.Heart)
 	if err := m.Db.GetCollection("heart").Find(bson.M{"roll": id}).
-		All(&userVotes); err != nil {
+		All(userVotes); err != nil {
 		ctx.EmitError(iris.StatusNotFound)
 		log.Print(err)
 		return
 	}
 
-	diffHearts := difference(userVotes, info)
+	diffHearts := difference(*userVotes, *info)
+
+	log.Print("Earlier count: ", len(*userVotes))
+	log.Print("Sent new: ", len(diffHearts))
 
 	if len(diffHearts)+len(*userVotes) > 4 {
 		ctx.Error("More than allowed votes", iris.StatusBadRequest)

@@ -115,11 +115,6 @@ func (m VoteGet) Serve(ctx *iris.Context) {
 
 	// Current time
 	ctime := uint64(time.Now().UnixNano() / 1000000)
-	var granularity uint64 = 600000 // 10 mins
-	log.Print("Ctime: ", ctime)
-	ctime = ctime - ctime%granularity
-	log.Print("Ctimf: ", ctime)
-	log.Print("Ltime: ", ltime)
 
 	type AnonymVote struct {
 		Value string `json:"v" bson:"v"`
