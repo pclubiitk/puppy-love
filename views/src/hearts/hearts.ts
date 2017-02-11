@@ -95,7 +95,11 @@ export class Hearts {
             let totalvotes = resp.votes.length;
             let vote;
             let voteparse = (fromindex: number) => {
-              if (fromindex >= totalvotes) return;
+              if (fromindex >= totalvotes) {
+                this.dataservice.lastcheck = resp.time;
+                this.dataservice.save();
+                return;
+              }
               console.log('Vote number: ' + fromindex);
               vote = resp.votes[fromindex];
               let dec_res: Option<string> =
@@ -118,9 +122,6 @@ export class Hearts {
               }
             };
             voteparse(0);
-
-            this.dataservice.lastcheck = resp.time;
-            this.dataservice.save();
 
           } catch (err) {
             this.toast('Bad response for votes');
