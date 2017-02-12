@@ -79,7 +79,12 @@ func main() {
 	}
 
 	sort.Sort(ByValue(flat))
-	fmt.Println(flat)
+
+	for i := range flat {
+		fmt.Println(flat[i].Token, flat[i].Id)
+	}
+
+	fmt.Println()
 
 	for i := range flat {
 		if i == 0 {
