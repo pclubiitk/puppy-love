@@ -52,7 +52,8 @@ func (m DeclarePrepare) Serve(ctx *iris.Context) {
 }
 
 type DeclareStep struct {
-	Db db.PuppyDb
+	Db     db.PuppyDb
+	DbName string
 }
 
 func (m DeclareStep) Serve(ctx *iris.Context) {
@@ -62,21 +63,37 @@ func (m DeclareStep) Serve(ctx *iris.Context) {
 		return
 	}
 
+	type Tokens struct {
+		Id     string `json:"_id" bson:"_id"`
+		Token0 string `json:"t0" bson:"t0"`
+		Token1 string `json:"t1" bson:"t1"`
+		Token2 string `json:"t2" bson:"t2"`
+		Token3 string `json:"t3" bson:"t3"`
+	}
+
 	// Verify valid requested changes
-	info := new(models.Declare)
+	info := new(Tokens)
 	if err := ctx.ReadJSON(info); err != nil {
 		ctx.JSON(iris.StatusBadRequest, "Invalid JSON")
 		log.Println(err)
 		return
 	}
 
-	tmp := models.Declare{}
-
-	if _, err := m.Db.GetById("declare", id).
-		Apply(models.UpsertDeclareTable(info), &tmp); err != nil {
-
-		ctx.EmitError(iris.StatusInternalServerError)
-		log.Println(err)
+	if info.Id != id {
+		ctx.Error("Invalid session/userId", iris.StatusBadRequest)
+		log.Print("Invalid session/userId:", id, "and", info.Id)
 		return
 	}
+
+	if _, err := m.Db.GetCollection(m.DbName).UpsertId(id, bson.M{
+		"t0": info.Token0,
+		"t1": info.Token1,
+		"t2": info.Token2,
+		"t3": info.Token3,
+	}); err != nil {
+		ctx.Error("There was an internal server error", iris.StatusInternalServerError)
+		log.Println("ERROR:", err)
+		return
+	}
+	ctx.JSON(iris.StatusOK, "Saved your values")
 }
