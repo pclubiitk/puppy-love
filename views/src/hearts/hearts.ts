@@ -64,7 +64,7 @@ export class Hearts {
 
     if (tosend.length === 0) return;
 
-    this.http.post(Config.voteSend, tosend)
+    this.http.post(Config.voteSend + '/' + this.dataservice.id, tosend)
       .subscribe(
         response => {
           // Mark these people as done
@@ -107,7 +107,8 @@ export class Hearts {
     this.totalstuff = 0;
     this.donestuff = 0;
 
-    this.http.get(Config.voteGet + '/' + this.dataservice.lastcheck)
+    this.http.get(Config.voteGet + '/' + this.dataservice.lastcheck + '/' +
+                  this.dataservice.id)
       .subscribe(
         response => {
           try {
@@ -127,7 +128,8 @@ export class Hearts {
       );
 
     this.http.get(Config.heartGet + '/' + this.dataservice.lastcheck2 + '/' +
-                  (this.dataservice.your_gender === 'Male' ? '1' : '0'))
+                   (this.dataservice.your_gender === 'Male' ? '1' : '0') + '/' +
+                   this.dataservice.id)
       .subscribe(
         response => {
           try {

@@ -38,7 +38,7 @@ type GotHeart struct {
 // Serve when a Heart is to be saved
 func (m GotHeart) Serve(ctx *iris.Context) {
 	id, err := SessionId(ctx)
-	if err != nil {
+	if err != nil || id != ctx.Param("you") {
 		ctx.EmitError(iris.StatusForbidden)
 		return
 	}
@@ -117,8 +117,8 @@ type HeartGet struct {
 }
 
 func (m HeartGet) Serve(ctx *iris.Context) {
-	_, err := SessionId(ctx)
-	if err != nil {
+	id, err := SessionId(ctx)
+	if err != nil || id != ctx.Param("you") {
 		ctx.EmitError(iris.StatusForbidden)
 		return
 	}

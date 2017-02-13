@@ -30,6 +30,8 @@ export class DataService {
 
   crypto: Crypto;
 
+  id: string;
+
   emitdone: EventEmitter<boolean> = new EventEmitter<boolean>();
   emitsend: EventEmitter<boolean> = new EventEmitter<boolean>();
 
@@ -39,14 +41,16 @@ export class DataService {
               public router: Router,
               public t: ToastService) {
     this.dataToBeSent.concatMap(
-      data => this.http.post(Config.dataSaveUrl, {data: data}, null))
+      data => this.http.post(Config.dataSaveUrl + '/' + this.id,
+                             {data: data}, null))
       .subscribe (
         response => this.saving = 'Saved ...',
         error => this.saving = 'Error saving your choices!'
       );
   }
 
-  createcrypto(password: string) {
+  createcrypto(id: string, password: string) {
+    this.id = id;
     this.crypto = new Crypto(password);
   }
 

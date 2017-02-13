@@ -16,10 +16,10 @@ func PuppyRoute(db db.PuppyDb) {
 	// User administration
 	uPre := "/users"
 	iris.Handle("POST", uPre+"/login/first", controllers.UserFirst{db})
-	iris.Handle("POST", uPre+"/data/update", controllers.UserUpdateData{db})
-	iris.Handle("POST", uPre+"/data/submit", controllers.UserSubmitTrue{db})
-	iris.Handle("POST", uPre+"/image/update", controllers.UserUpdateImage{db})
-	iris.Handle("POST", uPre+"/pass/update", controllers.UserSavePass{db})
+	iris.Handle("POST", uPre+"/data/update/:you", controllers.UserUpdateData{db})
+	iris.Handle("POST", uPre+"/data/submit/:you", controllers.UserSubmitTrue{db})
+	iris.Handle("POST", uPre+"/image/update/:you", controllers.UserUpdateImage{db})
+	iris.Handle("POST", uPre+"/pass/update/:you", controllers.UserSavePass{db})
 	iris.Handle("POST", uPre+"/name/update/:id", controllers.UserUpdateName{db})
 
 	iris.Handle("GET", uPre+"/data/info", controllers.UserLoginGet{db})
@@ -44,10 +44,10 @@ func PuppyRoute(db db.PuppyDb) {
 	iris.Handle("POST", "/declare/dec3", controllers.DeclareStep{db, "declare3"})
 
 	// Votes
-	iris.Handle("GET", "/votes/get/:time", controllers.VoteGet{db})
-	iris.Handle("GET", "/hearts/get/:time/:gen", controllers.HeartGet{db})
-	iris.Handle("POST", "/votes/send", controllers.VoteSend{db})
-	iris.Handle("POST", "/hearts/send", controllers.GotHeart{db})
+	iris.Handle("GET", "/votes/get/:time/:you", controllers.VoteGet{db})
+	iris.Handle("GET", "/hearts/get/:time/:gen/:you", controllers.HeartGet{db})
+	iris.Handle("POST", "/votes/send/:you", controllers.VoteSend{db})
+	iris.Handle("POST", "/hearts/send/:you", controllers.GotHeart{db})
 
 	// Session administration
 	sesPre := "/session"

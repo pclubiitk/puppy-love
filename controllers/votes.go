@@ -19,7 +19,7 @@ type VoteSend struct {
 
 func (m VoteSend) Serve(ctx *iris.Context) {
 	id, err := SessionId(ctx)
-	if err != nil {
+	if err != nil || id != ctx.Param("you") {
 		ctx.EmitError(iris.StatusForbidden)
 		return
 	}
@@ -100,8 +100,8 @@ type typeVoteGet struct {
 }
 
 func (m VoteGet) Serve(ctx *iris.Context) {
-	_, err := SessionId(ctx)
-	if err != nil {
+	id, err := SessionId(ctx)
+	if err != nil || id != ctx.Param("you") {
 		ctx.EmitError(iris.StatusForbidden)
 		return
 	}

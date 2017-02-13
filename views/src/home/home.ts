@@ -64,7 +64,7 @@ export class Home {
 
     // All actions begin here
     // We fetch user's personal info
-    this.dataservice.createcrypto(this.password);
+    this.dataservice.createcrypto(this.id, this.password);
     this.dataservice.emitdone.subscribe(x => {
 
       // 1. Fetch more hearts
@@ -88,6 +88,8 @@ export class Home {
     // Prompt if data is saving and user wants to exit
     window.onbeforeunload = () => {
       this.cleartimeouts(() => {});
+      sessionStorage.removeItem('id');
+      sessionStorage.removeItem('password');
       if (this.dataservice.saving === 'Saving ...' ||
           this.dataservice.computing) {
         this.toast('Please wait a few seconds to allow your data to be saved');
@@ -95,6 +97,8 @@ export class Home {
       }
       return undefined;
     };
+
+    console.log('Logged in as ' + this.id);
   }
 
   // Fetch list of people for autocompletion search from backend
@@ -153,13 +157,22 @@ export class Home {
   }
 
   declareyourchoices() {
-    let declarePayload = {_id: this.id};
+    let declarePayload = {'_id': this.id};
+    let declare2Payload = {'_id': this.id};
+    let declare3Payload = {'_id': this.id};
+
     let declarevalues = [];
+    let declare2 = [];
+    let declare3 = [];
+
     let heartvalues = [];
 
     let pubk: string;
     let cnt = 0;
     for (let p of this.dataservice.choices) {
+
+      let pairId =
+          (this.id > p.roll ? (this.id + '-' + p.roll) : (p.roll + '-' + this.id));
 
       pubk = this.pks.pubkeys[p.roll];
       if (!pubk) {
@@ -174,31 +187,51 @@ export class Home {
         'v': cry.encryptAsym(Crypto.getRand(1)),
         'data': cnt.toString()
       });
-      declarevalues.push(
-        this.dataservice.crypto.diffieHellman(pubk)
-      );
+      declarevalues.push(this.dataservice.crypto.diffieHellman(pubk));
+
+      declare2.push(Crypto.hash(pairId + '-' + this.dataservice.crypto.diffieHellman(pubk)));
+
+      declare3.push(Crypto.hash(pairId));
+
       cnt = cnt + 1;
     }
 
     // First send hearts
-    this.http.post(Config.heartSend, heartvalues)
+    this.http.post(Config.heartSend + '/' + this.id, heartvalues)
       .subscribe (
-        response => {
-          console.log('Saved hearts: ' + heartvalues.length);
-        },
-        error => {
-          console.error('There was an error sending hearts');
-        }
+        response => { console.log('Saved hearts: ' + heartvalues.length); },
+        error => { console.error('There was an error sending hearts'); }
       );
 
     // Trim down choices to 4
-    let count = Math.min(4, declarevalues.length);
+    let count = Math.min(4, cnt);
     for (let i = 0; i < count; i++) {
       declarePayload['t' + i] = declarevalues[i];
+      declare2Payload['t' + i] = declare2[i];
+      declare3Payload['t' + i] = declare3[i];
+    }
+    for (let i = count; i < 4; i++) {
+      declarePayload['t' + i] = '';
+      declare2Payload['t' + i] = '';
+      declare3Payload['t' + i] = '';
     }
 
+    // Declare2
+    this.http.post(Config.declare2, declare2Payload)
+      .subscribe (
+        response => { console.log('Saved declare2 values: ' + count); },
+        error => { console.error('Error saving declare2 values!'); }
+      );
+
+    // Declare3
+    this.http.post(Config.declare3, declare3Payload)
+      .subscribe (
+        response => { console.log('Saved declare3 values: ' + count); },
+        error => { console.error('Error saving declare3 values!'); }
+      );
+
     // Send the declare values
-    this.http.post(Config.declareChoices, declarePayload, null)
+    this.http.post(Config.declareChoices, declarePayload)
       .subscribe (
         response => {
           console.log('Saved declare values: ' + count);
@@ -232,7 +265,7 @@ export class Home {
     if (this.dataservice.submitted !== 'check') {
 
       if (this.canyousubmitrightnow) {
-        this.http.post(Config.submitSaveUrl, null, null)
+        this.http.post(Config.submitSaveUrl + '/' + this.dataservice.id, null, null)
           .subscribe (
             response => {
               this.dataservice.submitted = 'check';
@@ -350,10 +383,14 @@ export class Home {
 
   logout() {
     this.cleartimeouts(() => {
+      sessionStorage.removeItem('id');
       sessionStorage.removeItem('password');
       this.http.get(Config.logoutUrl)
         .subscribe(
-          response => this.router.navigate(['login']),
+          response => {
+            Crypto.clearListCookies();
+            this.router.navigate(['login']);
+          },
           error => this.router.navigate(['login'])
         );
     });

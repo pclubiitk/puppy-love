@@ -244,7 +244,7 @@ type UserSubmitTrue struct {
 
 func (m UserSubmitTrue) Serve(ctx *iris.Context) {
 	id, err := SessionId(ctx)
-	if err != nil {
+	if err != nil || id != ctx.Param("you") {
 		ctx.EmitError(iris.StatusForbidden)
 		return
 	}
@@ -270,7 +270,7 @@ type UserUpdateData struct {
 
 func (m UserUpdateData) Serve(ctx *iris.Context) {
 	id, err := SessionId(ctx)
-	if err != nil {
+	if err != nil || id != ctx.Param("you") {
 		ctx.EmitError(iris.StatusForbidden)
 		return
 	}
@@ -302,7 +302,7 @@ type UserUpdateImage struct {
 
 func (m UserUpdateImage) Serve(ctx *iris.Context) {
 	id, err := SessionId(ctx)
-	if err != nil {
+	if err != nil || id != ctx.Param("you") {
 		ctx.EmitError(iris.StatusForbidden)
 		return
 	}
@@ -338,7 +338,7 @@ type UserSavePass struct {
 
 func (m UserSavePass) Serve(ctx *iris.Context) {
 	id, err := SessionId(ctx)
-	if err != nil {
+	if err != nil || id != ctx.Param("you") {
 		ctx.EmitError(iris.StatusForbidden)
 		return
 	}

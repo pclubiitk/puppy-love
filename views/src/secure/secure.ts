@@ -4,6 +4,7 @@ import { Http } from '@angular/http';
 import { Config } from '../config';
 import { Crypto } from '../common/crypto';
 import { ToastService } from '../toasts';
+import { DataService } from '../data.service';
 
 const styles   = require('./secure.css');
 const template = require('./secure.html');
@@ -16,6 +17,7 @@ const template = require('./secure.html');
 export class Secure {
   constructor(public router: Router,
               public t: ToastService,
+              public dataservice: DataService,
               public http: Http) {
   }
 
@@ -40,7 +42,7 @@ export class Secure {
 
     let encpass = crypto.encryptSym(ccpass);
 
-    this.http.post(Config.savePassUrl, {'pass': encpass})
+    this.http.post(Config.savePassUrl + '/' + this.dataservice.id, {'pass': encpass})
       .subscribe(
         response => {
           this.toast('Your password has been secured');

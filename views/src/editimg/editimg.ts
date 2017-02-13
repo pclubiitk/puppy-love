@@ -37,7 +37,7 @@ export class Editimg {
 
   setimg(event: Event, newurl: string) {
     console.log('Saving link: ' + newurl);
-    this.http.post(Config.imageSaveUrl, {'img': newurl})
+    this.http.post(Config.imageSaveUrl + '/' + this.dataservice.id, {'img': newurl})
       .subscribe(
         response => {
           this.t.toast('Saved new image');

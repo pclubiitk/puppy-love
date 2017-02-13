@@ -18,6 +18,17 @@ export class Login {
   constructor(public router: Router,
               public http: Http,
               public t: ToastService) {
+
+    let password = sessionStorage.getItem('password');
+    let id = sessionStorage.getItem('id');
+    if (password && id) {
+      this.router.navigate(['home']);
+    } else {
+      sessionStorage.removeItem('id');
+      sessionStorage.removeItem('password');
+    }
+
+    Crypto.clearListCookies();
   }
 
   login(event, username, _password) {
@@ -27,6 +38,21 @@ export class Login {
 
     let body = JSON.stringify({ username, password });
 
+    this.http.get(Config.logoutUrl)
+    .subscribe(
+        response => {
+          Crypto.clearListCookies();
+          this.sendLoginReq(body, username, _password);
+        },
+        error => {
+          Crypto.clearListCookies();
+          this.sendLoginReq(body, username, _password);
+        }
+    );
+
+  }
+
+  sendLoginReq(body, username, _password) {
     this.http.post(Config.loginUrl, body, { headers: contentHeaders })
       .subscribe(
         response => {
