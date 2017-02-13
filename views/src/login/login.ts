@@ -21,6 +21,10 @@ export class Login {
 
     let password = sessionStorage.getItem('password');
     let id = sessionStorage.getItem('id');
+    console.log('Here=>');
+    console.log(password);
+    console.log(id);
+    console.log(document.cookie);
     if (password && id) {
       this.router.navigate(['home']);
     } else {
@@ -38,17 +42,19 @@ export class Login {
 
     let body = JSON.stringify({ username, password });
 
-    this.http.get(Config.logoutUrl)
-    .subscribe(
-        response => {
-          Crypto.clearListCookies();
-          this.sendLoginReq(body, username, _password);
-        },
-        error => {
-          Crypto.clearListCookies();
-          this.sendLoginReq(body, username, _password);
-        }
-    );
+
+    Crypto.clearListCookies();
+    this.sendLoginReq(body, username, _password);
+
+    //this.http.get(Config.logoutUrl)
+    //.subscribe(
+        //response => {
+        //},
+        //error => {
+          //Crypto.clearListCookies();
+          //this.sendLoginReq(body, username, _password);
+        //}
+    //);
 
   }
 

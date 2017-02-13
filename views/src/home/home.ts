@@ -191,8 +191,6 @@ export class Home {
 
       declare2.push(Crypto.hash(pairId + '-' + this.dataservice.crypto.diffieHellman(pubk)));
 
-      declare3.push(Crypto.hash(pairId));
-
       cnt = cnt + 1;
     }
 
@@ -402,11 +400,11 @@ export class Home {
     });
   }
 
-  secure() {
-    this.cleartimeouts(() => {
-      this.router.navigate(['./secure']);
-    });
-  }
+  //secure() {
+    //this.cleartimeouts(() => {
+      //this.router.navigate(['./secure']);
+    //});
+  //}
 
   creditspage() {
     this.cleartimeouts(() => {

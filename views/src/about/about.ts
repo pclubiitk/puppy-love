@@ -44,6 +44,6 @@ export class About {
   }
 
   homepage() {
-    this.router.navigate(['home']);
+    this.router.navigate(['login']);
   }
 }
