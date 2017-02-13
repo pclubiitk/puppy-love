@@ -19,6 +19,7 @@ import { Search } from './search';
 import { Choices } from './choices';
 import { Hearts } from './hearts';
 import { Toasts } from './toasts';
+import { Results } from './results';
 import { App } from './app';
 
 import { routes } from './app.routes';
@@ -28,7 +29,7 @@ import { routes } from './app.routes';
   declarations: [
     Home, Login, Signup, App, About, Search,
     Choices, Toasts, Hearts, Credits, Howto,
-    Editimg, Secure
+    Editimg, Secure, Results
   ],
   imports: [
     HttpModule, BrowserModule, FormsModule,

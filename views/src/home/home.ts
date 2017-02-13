@@ -38,6 +38,8 @@ export class Home {
 
   timeouts = [];
 
+  showresults = new EventEmitter<boolean>();
+
   private static checker(data): boolean {
     if (!data ||
         !data['d0'] ||
@@ -234,6 +236,7 @@ export class Home {
         response => {
           console.log('Saved declare values: ' + count);
           this.dataservice.computing = false;
+          // this.showresults.emit(true);
           this.timeouts.push(
             setTimeout(() => {
               this.submit();
@@ -256,6 +259,10 @@ export class Home {
   // ===============================================
   // Handlers for click and user interaction buttons
   // ===============================================
+
+  resultbutton() {
+    this.showresults.emit(true);
+  }
 
   // Only used when submit button is pressed
   submitButton() {

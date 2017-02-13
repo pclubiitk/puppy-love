@@ -6,6 +6,8 @@ export class Config {
   static loginFirstUrl: string = Config.baseUrl + '/users/login/first';
   static loginMailUrl: string = Config.baseUrl + '/users/mail/';
 
+  static matchUrl: string = Config.baseUrl + '/users/data/match';
+
   static imageSaveUrl: string = Config.baseUrl + '/users/image/update';
   static dataSaveUrl: string = Config.baseUrl + '/users/data/update';
   static savePassUrl: string = Config.baseUrl + '/users/pass/update';

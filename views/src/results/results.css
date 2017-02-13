@@ -1,0 +1,11 @@
+.about {
+    position: absolute;
+    z-index: 10;
+    width:100%;
+
+    background-image: url("va.jpg");
+}
+
+p {
+    font-size: 25px;
+}

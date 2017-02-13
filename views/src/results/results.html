@@ -1,0 +1,55 @@
+<div class="about jumbotron center-block container-fluid" *ngIf="displayres">
+  <div class="row">
+    <div class="text-center">
+      <h1>Results!</h1>
+      <div *ngIf="fetching">
+        <p>
+          Fetching the results, please wait.
+        </p>
+      </div>
+      <div *ngIf="!fetching">
+        <div *ngIf="matches?.length !== 0">
+          <p>
+            Congratulations! You matched with the following roll number(s):
+          </p>
+          <ul style="font-size: 25px; list-style: none; padding-left:0;">
+            <div *ngFor="let match of matches">
+              <li>{{match}}</li>
+            </div>
+          </ul>
+          <div *ngIf="matches?.length > 1">
+            <p>
+              Good luck handling them all! :)<br>
+              Happy Valentines Day from Programming Club! &#x2764;
+            </p>
+          </div>
+          <div *ngIf="matches?.length === 1">
+            <p>
+              Happy Valentines Day from Programming Club! &#x2764;
+            </p>
+          </div>
+        </div>
+        <div *ngIf="matches?.length === 0">
+          <p>
+            We still haven't found a match for you.<br>
+            It is possible that your crush has not yet come online. <br>
+            Do check back in a short while!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="[ form-group text-center ]" style="margin: 15px;">
+      <div class="[ btn-group ]">
+        <label id="submit_button" class="[ btn btn-default greenbt ]"
+               (click)="shutdown()">
+          <i class="material-icons">
+            sentiment_very_satisfied
+          </i>
+          Close
+        </label>
+      </div>
+    </div>
+
+  </div>
+</div>

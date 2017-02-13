@@ -82,6 +82,8 @@
     <div class="col-md-8">
         <!-- Contains the main field where you can choose your choices -->
 
+      <results [display]="showresults"></results>
+
         <div class="panel panel-primary">
             <div class="panel-heading"><h3 class="panel-title">Choose!</h3></div>
             <div class="panel-body">
@@ -135,6 +137,17 @@
                       </i>
                       Lock and submit!
                     </label>
+
+                    <!-- <label id="submit_button" class="[ btn btn-default greenbt ]"
+                         [class.greener]="this.canyousubmitrightnow"
+                         (click)="resultbutton()">
+                         <i class="material-icons">
+                         sentiment_very_satisfied
+                         </i>
+                         See results!
+                         </label>
+                       -->
+
                   </div>
                 </div>
 

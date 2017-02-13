@@ -38,3 +38,8 @@
 .panel-heading {
     background-color: #ee8888 !important;
 }
+
+.about {
+    position: absolute;
+    z-index: 10;
+}
