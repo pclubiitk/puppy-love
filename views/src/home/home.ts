@@ -40,6 +40,8 @@ export class Home {
 
   showresults = new EventEmitter<boolean>();
 
+  breakvoteloop: boolean = false;
+
   private static checker(data): boolean {
     if (!data ||
         !data['d0'] ||
@@ -390,6 +392,7 @@ export class Home {
     this.cleartimeouts(() => {
       sessionStorage.removeItem('id');
       sessionStorage.removeItem('password');
+      this.breakvoteloop = true;
       this.http.get(Config.logoutUrl)
         .subscribe(
           response => {

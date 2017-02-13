@@ -26,6 +26,8 @@ export class Hearts {
 
   Math: any;
 
+  @Input('breakloop') breakloop: boolean;
+
   constructor(public http: Http,
               public dataservice: DataService,
               public t: ToastService,
@@ -157,6 +159,9 @@ export class Hearts {
     let totalvotes = resp.votes.length;
     let vote;
     let voteparse = (fromindex: number) => {
+      if (this.breakloop) {
+        return;
+      }
       this.donestuff = this.donestuff + 1;
       if (fromindex >= totalvotes) {
         console.log('Hearts: ' + this.dataservice.hearts2);
