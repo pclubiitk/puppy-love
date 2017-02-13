@@ -35,6 +35,7 @@ func (b ByValue) Less(i, j int) bool {
 
 func main() {
 	CfgInit()
+	log.Println("Computing for table:", CfgTable)
 	db, error := MongoConnect()
 	if error != nil {
 		log.Print("ERROR: Could not connect to MongoDB")
@@ -42,7 +43,7 @@ func main() {
 	}
 
 	var decs []Declare
-	collection := db.GetCollection("declare")
+	collection := db.GetCollection(CfgTable)
 	err := collection.Find(bson.M{}).All(&decs)
 	if err != nil {
 		log.Println("ERROR: Results cannot fetch declare list: ")
