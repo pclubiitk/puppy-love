@@ -23,6 +23,7 @@ func PuppyRoute(db db.PuppyDb) {
 	iris.Handle("POST", uPre+"/name/update/:id", controllers.UserUpdateName{db})
 
 	iris.Handle("GET", uPre+"/data/info", controllers.UserLoginGet{db})
+	iris.Handle("GET", uPre+"/data/match/:you", controllers.MatchGet{db})
 	iris.Handle("GET", uPre+"/get/:id", controllers.UserGet{db})
 	iris.Handle("GET", uPre+"/mail/:id", controllers.UserMail{db})
 

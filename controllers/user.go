@@ -148,6 +148,36 @@ func (m UserMail) Serve(ctx *iris.Context) {
 	ctx.JSON(iris.StatusAccepted, "Mail will be sent to "+u.Email)
 }
 
+type MatchGet struct {
+	Db db.PuppyDb
+}
+
+func (m MatchGet) Serve(ctx *iris.Context) {
+	id, err := SessionId(ctx)
+	if err != nil || ctx.Param("you") != id {
+		ctx.EmitError(iris.StatusForbidden)
+		log.Println("Failed on match get: " + id)
+		log.Println(err)
+		return
+	}
+
+	type typeUserGet struct {
+		Id      string `json:"_id" bson:"_id"`
+		Matches string `json:"matches" bson:"matches"`
+	}
+
+	user := new(typeUserGet)
+
+	// Fetch user
+	if err := m.Db.GetById("user", id).One(user); err != nil {
+		ctx.EmitError(iris.StatusNotFound)
+		log.Print(err)
+		return
+	}
+
+	ctx.JSON(iris.StatusOK, (*user))
+}
+
 // Get user's information
 // ----------------------
 type UserGet struct {
