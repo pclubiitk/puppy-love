@@ -163,11 +163,9 @@ export class Home {
   declareyourchoices() {
     let declarePayload = {'_id': this.id};
     let declare2Payload = {'_id': this.id};
-    let declare3Payload = {'_id': this.id};
 
     let declarevalues = [];
     let declare2 = [];
-    let declare3 = [];
 
     let heartvalues = [];
 
@@ -210,12 +208,10 @@ export class Home {
     for (let i = 0; i < count; i++) {
       declarePayload['t' + i] = declarevalues[i];
       declare2Payload['t' + i] = declare2[i];
-      declare3Payload['t' + i] = declare3[i];
     }
     for (let i = count; i < 4; i++) {
       declarePayload['t' + i] = '';
       declare2Payload['t' + i] = '';
-      declare3Payload['t' + i] = '';
     }
 
     // Declare2
@@ -225,24 +221,15 @@ export class Home {
         error => { console.error('Error saving declare2 values!'); }
       );
 
-    // Declare3
-    this.http.post(Config.declare3, declare3Payload)
-      .subscribe (
-        response => { console.log('Saved declare3 values: ' + count); },
-        error => { console.error('Error saving declare3 values!'); }
-      );
-
     // Send the declare values
     this.http.post(Config.declareChoices, declarePayload)
       .subscribe (
         response => {
           console.log('Saved declare values: ' + count);
           this.dataservice.computing = false;
-          // this.showresults.emit(true);
+          this.showresults.emit(true);
           this.timeouts.push(
-            setTimeout(() => {
-              this.submit();
-            }, 15000)
+            setTimeout(() => { this.submit(); }, 15000)
           );
         },
         error => {
@@ -250,9 +237,7 @@ export class Home {
           this.toast('Error saving declare values!');
           this.dataservice.computing = false;
           this.timeouts.push(
-            setTimeout(() => {
-              this.submit();
-            }, 10000)
+            setTimeout(() => { this.submit(); }, 10000)
           );
         }
       );
