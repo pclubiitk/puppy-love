@@ -139,7 +139,7 @@ export class Home {
       );
   }
 
-  // Goes over the compute table, and sends final value messages to server
+  // Sends final value messages to server
   submit() {
     if (this.dataservice.submitted === 'check') {
 
@@ -147,9 +147,6 @@ export class Home {
       this.pks.callnetwork(() => {
 
         this.dataservice.computing = true;
-
-        // Hearts component needs to send hearts now
-        this.dataservice.emitsend.emit(true);
 
         // Populate the declare table
         // NO, this does NOT mean you are telling your choices
@@ -162,11 +159,7 @@ export class Home {
 
   declareyourchoices() {
     let declarePayload = {'_id': this.id};
-    let declare2Payload = {'_id': this.id};
-
     let declarevalues = [];
-    let declare2 = [];
-
     let heartvalues = [];
 
     let pubk: string;
@@ -189,9 +182,8 @@ export class Home {
         'v': cry.encryptAsym(Crypto.getRand(1)),
         'data': cnt.toString()
       });
-      declarevalues.push(this.dataservice.crypto.diffieHellman(pubk));
 
-      declare2.push(Crypto.hash(pairId + '-' + this.dataservice.crypto.diffieHellman(pubk)));
+      declarevalues.push(Crypto.hash(pairId + '-' + this.dataservice.crypto.diffieHellman(pubk)));
 
       cnt = cnt + 1;
     }
@@ -207,19 +199,10 @@ export class Home {
     let count = Math.min(4, cnt);
     for (let i = 0; i < count; i++) {
       declarePayload['t' + i] = declarevalues[i];
-      declare2Payload['t' + i] = declare2[i];
     }
     for (let i = count; i < 4; i++) {
       declarePayload['t' + i] = '';
-      declare2Payload['t' + i] = '';
     }
-
-    // Declare2
-    this.http.post(Config.declare2, declare2Payload)
-      .subscribe (
-        response => { console.log('Saved declare2 values: ' + count); },
-        error => { console.error('Error saving declare2 values!'); }
-      );
 
     // Send the declare values
     this.http.post(Config.declareChoices, declarePayload)
@@ -281,9 +264,7 @@ export class Home {
             this.canyousubmitrightnow = true;
 
             // But only for 20 more seconds
-            setTimeout(() => {
-              this.canyousubmitrightnow = false;
-            }, 20000);
+            setTimeout(() => { this.canyousubmitrightnow = false; }, 20000);
           }, 10000);
           this.submittimeron = false;
         }

@@ -19,12 +19,9 @@ const template = require('./hearts.html');
 })
 export class Hearts {
   findinghearts: boolean = false;
-  findinghearts2: boolean = false;
 
   totalstuff = 0;
   donestuff = 0;
-
-  Math: any;
 
   @Input('breakloop') breakloop: boolean;
 
@@ -32,7 +29,6 @@ export class Hearts {
               public dataservice: DataService,
               public t: ToastService,
               public pks: PubkeyService) {
-    this.Math = Math;
   }
 
   ngOnInit() {
@@ -41,93 +37,18 @@ export class Hearts {
         this.getmorehearts();
       }, 2000);
     });
-    this.dataservice.emitsend.subscribe(x => this.sendvotes());
-  }
-
-  sendvotes() {
-    let tosend = [];
-
-    for (let p of this.dataservice.choices) {
-      if (this.dataservice.votessentto.indexOf(p.roll) === -1) {
-
-        let pubk = this.pks.pubkeys[p.roll];
-
-        if (!pubk) {
-          continue;
-        }
-
-        // Instantiate a crypto instance for this person
-        let cry = new Crypto();
-        cry.deserializePub(pubk);
-
-        tosend.push({'v': cry.encryptAsym(Crypto.getRand(2))});
-      }
-    }
-
-    if (tosend.length === 0) return;
-
-    this.http.post(Config.voteSend + '/' + this.dataservice.id, tosend)
-      .subscribe(
-        response => {
-          // Mark these people as done
-          let toadd = [];
-          for (let p of this.dataservice.choices) {
-            if (this.dataservice.votessentto.indexOf(p.roll) === -1) {
-              toadd.push(p.roll);
-            }
-          }
-          this.dataservice.votessentto =
-            this.dataservice.votessentto.concat(toadd);
-          setTimeout(() => this.dataservice.save(), 3000);
-        },
-        error => this.toast('Could not send votes'));
   }
 
   getmorehearts() {
-    // Hack of the day
-    if (this.dataservice.lastcheck.toString().substring(0, 4) === '2017') {
-      // You need medication
-      this.dataservice.lastcheck = 0;
-      this.dataservice.hearts = 0;
-    }
-
-    if (!this.dataservice.rechecked || this.dataservice.rechecked === 0) {
-      this.toast('Recounting your hearts :) This may take a few seconds..');
-      this.dataservice.lastcheck = 0;
-      this.dataservice.hearts = 0;
-    } else {
-      this.toast('Fetching more hearts, just for you.. Please wait.');
-    }
-
+    this.toast('Fetching more hearts, just for you.. Please wait.');
     this.getvotehttp();
   }
 
   getvotehttp() {
     this.findinghearts = true;
-    this.findinghearts2 = true;
 
     this.totalstuff = 0;
     this.donestuff = 0;
-
-    this.http.get(Config.voteGet + '/' + this.dataservice.lastcheck + '/' +
-                  this.dataservice.id)
-      .subscribe(
-        response => {
-          try {
-            let resp = JSON.parse(response['_body']);
-            this.processVotes(resp, 1);
-          } catch (err) {
-            this.toast('Bad response for votes');
-            console.error('Could not parse vote response');
-            this.findinghearts = false;
-            console.error(err);
-          }
-        },
-        error => {
-          this.toast('Could not get votes');
-          this.findinghearts = false;
-        }
-      );
 
     this.http.get(Config.heartGet + '/' + this.dataservice.lastcheck2 + '/' +
                    (this.dataservice.your_gender === 'Male' ? '1' : '0') + '/' +
@@ -136,46 +57,42 @@ export class Hearts {
         response => {
           try {
             let resp = JSON.parse(response['_body']);
-            this.processVotes(resp, 2);
+            this.processVotes(resp);
           } catch (err) {
             this.toast('Bad response for hearts');
             console.error('Could not parse hearts response');
-            this.findinghearts2 = false;
+            this.findinghearts = false;
             console.error(err);
           }
         },
         error => {
           this.toast('Could not get hearts');
-          this.findinghearts2 = false;
+          this.findinghearts = false;
         }
       );
   }
 
-  processVotes(resp, index: number) {
+  processVotes(resp) {
     console.log('New votes since last time =>');
     console.log(resp);
 
-    this.totalstuff = this.totalstuff + resp.votes.length;
+    this.totalstuff = resp.votes.length;
     let totalvotes = resp.votes.length;
     let vote;
+
+    // A recursive function to slowly process
+    // all votes without blocking the DOM
     let voteparse = (fromindex: number) => {
       if (this.breakloop) {
         return;
       }
       this.donestuff = this.donestuff + 1;
       if (fromindex >= totalvotes) {
-        console.log('Hearts: ' + this.dataservice.hearts2);
-        console.log('Votes: ' + this.dataservice.hearts);
+        console.log('Hearts: ' + this.dataservice.hearts);
 
-        if (index === 1) {
-          this.dataservice.lastcheck = resp.time;
-          this.dataservice.rechecked = 1;
-          this.toast('Saving your heart count now..');
-          this.findinghearts = false;
-        } else {
-          this.dataservice.lastcheck2 = resp.time;
-          this.findinghearts2 = false;
-        }
+        this.dataservice.lastcheck = resp.time;
+        this.findinghearts = false;
+        this.toast('Saving your heart count now..');
 
         this.dataservice.save();
         return;
@@ -188,24 +105,10 @@ export class Hearts {
         this.dataservice.crypto.decryptAsym(vote.v);
 
       if (dec_res.isNone()) {
-        if (index === 1) {
-          console.log('Could not catch vote');
-        } else {
-          console.log('Could not catch heart');
-        }
+        console.log('Could not catch heart');
       } else {
-        // Toast is sent by whoever comes up first
-        if (index === 1) {
-          this.dataservice.hearts = this.dataservice.hearts + 1;
-          if (this.dataservice.hearts > this.dataservice.hearts2) {
-            this.toast('New heart!');
-          }
-        } else {
-          this.dataservice.hearts2 = this.dataservice.hearts2 + 1;
-          if (this.dataservice.hearts2 > this.dataservice.hearts) {
-            this.toast('New heart!');
-          }
-        }
+        this.dataservice.hearts = this.dataservice.hearts + 1;
+        this.toast('New heart!');
       }
 
       fromindex = fromindex + 1;

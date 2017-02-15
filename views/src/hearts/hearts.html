@@ -3,15 +3,15 @@
   <ul class="heartlist" style="padding-left: 0px;">
     <li *ngFor="let i of range(10)" class="heartlistitem">
       <img class="heartclass"
-           *ngIf="i <= Math.max(dataservice.hearts, dataservice.hearts2)"
+           *ngIf="i <= dataservice.hearts"
            src="/images/heart-filled.png">
       <img class="heartclass"
-           *ngIf="i > Math.max(dataservice.hearts, dataservice.hearts2)"
+           *ngIf="i > dataservice.hearts"
            src="/images/heart-empty.png">
     </li>
   </ul>
 
-  <div style="margin-top: 15px;" *ngIf="findinghearts || findinghearts2">
+  <div style="margin-top: 15px;" *ngIf="findinghearts">
     <p>Finding new hearts... :)</p>
     <div class="progress" style="margin-top: 15px;">
       <div class="progress-bar" role="progressbar"

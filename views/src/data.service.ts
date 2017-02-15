@@ -33,7 +33,6 @@ export class DataService {
   id: string;
 
   emitdone: EventEmitter<boolean> = new EventEmitter<boolean>();
-  emitsend: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   rechecked: number;
 
