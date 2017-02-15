@@ -5,7 +5,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"log"
 	"os"
+	"os/exec"
 	"sort"
+	"strings"
 )
 
 type Declare struct {
@@ -31,6 +33,14 @@ func (b ByValue) Swap(i, j int) {
 }
 func (b ByValue) Less(i, j int) bool {
 	return b[i].Token < b[j].Token
+}
+
+func AddMatch(toAdd string, prev string) string {
+	if prev == "" {
+		return toAdd
+	}
+
+	return prev + " " + toAdd
 }
 
 func main() {
@@ -86,6 +96,9 @@ func main() {
 	}
 
 	fmt.Println()
+	cnt := 0
+
+	var emails = []string{}
 
 	for i := range flat {
 		if i == 0 {
@@ -94,6 +107,113 @@ func main() {
 
 		if flat[i].Token == flat[i-1].Token {
 			fmt.Println("Matched:", flat[i].Id, "and", flat[i-1].Id)
+
+			u1 := User{}
+			u2 := User{}
+			if err := db.GetById("user", flat[i].Id).One(&u1); err != nil {
+				fmt.Println("Error")
+				fmt.Println(err)
+				continue
+			}
+			if err := db.GetById("user", flat[i-1].Id).One(&u2); err != nil {
+				fmt.Println("Error")
+				fmt.Println(err)
+				continue
+			}
+
+			fmt.Println("Names: ", u1.Name, "and", u2.Name)
+			fmt.Println("Emails: ", u1.Email, "and", u2.Email)
+			fmt.Println("Genders: ", u1.Gender, u2.Gender)
+			fmt.Println("Prev matches: ", u1.Matches, "; ", u2.Matches)
+
+			// EXTRA STUFF, NOT NEEDED
+			// If you want to verify some information
+			// As an example here, I match the hash, in the hypothetical scenario
+			// that the hash can be computed on the server
+
+			//fmt.Println("Hash: ", flat[i].Token)
+			//pairId := ""
+			//if flat[i].Id > flat[i-1].Id {
+			//pairId = flat[i].Id + "-" + flat[i-1].Id
+			//} else {
+			//pairId = flat[i-1].Id + "-" + flat[i].Id
+			//}
+
+			//out, _ := exec.Command("/bin/bash", "-c", "echo -n '"+pairId+"' | sha256sum").Output()
+			//h2 := strings.Fields(string(out[:]))[0]
+			//fmt.Println("Has2: ", h2)
+			//if h2 != flat[i].Token {
+			//fmt.Println("ERROR")
+			//continue
+			//} else {
+			//cnt = cnt + 1
+			//}
+
+			if u1.Gender == u2.Gender {
+				fmt.Println("SAME GENDER")
+				fmt.Println("ERROR")
+				continue
+			}
+
+			emails = append(emails, u1.Email)
+			emails = append(emails, u2.Email)
+
+			var b bool
+			var ans string
+
+			p1matches := strings.Fields(u1.Matches)
+			b = false
+			for _, match := range p1matches {
+				if match == u2.Id {
+					b = true
+					break
+				}
+			}
+			if !b {
+				fmt.Println(u2.Name, "is not in matches of", u1.Name, ". Add?")
+				_, _ = fmt.Scanf("%s", &ans)
+				if ans == "y" {
+					fmt.Println("Adding", AddMatch(u2.Id, u1.Matches))
+
+					if _, err := db.GetById("user", u1.Id).
+						Apply(u1.MatchedUpdate(AddMatch(u2.Id, u1.Matches)), &u1); err != nil {
+						fmt.Println(err)
+					}
+
+				} else {
+					fmt.Println("You said no")
+				}
+			}
+
+			p2matches := strings.Fields(u2.Matches)
+			b = false
+			for _, match := range p2matches {
+				if match == u1.Id {
+					b = true
+					break
+				}
+			}
+			if !b {
+				fmt.Println(u1.Name, "is not in matches of", u2.Name, ". Add?")
+				_, _ = fmt.Scanf("%s", &ans)
+				if ans == "y" {
+					fmt.Println("Adding", AddMatch(u1.Id, u2.Matches))
+
+					if _, err := db.GetById("user", u2.Id).
+						Apply(u2.MatchedUpdate(AddMatch(u1.Id, u2.Matches)), &u2); err != nil {
+						fmt.Println(err)
+					}
+
+				} else {
+					fmt.Println("You said no")
+				}
+			}
+			fmt.Println("**********************************************")
 		}
+	}
+	fmt.Println("Total", cnt, "matches")
+	fmt.Println()
+	for _, mail := range emails {
+		fmt.Println(mail)
 	}
 }
