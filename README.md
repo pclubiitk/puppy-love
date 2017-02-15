@@ -1,7 +1,11 @@
 Puppy Love
 ==========
 
-The modern and better avatar of Programming Club's [puppy-love](https://github.com/pclubiitk/valentine) in the making.
+The modern and better avatar of Programming Club's [puppy-love](https://github.com/pclubiitk/valentine).
+
+Puppy Love is a platform for shy people to reach out anonymously to their crush. They can sign up and mark up to 4 of their crushes. On Valentine's day, the platform will match them anonymously, and will inform them if both of them like each other.
+
+Used in IIT Kanpur from 7th to 14th February, 2017, witnessing 1800+ registrants.
 
 ![alt tag](https://raw.githubusercontent.com/pclubiitk/puppy-love/master/cover.jpg)
 
@@ -25,6 +29,7 @@ Implementation using:
 * Angular2
 * Bootstrap
 * Docker
+* Docker Compose
 
 # Requirements
 * golang
@@ -34,7 +39,25 @@ Implementation using:
 
 # Installation / Setup
 
-## First time setup
+## Server deployment
+It is really easy. Like, **really**.
+
+```
+# You need docker-compose 1.10 or higher.
+# Use the release script version from their website for installation.
+docker-compose up
+
+# Use the following to stop a container
+docker-compose stop <container_name>
+
+# Use the following to start a container
+docker-compose start <container_name>
+
+# Use the following to recreate and run a container
+docker-compose up -d <container_name>
+```
+
+## Development environment setup
 You shall need docker, golang, nodejs, nginx and npm for the following steps.
 
 **Note**: Arch users often have gccgo installed. Please use the package `go` from the main repositories instead.
@@ -157,10 +180,14 @@ Once you've created the users, you will need to register them. Open the UI at de
 ### Notes
 * You cannot login as admin on the frontend UI.
 * You can also check mongoDB's data for the auth token for the user.
+* Doing the above will mandate marking the user as `non-dirty` in the MongoDb users table manually.
 
 You can open the local website at [dev.puppy.pclub.in](dev.puppy.pclub.in)
 The backend will be listening on the printed port number.
 
-**Note**: Course project for CS252, by [Saksham Sharma](https://github.com/sakshamsharma/) and [Vinayak Tantia](https://github.com/vtantia).
-
-**Note**: Docker support will come soon.
+### Contributors
+The following people have contributed to this project in various capacities:
+* [Saksham Sharma](https://github.com/sakshamsharma)
+* [Yash Srivastav](https://github.com/yashsriv)
+* [Kunal Kapila](https://github.com/kunalapila)
+* [Vinayak Tantia](https://github.com/vtantia)
