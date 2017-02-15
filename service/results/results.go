@@ -5,7 +5,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"log"
 	"os"
-	"os/exec"
 	"sort"
 	"strings"
 )

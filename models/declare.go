@@ -15,6 +15,11 @@ type (
 	}
 )
 
+type PairUpsert struct {
+	Selector bson.M
+	Change   bson.M
+}
+
 // Create table update object for token table
 func UpsertDeclareTable(d *Declare) mgo.Change {
 	return mgo.Change{

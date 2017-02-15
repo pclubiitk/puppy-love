@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/smtp"
-	"time"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -32,7 +31,6 @@ func SignupService(
 	mail_channel chan User) {
 
 	for id := range signup_channel {
-		time.Sleep(3000 * time.Millisecond)
 		log.Println("Signing up: " + id)
 
 		u := User{}
@@ -49,53 +47,11 @@ func SignupService(
 
 			// Mailing should be async
 			go func(user User) {
-				log.Print("Sending mail now")
+				log.Println("Sending mail now")
 				mail_channel <- user
 			}(u)
 
 			continue
-		}
-
-		req_gender := "0"
-		if u.Gender == "1" {
-			req_gender = "0"
-		} else {
-			req_gender = "1"
-		}
-
-		// Compute table steps
-		type typeIds struct {
-			Id string `json:"_id" bson:"_id"`
-		}
-
-		var people []typeIds
-		collection := Db.GetCollection("user")
-		err := collection.Find(bson.M{"gender": req_gender, "dirty": false}).
-			All(&people)
-
-		if err != nil {
-			log.Println("ERROR: Signup cannot fetch gender list: ", req_gender)
-			log.Println(err)
-			return
-		}
-
-		cnt := 0
-		compute_coll := Db.GetCollection("compute")
-		for _, fe := range people {
-			log.Println("SignupService: "+fe.Id, "-", id, "-", cnt)
-			cnt = cnt + 1
-			res := UpsertEntry(fe.Id, id)
-			compute_coll.Upsert(res.Selector, res.Change)
-		}
-
-		log.Println("SignupService: Finished compute setting up for " + id)
-
-		newdec := NewDeclareTable(id)
-		_, err = Db.GetCollection("declare").
-			Upsert(newdec.Selector, newdec.Change)
-		if err != nil {
-			log.Println("ERROR: Could not create declare entry for ", id)
-			log.Println(err)
 		}
 
 		// Mark user as not dirty
@@ -109,6 +65,7 @@ func SignupService(
 		// Mailing should be async
 		go func(user User) {
 			mail_channel <- user
+			log.Println("Sending mail now")
 		}(u)
 	}
 }
