@@ -102,7 +102,7 @@ func (m UserFirst) Serve(ctx *iris.Context) {
 
 	// Remove user's auth token
 	if _, err := m.Db.GetById("user", info.Id).
-		Apply(user.RemoveAuthCode(), &user); err != nil {
+		Apply(user.SetField("autoCode", ""), &user); err != nil {
 
 		ctx.EmitError(iris.StatusInternalServerError)
 		log.Print(err)
@@ -162,7 +162,7 @@ func (m MatchGet) Serve(ctx *iris.Context) {
 	}
 
 	type typeUserGet struct {
-		Id      string `json:"_id" bson:"_id"`
+		ID      string `json:"_id" bson:"_id"`
 		Matches string `json:"matches" bson:"matches"`
 	}
 
@@ -282,7 +282,7 @@ func (m UserSubmitTrue) Serve(ctx *iris.Context) {
 	user := models.User{}
 
 	if _, err := m.Db.GetById("user", id).
-		Apply(user.HasSubmitted(), &user); err != nil {
+		Apply(user.SetField("submitted", true), &user); err != nil {
 
 		ctx.EmitError(iris.StatusInternalServerError)
 		log.Print(err)
@@ -305,7 +305,11 @@ func (m UserUpdateData) Serve(ctx *iris.Context) {
 		return
 	}
 
-	info := new(models.TypeUserUpdateData)
+	type typeUserUpdateData struct {
+		Data string `json:"data"`
+	}
+
+	info := new(typeUserUpdateData)
 	if err := ctx.ReadJSON(info); err != nil {
 		ctx.EmitError(iris.StatusBadRequest)
 		return
@@ -314,7 +318,7 @@ func (m UserUpdateData) Serve(ctx *iris.Context) {
 	user := models.User{}
 
 	if _, err := m.Db.GetById("user", id).
-		Apply(user.UpdateData(info), &user); err != nil {
+		Apply(user.SetField("data", info.Data), &user); err != nil {
 
 		ctx.EmitError(iris.StatusInternalServerError)
 		log.Print(err)
@@ -350,7 +354,7 @@ func (m UserUpdateImage) Serve(ctx *iris.Context) {
 	}
 
 	if _, err := m.Db.GetById("user", id).
-		Apply(user.UpdateImage(info.Image), &user); err != nil {
+		Apply(user.SetField("image", info.Image), &user); err != nil {
 
 		ctx.EmitError(iris.StatusInternalServerError)
 		log.Print(err)
@@ -386,45 +390,7 @@ func (m UserSavePass) Serve(ctx *iris.Context) {
 	}
 
 	if _, err := m.Db.GetById("user", id).
-		Apply(user.SavePass(info.Pass), &user); err != nil {
-
-		ctx.EmitError(iris.StatusInternalServerError)
-		log.Print(err)
-		return
-	}
-
-	ctx.JSON(iris.StatusAccepted, "Saved successfully")
-}
-
-// @AUTH @ADMIN Update user name
-// ------------------------------
-type UserUpdateName struct {
-	Db db.PuppyDb
-}
-
-func (m UserUpdateName) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
-	if err != nil || id != "admin" {
-		ctx.EmitError(iris.StatusForbidden)
-		return
-	}
-
-	id = ctx.Param("id")
-
-	type imgstruct struct {
-		Name string `json:"name" bson:"name"`
-	}
-
-	user := models.User{}
-	info := new(imgstruct)
-
-	if err := ctx.ReadJSON(info); err != nil {
-		ctx.EmitError(iris.StatusBadRequest)
-		return
-	}
-
-	if _, err := m.Db.GetById("user", id).
-		Apply(user.UpdateName(info.Name), &user); err != nil {
+		Apply(user.SetField("savepass", info.Pass), &user); err != nil {
 
 		ctx.EmitError(iris.StatusInternalServerError)
 		log.Print(err)

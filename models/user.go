@@ -87,82 +87,10 @@ func (u User) ValidPass(pass string) bool {
 	return u.Pass == pass
 }
 
-// ----------------------------------------
-func (u User) HasSubmitted() mgo.Change {
+func (u User) SetField(field string, value interface{}) mgo.Change {
 	return mgo.Change{
 		Update: bson.M{"$set": bson.M{
-			"submitted": true,
-		}},
-		ReturnNew: true,
-	}
-}
-
-// ----------------------------------------
-func (u User) HasVoted(more int) mgo.Change {
-	return mgo.Change{
-		Update: bson.M{"$inc": bson.M{
-			"voted": more,
-		}},
-		ReturnNew: true,
-	}
-}
-
-// ----------------------------------------
-func (u User) RemoveAuthCode() mgo.Change {
-	return mgo.Change{
-		Update: bson.M{"$set": bson.M{
-			"authCode": "",
-		}},
-		ReturnNew: true,
-	}
-}
-
-// ----------------------------------------
-func (u User) MarkNotDirty() mgo.Change {
-	return mgo.Change{
-		Update: bson.M{"$set": bson.M{
-			"dirty": false,
-		}},
-		ReturnNew: true,
-	}
-}
-
-// ----------------------------------------
-type TypeUserUpdateData struct {
-	Data string `json:"data"`
-}
-
-func (u User) UpdateData(info *TypeUserUpdateData) mgo.Change {
-	return mgo.Change{
-		Update: bson.M{"$set": bson.M{
-			"data": info.Data,
-		}},
-		ReturnNew: true,
-	}
-}
-
-func (u User) UpdateImage(info string) mgo.Change {
-	return mgo.Change{
-		Update: bson.M{"$set": bson.M{
-			"image": info,
-		}},
-		ReturnNew: true,
-	}
-}
-
-func (u User) SavePass(info string) mgo.Change {
-	return mgo.Change{
-		Update: bson.M{"$set": bson.M{
-			"savepass": info,
-		}},
-		ReturnNew: true,
-	}
-}
-
-func (u User) UpdateName(info string) mgo.Change {
-	return mgo.Change{
-		Update: bson.M{"$set": bson.M{
-			"name": info,
+			field: value,
 		}},
 		ReturnNew: true,
 	}

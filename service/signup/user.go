@@ -1,7 +1,6 @@
 package main
 
 import (
-	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -24,16 +23,6 @@ type (
 		Dirty   bool   `json:"dirty" bson:"dirty"`
 	}
 )
-
-// ----------------------------------------
-func (u User) MarkNotDirty() mgo.Change {
-	return mgo.Change{
-		Update: bson.M{"$set": bson.M{
-			"dirty": false,
-		}},
-		ReturnNew: true,
-	}
-}
 
 type PairUpsert struct {
 	Selector bson.M
