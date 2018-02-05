@@ -1,13 +1,7 @@
-mat-card {
-  margin: 0 auto;
-  max-width: 90%;
-  width: 500px;
+[mat-button] {
+  width: 100%;
+}
 
-  [mat-button] {
-    width: 100%;
-  }
-
-  li {
-    margin: 5px auto;
-  }
+li {
+  margin: 5px auto;
 }
