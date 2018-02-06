@@ -1,53 +1,72 @@
 package router
 
 import (
-	"github.com/pclubiitk/puppy-love/controllers"
-	"github.com/pclubiitk/puppy-love/db"
+	"net/http"
 
-	"github.com/kataras/iris"
+	"github.com/milindl/puppy-love/controllers"
+	"github.com/milindl/puppy-love/db"
+
+	"github.com/gin-gonic/gin"
 )
 
-func PuppyRoute(db db.PuppyDb) {
+func PuppyRoute(db db.PuppyDb) *gin.Engine {
 
-	iris.Get("/", func(ctx *iris.Context) {
-		ctx.JSON(iris.StatusAccepted, "Hello from the other side!")
+	r := gin.Default()
+
+	r.GET("/", func(c *gin.Context) {
+		c.String(http.StatusAccepted, "Hello from the other side!")
 	})
 
-	// User administration
-	uPre := "/users"
-	iris.Handle("POST", uPre+"/login/first", controllers.UserFirst{db})
-	iris.Handle("POST", uPre+"/data/update/:you", controllers.UserUpdateData{db})
-	iris.Handle("POST", uPre+"/data/submit/:you", controllers.UserSubmitTrue{db})
-	iris.Handle("POST", uPre+"/image/update/:you", controllers.UserUpdateImage{db})
-	iris.Handle("POST", uPre+"/pass/update/:you", controllers.UserSavePass{db})
+	controllers.Db = db
 
-	iris.Handle("GET", uPre+"/data/info", controllers.UserLoginGet{db})
-	iris.Handle("GET", uPre+"/data/match/:you", controllers.MatchGet{db})
-	iris.Handle("GET", uPre+"/get/:id", controllers.UserGet{db})
-	iris.Handle("GET", uPre+"/mail/:id", controllers.UserMail{db})
+	// User administration
+	users := r.Group("/users")
+	{
+		users.POST("/login/first", controllers.UserFirst)
+		users.POST("/data/update/:you", controllers.UserUpdateData)
+		users.POST("/data/submit/:you", controllers.UserSubmitTrue)
+		users.POST("/image/update/:you", controllers.UserUpdateImage)
+		users.POST("/pass/update/:you", controllers.UserSavePass)
+
+		users.GET("/data/info", controllers.UserLoginGet)
+		users.GET("/data/match/:you", controllers.MatchGet)
+		users.GET("/get/:id", controllers.UserGet)
+		users.GET("/mail/:id", controllers.UserMail)
+	}
 
 	// Listing users
-	lPre := "/list"
-	iris.Handle("GET", lPre+"/gender/:gender", controllers.ListAll{db})
-	iris.Handle("GET", lPre+"/pubkey/:gender", controllers.PubkeyList{db})
-	iris.Handle("GET", lPre+"/declare", controllers.DeclareList{db})
+	list := r.Group("/list")
+	{
+		list.GET("/gender/:gender", controllers.ListAll)
+		list.GET("/pubkey/:gender", controllers.PubkeyList)
+		list.GET("/declare", controllers.DeclareList)
+	}
 
 	// Declare
-	iris.Handle("POST", "/declare/choices", controllers.DeclareStep{db, "declare"})
+
+	r.POST("/declare/choices", controllers.DeclareStep)
 
 	// Hearts
-	iris.Handle("GET", "/hearts/get/:time/:gen/:you", controllers.HeartGet{db})
-	iris.Handle("POST", "/hearts/send/:you", controllers.GotHeart{db})
+	hearts := r.Group("/hearts")
+	{
+		hearts.GET("/hearts/get/:time/:gen/:you", controllers.HeartGet)
+		hearts.POST("/hearts/send/:you", controllers.GotHeart)
+	}
 
 	// Session administration
-	sesPre := "/session"
-	iris.Handle("POST", sesPre+"/login", controllers.SessionLogin{db})
-	iris.Get(sesPre+"/logout", controllers.SessionLogout)
+	session := r.Group("/session")
+	{
+		session.POST("/login", controllers.SessionLogin)
+		session.GET("/logout", controllers.SessionLogout)
+	}
 
 	// Admin
-	aPre := "/admin"
-	iris.Handle("GET", aPre+"/declare/prepare", controllers.DeclarePrepare{db})
+	admin := r.Group("/admin")
+	{
+		admin.GET("/declare/prepare", controllers.DeclarePrepare)
+		admin.GET("/user/drop", controllers.UserDelete)
+		admin.POST("/user/new", controllers.UserNew)
+	}
 
-	iris.Handle("GET", aPre+"/user/drop", controllers.UserDelete{db})
-	iris.Handle("POST", aPre+"/user/new", controllers.UserNew{db})
+	return r
 }

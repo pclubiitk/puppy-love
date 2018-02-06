@@ -1,15 +1,15 @@
 package utils
 
 import (
-	"github.com/kataras/iris"
+	"github.com/gin-gonic/gin"
 
 	"math/rand"
 	"time"
 )
 
-func CheckForFields(ctx *iris.Context, required []string) bool {
+func CheckForFields(c *gin.Context, required []string) bool {
 	for _, key := range required {
-		if ctx.Param(key) == "" {
+		if c.Param(key) == "" {
 			return false
 		}
 	}

@@ -4,18 +4,15 @@ import (
 	"os"
 )
 
-var EmailUser = os.Getenv("EMAIL_USER")
-var EmailPass = os.Getenv("EMAIL_PASS")
-
-var CfgAdminPass = "passhash"
-
-var CfgAddr = ":3000"
-
-var CfgMgoUrl = "mongodb://0.0.0.0:27017/puppy"
-
-var CfgRedisUrl = "0.0.0.0:6379"
-
-var SignupUrl string = "http://0.0.0.0:3001"
+var (
+	EmailUser           = os.Getenv("EMAIL_USER")
+	EmailPass           = os.Getenv("EMAIL_PASS")
+	CfgAdminPass        = "passhash"
+	CfgAddr             = ":3000"
+	CfgMgoUrl           = "mongodb://0.0.0.0:27017/puppy"
+	CfgRedisUrl         = "0.0.0.0:6379"
+	SignupUrl    string = "http://0.0.0.0:3001"
+)
 
 func CfgInit() {
 	var port string
