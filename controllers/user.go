@@ -53,7 +53,7 @@ func UserNew(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusAccepted, "Information set up")
+	c.JSON(http.StatusAccepted, "Information set up")
 }
 
 // User's first login
@@ -98,7 +98,7 @@ func UserFirst(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusAccepted, "Information set up")
+	c.JSON(http.StatusAccepted, "Information set up")
 }
 
 // User asking for email
@@ -130,7 +130,7 @@ func UserMail(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Something went wrong")
 	}
 
-	c.String(http.StatusAccepted,
+	c.JSON(http.StatusAccepted,
 		fmt.Sprintf("Mail will be sent to %s", u.Email))
 }
 
@@ -261,7 +261,7 @@ func UserSubmitTrue(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusAccepted, "Submitted successfully")
+	c.JSON(http.StatusAccepted, "Submitted successfully")
 }
 
 // @AUTH Update user data
@@ -294,7 +294,7 @@ func UserUpdateData(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusAccepted, "Saved successfully")
+	c.JSON(http.StatusAccepted, "Saved successfully")
 }
 
 // @AUTH Update user image
@@ -327,12 +327,11 @@ func UserUpdateImage(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusAccepted, "Saved successfully")
+	c.JSON(http.StatusAccepted, "Saved successfully")
 }
 
 // @AUTH Update user passsave
 // ------------------------------
-
 func UserSavePass(c *gin.Context) {
 	id, err := SessionId(c)
 	if err != nil || id != c.Param("you") {
@@ -360,5 +359,5 @@ func UserSavePass(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusAccepted, "Saved successfully")
+	c.JSON(http.StatusAccepted, "Saved successfully")
 }

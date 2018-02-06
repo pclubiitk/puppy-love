@@ -12,7 +12,7 @@ import (
 func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 
 	r.GET("/", func(c *gin.Context) {
-		c.String(http.StatusAccepted, "Hello from the other side!")
+		c.JSON(http.StatusAccepted, "Hello from the other side!")
 	})
 
 	controllers.Db = db
