@@ -2,25 +2,20 @@ package controllers
 
 import (
 	"log"
+	"net/http"
 
-	"github.com/pclubiitk/puppy-love/db"
-	"github.com/pclubiitk/puppy-love/models"
+	"github.com/milindl/puppy-love/models"
 
-	"github.com/kataras/iris"
-
+	"github.com/gin-gonic/gin"
 	"gopkg.in/mgo.v2/bson"
 )
 
 // @AUTH @Admin Create the entries in the declare table
 // ----------------------------------------------------
-type DeclarePrepare struct {
-	Db db.PuppyDb
-}
-
-func (m DeclarePrepare) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
+func DeclarePrepare(c *gin.Context) {
+	id, err := SessionId(c)
 	if err != nil || id != "admin" {
-		ctx.EmitError(iris.StatusForbidden)
+		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
@@ -30,13 +25,14 @@ func (m DeclarePrepare) Serve(ctx *iris.Context) {
 
 	var people []typeIds
 
-	if err := m.Db.GetCollection("user").Find(bson.M{"dirty": false}).
+	if err := Db.GetCollection("user").
+		Find(bson.M{"dirty": false}).
 		All(&people); err != nil {
-		ctx.EmitError(iris.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	bulk := m.Db.GetCollection("declare").Bulk()
+	bulk := Db.GetCollection("declare").Bulk()
 	for _, pe := range people {
 		res := models.NewDeclareTable(pe.Id)
 		bulk.Upsert(res.Selector, res.Change)
@@ -44,22 +40,17 @@ func (m DeclarePrepare) Serve(ctx *iris.Context) {
 	r, err := bulk.Run()
 
 	if err != nil {
-		ctx.EmitError(iris.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		log.Println(err)
 		return
 	}
-	ctx.JSON(iris.StatusOK, r)
+	c.JSON(http.StatusOK, r)
 }
 
-type DeclareStep struct {
-	Db     db.PuppyDb
-	DbName string
-}
-
-func (m DeclareStep) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
+func DeclareStep(c *gin.Context) {
+	id, err := SessionId(c)
 	if err != nil {
-		ctx.EmitError(iris.StatusForbidden)
+		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
@@ -73,27 +64,29 @@ func (m DeclareStep) Serve(ctx *iris.Context) {
 
 	// Verify valid requested changes
 	info := new(Tokens)
-	if err := ctx.ReadJSON(info); err != nil {
-		ctx.JSON(iris.StatusBadRequest, "Invalid JSON")
+	if err := c.BindJSON(info); err != nil {
+		c.String(http.StatusBadRequest, "Invalid JSON")
 		log.Println(err)
 		return
 	}
 
 	if info.Id != id {
-		ctx.Error("Invalid session/userId", iris.StatusBadRequest)
+		c.String(http.StatusBadRequest, "Invalid session/userId")
 		log.Print("Invalid session/userId:", id, "and", info.Id)
 		return
 	}
 
-	if _, err := m.Db.GetCollection(m.DbName).UpsertId(id, bson.M{
+	// TODO: fix db name to not be a constant
+	if _, err := Db.GetCollection("declare").UpsertId(id, bson.M{
 		"t0": info.Token0,
 		"t1": info.Token1,
 		"t2": info.Token2,
 		"t3": info.Token3,
 	}); err != nil {
-		ctx.Error("There was an internal server error", iris.StatusInternalServerError)
+		c.String(http.StatusInternalServerError,
+			"There was an internal server error")
 		log.Println("ERROR:", err)
 		return
 	}
-	ctx.JSON(iris.StatusOK, "Saved your values")
+	c.JSON(http.StatusOK, "Saved your values")
 }

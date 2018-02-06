@@ -2,56 +2,48 @@ package controllers
 
 import (
 	"log"
+	"net/http"
 
-	"github.com/pclubiitk/puppy-love/db"
-	"github.com/pclubiitk/puppy-love/models"
+	"github.com/milindl/puppy-love/models"
 
-	"github.com/kataras/iris"
+	"github.com/gin-gonic/gin"
 	"gopkg.in/mgo.v2/bson"
 )
 
 // @AUTH Get user's basic information
 // ---------------------------------------
-type ListAll struct {
-	Db db.PuppyDb
-}
-
 type typeListAll struct {
 	Id    string `json:"_id" bson:"_id"`
 	Name  string `json:"name" bson:"name"`
 	Image string `json:"image" bson:"image"`
 }
 
-func (m ListAll) Serve(ctx *iris.Context) {
+func ListAll(c *gin.Context) {
 	var results []typeListAll
 
-	_gender := ctx.Param("gender")
+	_gender := c.Param("gender")
 	if _gender != "0" && _gender != "1" {
-		ctx.EmitError(iris.StatusBadRequest)
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	// Fetch user
-	if err := m.Db.GetCollection("user").
+	if err := Db.GetCollection("user").
 		Find(bson.M{"gender": _gender}).
 		All(&results); err != nil {
 
-		ctx.EmitError(iris.StatusNotFound)
+		c.AbortWithStatus(http.StatusNotFound)
 		log.Print(err)
 		return
 	}
 
-	ctx.JSON(iris.StatusAccepted, results)
+	c.JSON(http.StatusAccepted, results)
 }
 
-type PubkeyList struct {
-	Db db.PuppyDb
-}
-
-func (m PubkeyList) Serve(ctx *iris.Context) {
-	_gender := ctx.Param("gender")
+func PubkeyList(c *gin.Context) {
+	_gender := c.Param("gender")
 	if _gender != "0" && _gender != "1" {
-		ctx.EmitError(iris.StatusBadRequest)
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
@@ -60,31 +52,28 @@ func (m PubkeyList) Serve(ctx *iris.Context) {
 		PK string `json:"pubKey" bson:"pubKey"`
 	})
 
-	if err := m.Db.GetCollection("user").
-		Find(bson.M{"gender": _gender, "dirty": false}).All(&query); err != nil {
+	if err := Db.GetCollection("user").
+		Find(bson.M{"gender": _gender, "dirty": false}).
+		All(&query); err != nil {
 
-		ctx.EmitError(iris.StatusNotFound)
+		c.AbortWithStatus(http.StatusNotFound)
 		log.Print(err)
 		return
 	}
 
-	ctx.JSON(iris.StatusAccepted, query)
+	c.JSON(http.StatusAccepted, query)
 }
 
-type DeclareList struct {
-	Db db.PuppyDb
-}
-
-func (m DeclareList) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
+func DeclareList(c *gin.Context) {
+	id, err := SessionId(c)
 	if err != nil {
-		ctx.EmitError(iris.StatusForbidden)
+		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
 	var resp models.Declare
-	if err := m.Db.GetById("declare", id).One(&resp); err != nil {
-		ctx.EmitError(iris.StatusNotFound)
+	if err := Db.GetById("declare", id).One(&resp); err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
 		log.Print(err)
 		return
 	}
@@ -102,5 +91,5 @@ func (m DeclareList) Serve(ctx *iris.Context) {
 		resp.Token3 = "1"
 	}
 
-	ctx.JSON(iris.StatusOK, resp)
+	c.JSON(http.StatusOK, resp)
 }

@@ -2,13 +2,13 @@ package controllers
 
 import (
 	"log"
+	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/pclubiitk/puppy-love/db"
-	"github.com/pclubiitk/puppy-love/models"
+	"github.com/milindl/puppy-love/models"
 
-	"github.com/kataras/iris"
+	"github.com/gin-gonic/gin"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -31,22 +31,18 @@ func difference(oldVotes []models.Heart,
 	return diff
 }
 
-type GotHeart struct {
-	Db db.PuppyDb
-}
-
 // Serve when a Heart is to be saved
-func (m GotHeart) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
-	if err != nil || id != ctx.Param("you") {
-		ctx.EmitError(iris.StatusForbidden)
+func GotHeart(c *gin.Context) {
+	id, err := SessionId(c)
+	if err != nil || id != c.Param("you") {
+		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
 	// Verify valid requested changes
 	info := new([]models.GotHeart)
-	if err := ctx.ReadJSON(info); err != nil {
-		ctx.Error("Invalid JSON", iris.StatusBadRequest)
+	if err := c.BindJSON(info); err != nil {
+		c.String(http.StatusBadRequest, "Invalid JSON")
 		log.Println(err)
 		return
 	}
@@ -54,8 +50,8 @@ func (m GotHeart) Serve(ctx *iris.Context) {
 	// Check that user isn't voting more than 4
 	// ========================================
 	user := models.User{}
-	if err := m.Db.GetById("user", id).One(&user); err != nil {
-		ctx.EmitError(iris.StatusNotFound)
+	if err := Db.GetById("user", id).One(&user); err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
 		log.Print(err)
 		return
 	}
@@ -67,9 +63,10 @@ func (m GotHeart) Serve(ctx *iris.Context) {
 	}
 
 	userVotes := new([]models.Heart)
-	if err := m.Db.GetCollection("heart").Find(bson.M{"roll": id}).
+	if err := Db.GetCollection("heart").
+		Find(bson.M{"roll": id}).
 		All(userVotes); err != nil {
-		ctx.EmitError(iris.StatusNotFound)
+		c.AbortWithStatus(http.StatusNotFound)
 		log.Print(err)
 		return
 	}
@@ -80,7 +77,7 @@ func (m GotHeart) Serve(ctx *iris.Context) {
 	log.Print("Sent new: ", len(diffHearts))
 
 	if len(diffHearts)+len(*userVotes) > 4 {
-		ctx.Error("More than allowed votes", iris.StatusBadRequest)
+		c.String(http.StatusBadRequest, "More than allowed votes")
 		return
 	}
 
@@ -98,39 +95,35 @@ func (m GotHeart) Serve(ctx *iris.Context) {
 			})
 	}
 
-	bulk := m.Db.GetCollection("heart").Bulk()
+	bulk := Db.GetCollection("heart").Bulk()
 	for _, heart := range newHearts {
 		bulk.Insert(heart)
 	}
 	r, err := bulk.Run()
 
 	if err != nil {
-		ctx.EmitError(iris.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		log.Println(err)
 		return
 	}
-	ctx.JSON(iris.StatusOK, r)
+	c.JSON(http.StatusOK, r)
 }
 
-type HeartGet struct {
-	Db db.PuppyDb
-}
-
-func (m HeartGet) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
-	if err != nil || id != ctx.Param("you") {
-		ctx.EmitError(iris.StatusForbidden)
+func HeartGet(c *gin.Context) {
+	id, err := SessionId(c)
+	if err != nil || id != c.Param("you") {
+		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
 	// Last checked time
-	ltime, err := strconv.ParseUint(ctx.Param("time"), 10, 64)
+	ltime, err := strconv.ParseUint(c.Param("time"), 10, 64)
 	if err != nil {
-		ctx.Error("Bad timestamp value", iris.StatusBadRequest)
+		c.String(http.StatusBadRequest, "Bad timestamp value")
 		return
 	}
 
-	gen := ctx.Param("gen")
+	gen := c.Param("gen")
 
 	// Current time
 	ctime := uint64(time.Now().UnixNano() / 1000000)
@@ -142,10 +135,10 @@ func (m HeartGet) Serve(ctx *iris.Context) {
 	votes := new([]AnonymVote)
 
 	// Fetch user
-	if err := m.Db.GetCollection("heart").
+	if err := Db.GetCollection("heart").
 		Find(bson.M{"time": bson.M{"$gt": ltime, "$lte": ctime},
 			"gender": gen}).All(votes); err != nil {
-		ctx.EmitError(iris.StatusNotFound)
+		c.AbortWithStatus(http.StatusNotFound)
 		log.Print(err)
 		return
 	}
@@ -154,5 +147,8 @@ func (m HeartGet) Serve(ctx *iris.Context) {
 		*votes = []AnonymVote{}
 	}
 
-	ctx.JSON(iris.StatusAccepted, bson.M{"votes": *votes, "time": ctime})
+	c.JSON(http.StatusAccepted, bson.M{
+		"votes": *votes,
+		"time":  ctime,
+	})
 }

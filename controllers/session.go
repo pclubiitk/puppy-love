@@ -2,13 +2,15 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"log"
+	"net/http"
 
-	"github.com/pclubiitk/puppy-love/config"
-	"github.com/pclubiitk/puppy-love/db"
-	"github.com/pclubiitk/puppy-love/models"
+	"github.com/milindl/puppy-love/config"
+	"github.com/milindl/puppy-love/models"
 
-	"github.com/kataras/iris"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 )
 
 type LoginInfo struct {
@@ -16,18 +18,15 @@ type LoginInfo struct {
 	Passhash string `json:"password" xml:"password" form:"password"`
 }
 
-type SessionLogin struct {
-	Db db.PuppyDb
-}
-
-func (m SessionLogin) Serve(ctx *iris.Context) {
-	if ctx.Session().Get("Status") != nil {
-		ctx.Session().Clear()
+func SessionLogin(c *gin.Context) {
+	session := sessions.Default(c)
+	if session.Get("Status") != nil {
+		session.Clear()
 	}
 
 	u := new(LoginInfo)
-	if err := ctx.ReadJSON(u); err != nil {
-		ctx.EmitError(iris.StatusBadRequest)
+	if err := c.BindJSON(u); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
 		log.Println(err)
 		return
 	}
@@ -35,12 +34,13 @@ func (m SessionLogin) Serve(ctx *iris.Context) {
 	// @TODO @IMPORTANT Move password to env variable
 	if u.Username == "admin" {
 		if u.Passhash == config.CfgAdminPass {
-			ctx.Session().Set("Status", "login")
-			ctx.Session().Set("id", u.Username)
-			ctx.Write("Logged in: %s", u.Username)
+			session.Set("Status", "login")
+			session.Set("id", u.Username)
+			c.String(http.StatusOK,
+				fmt.Sprintf("Logged in: %s", u.Username))
 		} else {
-			SessionLogout(ctx)
-			ctx.Write("Invalid username or password")
+			SessionLogout(c)
+			c.String(http.StatusOK, "Invalid username or password")
 		}
 		return
 	}
@@ -48,30 +48,32 @@ func (m SessionLogin) Serve(ctx *iris.Context) {
 	user := models.User{}
 
 	// Fetch user
-	if err := m.Db.GetById("user", u.Username).One(&user); err != nil {
-		SessionLogout(ctx)
-		ctx.Error("Invalid user", iris.StatusNotFound)
+	if err := Db.GetById("user", u.Username).One(&user); err != nil {
+		SessionLogout(c)
+		c.String(http.StatusNotFound, "Invalid user")
 		log.Println("Invalid user: " + u.Username)
 		return
 	}
 
 	// Check login
 	if user.Pass == u.Passhash {
-		ctx.Session().Set("Status", "login")
-		ctx.Session().Set("id", u.Username)
-		ctx.Write("Logged in: %s", u.Username)
+		session.Set("Status", "login")
+		session.Set("id", u.Username)
+		c.JSON(http.StatusOK, gin.H{
+			"username": u.Username,
+		})
 	} else {
-		SessionLogout(ctx)
-		ctx.Error("Invalid password", iris.StatusForbidden)
+		SessionLogout(c)
+		c.AbortWithStatus(http.StatusForbidden)
 	}
 }
 
-func SessionLogout(ctx *iris.Context) {
-	ctx.SessionDestroy()
+func SessionLogout(c *gin.Context) {
+	sessions.Default(c).Clear()
 }
 
-func SessionId(ctx *iris.Context) (string, error) {
-	id := ctx.Session().Get("id")
+func SessionId(c *gin.Context) (string, error) {
+	id := sessions.Default(c).Get("id")
 	if id != nil {
 		return id.(string), nil
 	}

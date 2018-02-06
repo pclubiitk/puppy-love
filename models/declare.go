@@ -13,12 +13,11 @@ type (
 		Token2 string `json:"t2" bson:"t2"`
 		Token3 string `json:"t3" bson:"t3"`
 	}
+	PairUpsert struct {
+		Selector bson.M
+		Change   bson.M
+	}
 )
-
-type PairUpsert struct {
-	Selector bson.M
-	Change   bson.M
-}
 
 // Create table update object for token table
 func UpsertDeclareTable(d *Declare) mgo.Change {

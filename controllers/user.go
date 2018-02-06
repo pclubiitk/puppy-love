@@ -1,125 +1,114 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 
-	"github.com/pclubiitk/puppy-love/db"
-	"github.com/pclubiitk/puppy-love/models"
-	"github.com/pclubiitk/puppy-love/utils"
+	"github.com/milindl/puppy-love/db"
+	"github.com/milindl/puppy-love/models"
+	"github.com/milindl/puppy-love/utils"
 
-	"github.com/kataras/iris"
+	"github.com/gin-gonic/gin"
 )
+
+var Db db.PuppyDb
 
 // @AUTH @Admin Drop users table
 // ----------------------------------------------------
-type UserDelete struct {
-	Db db.PuppyDb
-}
-
-func (m UserDelete) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
+func UserDelete(c *gin.Context) {
+	id, err := SessionId(c)
 	if err != nil || id != "admin" {
-		ctx.EmitError(iris.StatusForbidden)
+		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
-	if err := m.Db.GetCollection("user").DropCollection(); err != nil {
-		ctx.Text(iris.StatusInternalServerError, "Could not delete collection")
+	if err := Db.GetCollection("user").DropCollection(); err != nil {
+		c.String(http.StatusInternalServerError,
+			"Could not delete collection")
 		return
 	}
 
-	ctx.JSON(iris.StatusOK, "Deleted user table")
+	c.String(http.StatusOK, "Deleted user table")
 }
 
 // @AUTH @Admin Create new user
 // -------------------------------
-type UserNew struct {
-	Db db.PuppyDb
-}
-
-func (m UserNew) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
+func UserNew(c *gin.Context) {
+	id, err := SessionId(c)
 	if err != nil || id != "admin" {
-		ctx.EmitError(iris.StatusForbidden)
+		c.AbortWithStatus(http.StatusForbidden)
 		log.Print("Unauthorized creation attempt by: " + id)
 		log.Print(err)
 		return
 	}
 
 	info := new(models.TypeUserNew)
-	if err := ctx.ReadJSON(info); err != nil {
-		ctx.EmitError(iris.StatusBadRequest)
+	if err := c.BindJSON(info); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	user := models.NewUser(info)
 
-	if err := m.Db.GetCollection("user").Insert(&user); err != nil {
-		ctx.EmitError(iris.StatusInternalServerError)
+	if err := Db.GetCollection("user").Insert(&user); err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
 		log.Print(err)
 		return
 	}
 
-	ctx.JSON(iris.StatusAccepted, "Information set up")
+	c.String(http.StatusAccepted, "Information set up")
 }
 
 // User's first login
 // ------------------
-type UserFirst struct {
-	Db db.PuppyDb
-}
-
-func (m UserFirst) Serve(ctx *iris.Context) {
+func UserFirst(c *gin.Context) {
 	info := new(models.TypeUserFirst)
-	if err := ctx.ReadJSON(info); err != nil {
-		ctx.EmitError(iris.StatusBadRequest)
+	if err := c.BindJSON(info); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	user := models.User{}
 
 	// Fetch user
-	if err := m.Db.GetById("user", info.Id).One(&user); err != nil {
-		ctx.EmitError(iris.StatusNotFound)
+	if err := Db.GetById("user", info.Id).One(&user); err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
 		log.Print(err)
 		return
 	}
 
 	// If auth code did not match
 	if user.AuthC != info.AuthCode || user.AuthC == "" {
-		ctx.EmitError(iris.StatusForbidden)
+		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
 	// Edit information
-	if _, err := m.Db.GetById("user", info.Id).
+	if _, err := Db.GetById("user", info.Id).
 		Apply(user.FirstLogin(info), &user); err != nil {
 
-		ctx.EmitError(iris.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		log.Print(err)
 		return
 	}
 
 	// Remove user's auth token
-	if _, err := m.Db.GetById("user", info.Id).
+	if _, err := Db.GetById("user", info.Id).
 		Apply(user.SetField("autoCode", ""), &user); err != nil {
 
-		ctx.EmitError(iris.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		log.Print(err)
 		return
 	}
 
-	ctx.JSON(iris.StatusAccepted, "Information set up")
-}
-
-type UserMail struct {
-	Db db.PuppyDb
+	c.String(http.StatusAccepted, "Information set up")
 }
 
 // User asking for email
 // ---------------------
-func (m UserMail) Serve(ctx *iris.Context) {
-	id := ctx.Param("id")
+func UserMail(c *gin.Context) {
+	id := c.Param("id")
 
 	type mailData struct {
 		Email string `json:"email" bson:"email"`
@@ -128,34 +117,31 @@ func (m UserMail) Serve(ctx *iris.Context) {
 
 	u := mailData{}
 
-	if err := m.Db.GetById("user", id).One(&u); err != nil {
-		ctx.EmitError(iris.StatusNotFound)
+	if err := Db.GetById("user", id).One(&u); err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
 		log.Print(err)
 		return
 	}
 
 	if u.AuthC == "" {
-		ctx.Error("You have already signed up", iris.StatusBadRequest)
+		c.String(http.StatusBadRequest, "You have already signed up")
 		return
 	}
 
 	// Queue this request in service
 	err := utils.SignupRequest(id)
 	if err != nil {
-		ctx.Error("Something went wrong", iris.StatusInternalServerError)
+		c.String(http.StatusInternalServerError, "Something went wrong")
 	}
 
-	ctx.JSON(iris.StatusAccepted, "Mail will be sent to "+u.Email)
+	c.String(http.StatusAccepted,
+		fmt.Sprintf("Mail will be sent to %s", u.Email))
 }
 
-type MatchGet struct {
-	Db db.PuppyDb
-}
-
-func (m MatchGet) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
-	if err != nil || ctx.Param("you") != id {
-		ctx.EmitError(iris.StatusForbidden)
+func MatchGet(c *gin.Context) {
+	id, err := SessionId(c)
+	if err != nil || c.Param("you") != id {
+		c.AbortWithStatus(http.StatusForbidden)
 		log.Println("Failed on match get: " + id)
 		log.Println(err)
 		return
@@ -169,21 +155,17 @@ func (m MatchGet) Serve(ctx *iris.Context) {
 	user := new(typeUserGet)
 
 	// Fetch user
-	if err := m.Db.GetById("user", id).One(user); err != nil {
-		ctx.EmitError(iris.StatusNotFound)
+	if err := Db.GetById("user", id).One(user); err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
 		log.Print(err)
 		return
 	}
 
-	ctx.JSON(iris.StatusOK, (*user))
+	c.JSON(http.StatusOK, (*user))
 }
 
 // Get user's information
 // ----------------------
-type UserGet struct {
-	Db db.PuppyDb
-}
-
 type typeUserGet struct {
 	Id     string `json:"_id" bson:"_id"`
 	Name   string `json:"name" bson:"name"`
@@ -192,14 +174,14 @@ type typeUserGet struct {
 	PubK   string `json:"pubKey" bson:"pubKey"`
 }
 
-func (m UserGet) Serve(ctx *iris.Context) {
-	id := ctx.Param("id")
+func UserGet(c *gin.Context) {
+	id := c.Param("id")
 
 	user := models.User{}
 
 	// Fetch user
-	if err := m.Db.GetById("user", id).One(&user); err != nil {
-		ctx.EmitError(iris.StatusNotFound)
+	if err := Db.GetById("user", id).One(&user); err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
 		log.Print(err)
 		return
 	}
@@ -212,14 +194,11 @@ func (m UserGet) Serve(ctx *iris.Context) {
 		PubK:   user.PubK,
 	}
 
-	ctx.JSON(iris.StatusAccepted, resp)
+	c.JSON(http.StatusAccepted, resp)
 }
 
 // @AUTH Get user's private information on login
 // ---------------------------------------
-type UserLoginGet struct {
-	Db db.PuppyDb
-}
 
 type typeUserLoginGet struct {
 	Id      string `json:"_id" bson:"_id"`
@@ -233,10 +212,10 @@ type typeUserLoginGet struct {
 	Matches string `json:"matches" bson:"matches"`
 }
 
-func (m UserLoginGet) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
+func UserLoginGet(c *gin.Context) {
+	id, err := SessionId(c)
 	if err != nil {
-		ctx.EmitError(iris.StatusForbidden)
+		c.AbortWithStatus(http.StatusForbidden)
 		log.Println("Failed on login info: " + id)
 		log.Println(err)
 		return
@@ -245,8 +224,8 @@ func (m UserLoginGet) Serve(ctx *iris.Context) {
 	user := models.User{}
 
 	// Fetch user
-	if err := m.Db.GetById("user", id).One(&user); err != nil {
-		ctx.EmitError(iris.StatusNotFound)
+	if err := Db.GetById("user", id).One(&user); err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
 		log.Print(err)
 		return
 	}
@@ -263,45 +242,39 @@ func (m UserLoginGet) Serve(ctx *iris.Context) {
 		Matches: user.Matches,
 	}
 
-	ctx.JSON(iris.StatusAccepted, resp)
+	c.JSON(http.StatusAccepted, resp)
 }
 
 // After user submits all choices
 // ------------------------------
-type UserSubmitTrue struct {
-	Db db.PuppyDb
-}
 
-func (m UserSubmitTrue) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
-	if err != nil || id != ctx.Param("you") {
-		ctx.EmitError(iris.StatusForbidden)
+func UserSubmitTrue(c *gin.Context) {
+	id, err := SessionId(c)
+	if err != nil || id != c.Param("you") {
+		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
 	user := models.User{}
 
-	if _, err := m.Db.GetById("user", id).
+	if _, err := Db.GetById("user", id).
 		Apply(user.SetField("submitted", true), &user); err != nil {
 
-		ctx.EmitError(iris.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		log.Print(err)
 		return
 	}
 
-	ctx.JSON(iris.StatusAccepted, "Submitted successfully")
+	c.String(http.StatusAccepted, "Submitted successfully")
 }
 
 // @AUTH Update user data
 // ------------------------------
-type UserUpdateData struct {
-	Db db.PuppyDb
-}
 
-func (m UserUpdateData) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
-	if err != nil || id != ctx.Param("you") {
-		ctx.EmitError(iris.StatusForbidden)
+func UserUpdateData(c *gin.Context) {
+	id, err := SessionId(c)
+	if err != nil || id != c.Param("you") {
+		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
@@ -310,34 +283,31 @@ func (m UserUpdateData) Serve(ctx *iris.Context) {
 	}
 
 	info := new(typeUserUpdateData)
-	if err := ctx.ReadJSON(info); err != nil {
-		ctx.EmitError(iris.StatusBadRequest)
+	if err := c.BindJSON(info); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	user := models.User{}
 
-	if _, err := m.Db.GetById("user", id).
+	if _, err := Db.GetById("user", id).
 		Apply(user.SetField("data", info.Data), &user); err != nil {
 
-		ctx.EmitError(iris.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		log.Print(err)
 		return
 	}
 
-	ctx.JSON(iris.StatusAccepted, "Saved successfully")
+	c.String(http.StatusAccepted, "Saved successfully")
 }
 
 // @AUTH Update user image
 // ------------------------------
-type UserUpdateImage struct {
-	Db db.PuppyDb
-}
 
-func (m UserUpdateImage) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
-	if err != nil || id != ctx.Param("you") {
-		ctx.EmitError(iris.StatusForbidden)
+func UserUpdateImage(c *gin.Context) {
+	id, err := SessionId(c)
+	if err != nil || id != c.Param("you") {
+		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
@@ -348,32 +318,29 @@ func (m UserUpdateImage) Serve(ctx *iris.Context) {
 	user := models.User{}
 	info := new(imgstruct)
 
-	if err := ctx.ReadJSON(info); err != nil {
-		ctx.EmitError(iris.StatusBadRequest)
+	if err := c.BindJSON(info); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
-	if _, err := m.Db.GetById("user", id).
+	if _, err := Db.GetById("user", id).
 		Apply(user.SetField("image", info.Image), &user); err != nil {
 
-		ctx.EmitError(iris.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		log.Print(err)
 		return
 	}
 
-	ctx.JSON(iris.StatusAccepted, "Saved successfully")
+	c.String(http.StatusAccepted, "Saved successfully")
 }
 
 // @AUTH Update user passsave
 // ------------------------------
-type UserSavePass struct {
-	Db db.PuppyDb
-}
 
-func (m UserSavePass) Serve(ctx *iris.Context) {
-	id, err := SessionId(ctx)
-	if err != nil || id != ctx.Param("you") {
-		ctx.EmitError(iris.StatusForbidden)
+func UserSavePass(c *gin.Context) {
+	id, err := SessionId(c)
+	if err != nil || id != c.Param("you") {
+		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
@@ -384,18 +351,18 @@ func (m UserSavePass) Serve(ctx *iris.Context) {
 	user := models.User{}
 	info := new(imgstruct)
 
-	if err := ctx.ReadJSON(info); err != nil {
-		ctx.EmitError(iris.StatusBadRequest)
+	if err := c.BindJSON(info); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
-	if _, err := m.Db.GetById("user", id).
+	if _, err := Db.GetById("user", id).
 		Apply(user.SetField("savepass", info.Pass), &user); err != nil {
 
-		ctx.EmitError(iris.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		log.Print(err)
 		return
 	}
 
-	ctx.JSON(iris.StatusAccepted, "Saved successfully")
+	c.String(http.StatusAccepted, "Saved successfully")
 }
