@@ -14,8 +14,6 @@ import (
 
 var Db db.PuppyDb
 
-// @AUTH @Admin Drop users table
-// ----------------------------------------------------
 func UserDelete(c *gin.Context) {
 	id, err := SessionId(c)
 	if err != nil || id != "admin" {
@@ -32,8 +30,6 @@ func UserDelete(c *gin.Context) {
 	c.String(http.StatusOK, "Deleted user table")
 }
 
-// @AUTH @Admin Create new user
-// -------------------------------
 func UserNew(c *gin.Context) {
 	id, err := SessionId(c)
 	if err != nil || id != "admin" {

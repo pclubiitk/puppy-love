@@ -22,6 +22,7 @@ func SessionLogin(c *gin.Context) {
 	session := sessions.Default(c)
 	if session.Get("Status") != nil {
 		session.Clear()
+		session.Save()
 	}
 
 	u := new(LoginInfo)
@@ -36,6 +37,7 @@ func SessionLogin(c *gin.Context) {
 		if u.Passhash == config.CfgAdminPass {
 			session.Set("Status", "login")
 			session.Set("id", u.Username)
+			session.Save()
 			c.String(http.StatusOK,
 				fmt.Sprintf("Logged in: %s", u.Username))
 		} else {
@@ -59,6 +61,7 @@ func SessionLogin(c *gin.Context) {
 	if user.Pass == u.Passhash {
 		session.Set("Status", "login")
 		session.Set("id", u.Username)
+		session.Save()
 		c.JSON(http.StatusOK, gin.H{
 			"username": u.Username,
 		})
@@ -70,6 +73,7 @@ func SessionLogin(c *gin.Context) {
 
 func SessionLogout(c *gin.Context) {
 	sessions.Default(c).Clear()
+	sessions.Default(c).Save()
 }
 
 func SessionId(c *gin.Context) (string, error) {

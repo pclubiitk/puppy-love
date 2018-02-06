@@ -35,8 +35,8 @@ func main() {
 	store := sessions.NewCookieStore([]byte("secret"))
 
 	// iris.Config.Gzip = true
-
-	r := router.PuppyRoute(mongoDb)
+	r := gin.Default()
 	r.Use(sessions.Sessions("mysession", store))
+	router.PuppyRoute(r, mongoDb)
 	r.Run(config.CfgAddr)
 }

@@ -9,9 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func PuppyRoute(db db.PuppyDb) *gin.Engine {
-
-	r := gin.Default()
+func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 
 	r.GET("/", func(c *gin.Context) {
 		c.String(http.StatusAccepted, "Hello from the other side!")
@@ -68,5 +66,4 @@ func PuppyRoute(db db.PuppyDb) *gin.Engine {
 		admin.POST("/user/new", controllers.UserNew)
 	}
 
-	return r
 }
