@@ -233,6 +233,7 @@ func UserLoginGet(c *gin.Context) {
 	resp := typeUserLoginGet{
 		Id:      user.Id,
 		Name:    user.Name,
+		Email:   user.Email,
 		Gender:  user.Gender,
 		Image:   user.Image,
 		PrivK:   user.PrivK,
