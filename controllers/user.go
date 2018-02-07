@@ -206,6 +206,7 @@ type typeUserLoginGet struct {
 	Data    string `json:"data" bson:"data"`
 	Submit  bool   `json:"submitted" bson:"submitted"`
 	Matches string `json:"matches" bson:"matches"`
+	Email   string `json:"email" bson:"email"`
 }
 
 func UserLoginGet(c *gin.Context) {
