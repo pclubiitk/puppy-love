@@ -47,8 +47,8 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 	// Hearts
 	hearts := r.Group("/hearts")
 	{
-		hearts.GET("/hearts/get/:time/:you", controllers.HeartGet)
-		hearts.POST("/hearts/send/:you", controllers.GotHeart)
+		hearts.GET("/get/:time/:you", controllers.HeartGet)
+		hearts.POST("/send/:you", controllers.GotHeart)
 	}
 
 	// Session administration
