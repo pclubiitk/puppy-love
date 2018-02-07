@@ -15,7 +15,11 @@ mat-card-title {
 }
 
 .profile-pic {
+  width: 20vw;
   height: 20vw;
+  background-size: cover;
+  padding: 24px;
+  flex-grow: 1;
 }
 
 .main {

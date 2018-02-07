@@ -2,7 +2,8 @@
   <div fxLayout="row" fxLayoutAlign="space-around center">
     <mat-card class="profile">
       <!-- <img mat-card-image [src]="user.image" alt="You?"> -->
-      <div mat-card-image class="profile-pic"></div>
+      <div mat-card-image class="profile-pic" [style.background-image]="url">
+      </div>
       <mat-card-title> Hi {{ user.name }} </mat-card-title>
       <mat-card-content>
         <button mat-button>
