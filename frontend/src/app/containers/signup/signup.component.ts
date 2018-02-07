@@ -5,22 +5,33 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MainService } from '../../services/main.service';
 
 @Component({
-  templateUrl: './login.container.html',
-  styleUrls: [ './login.container.scss' ]
+  templateUrl: './signup.component.html',
+  styleUrls: [ './signup.component.scss' ]
 })
-export class LoginComponent {
+export class SignupComponent {
 
   constructor(private main: MainService,
               private router: Router,
               private snackBar: MatSnackBar) {}
 
-  onLogin(login: { roll: string, password: string }) {
-    this.main.login(login.roll, login.password)
+  signup(event: any) {
+    this.main.signup(event)
       .subscribe(
-        () => this.router.navigate([ 'home' ]),
+        () => this.router.navigate([ 'login' ]),
         (err) => this.snackBar.open(err, '', {
           duration: 3000
         }));
+  }
+
+  mail(roll: string) {
+    this.main.mail(roll)
+      .subscribe(
+        (msg) => {
+          console.log(msg);
+          this.snackBar.open(msg, '', {
+            duration: 3000
+          })
+        });
   }
 
 }

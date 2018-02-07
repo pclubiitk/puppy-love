@@ -1,0 +1,59 @@
+<ng-container *ngIf="(user$ | async) as user; else loading;">
+  <div fxLayout="row" fxLayoutAlign="space-around center">
+    <mat-card class="profile">
+      <img mat-card-image [src]="user.image" alt="You?">
+      <mat-card-title> Hi {{ user.name }} </mat-card-title>
+      <mat-card-content>
+        <button mat-button>
+          <mat-icon>{{ user.submitted ? 'check' : 'close' }}</mat-icon>
+          {{ user.submitted ? 'Submitted!' : 'Not Submitted' }}
+        </button>
+        <button mat-button>
+          <mat-icon>power_settings_new</mat-icon>
+          Logout
+        </button>
+        <hr>
+        <a mat-button routerLink="/about"> About the platform </a>
+        <a mat-button href="https://github.com/pclubiitk/puppy-love"> Source Code </a>
+        <a mat-button href="http://pclub.in"> pclub.in </a>
+        <a mat-button routerLink="/credits"> Credits </a>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="main">
+      <mat-card-content>
+        <!-- <search (selected) [items]=""></search> -->
+        <!-- <choices [choices]="user.choices" (personRemoved)=""></choices> -->
+        <mat-form-field class="demo-chip-list">
+          <mat-chip-list #chipList>
+            <mat-chip *ngFor="let choice of user.data.choices" [selectable]="true"
+              [removable]="true" (remove)="remove(choice)">
+              {{ choice._id }}
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+            <input placeholder="New Choice..."
+              [disabled]="user.data.choices.length > 4"
+              [matChipInputFor]="chipList"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+              (matChipInputTokenEnd)="add($event)" />
+          </mat-chip-list>
+        </mat-form-field>
+        <button mat-button (click)="onSubmit()">
+          <mat-icon>sentiment_very_satisfied</mat-icon>
+          Lock and submit!
+        </button>
+        <div fxLayout="row" fxLayoutAlign="center center">
+          <img *ngFor="let h of maleHearts(user)" src="/assets/heart.png">
+        </div>
+        <div fxLayout="row" fxLayoutAlign="center center">
+          <img *ngFor="let h of femaleHearts(user)" src="/assets/heart.png">
+        </div>
+        <!-- <hearts [breakloop]="breakvoteloop"> </hearts> -->
+      </mat-card-content>
+    </mat-card>
+  </div>
+</ng-container>
+
+<ng-template #loading>
+  Loading
+</ng-template>
