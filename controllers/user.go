@@ -278,6 +278,11 @@ func UserSubmitTrue(c *gin.Context) {
 	}
 
 	// Then, declare the choices
+	if err = declareStep(user, heartsAndChoices.Tokens); err != nil {
+		c.JSON(http.StatusBadRequest, "Failed, probably the request is invalid")
+		log.Print(err)
+		return
+	}
 
 	if _, err := Db.GetById("user", id).
 		Apply(user.SetField("submitted", true), &user); err != nil {
