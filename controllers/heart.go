@@ -122,7 +122,7 @@ func HeartGet(c *gin.Context) {
 
 	type AnonymVote struct {
 		Value          string `json:"v" bson:"v"`
-		GenderOfSender string `json:"genderOfSender" bson:"genderOfSender"`
+		GenderOfSender string `json:"genderOfSender" bson:"gender"`
 	}
 
 	votes := new([]AnonymVote)
