@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+    mongo:
+      image: mongo
+      networks:
+        - mynet
+
+    signup:
+      image: pclub/puppy-love:signup
+      env_file:
+        - .backend.env
+        - .mail.env
+      ports:
+        - "3001"
+      links:
+        - mongo
+      networks:
+        - mynet
+
+    backend:
+      image: pclub/puppy-love:backend
+      env_file:
+        - .backend.env
+        - .pass.env
+      ports:
+        - "34770:3000"
+      links:
+        - mongo
+        - signup
+      networks:
+        - mynet
+
+    frontend:
+      image: pclub/puppy-love:frontend
+      ports:
+        - "34771:80"
+
+networks:
+  mynet:
