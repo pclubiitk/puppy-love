@@ -18,7 +18,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AppRoutingModule } from './app-routing.module';
 
-import { ServiceWorkerModule } from '@angular/service-worker';
 import { AppComponent } from './app.component';
 
 import { environment } from '../environments/environment';
@@ -53,7 +52,6 @@ import { LoggedOutGuard } from './guards/logged-out.guard';
     MatSnackBarModule,
 
     AppRoutingModule,
-    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [ LoggedInGuard, LoggedOutGuard, MainService ],
   bootstrap: [AppComponent]
