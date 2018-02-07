@@ -55,12 +55,6 @@ func GotHeart(c *gin.Context) {
 		log.Print(err)
 		return
 	}
-	var gen string
-	if user.Gender == "0" {
-		gen = "1"
-	} else {
-		gen = "0"
-	}
 
 	userVotes := new([]models.Heart)
 	if err := Db.GetCollection("heart").
@@ -88,7 +82,7 @@ func GotHeart(c *gin.Context) {
 		newHearts = append(newHearts,
 			models.Heart{
 				Id:     id,
-				Gender: gen,
+				Gender: heart.GenderOfSender,
 				Time:   ctime,
 				Value:  heart.Value,
 				Data:   heart.Data,
