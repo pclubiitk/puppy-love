@@ -10,7 +10,8 @@ type (
 	}
 
 	GotHeart struct {
-		Value string `json:"v" bson:"v"`
-		Data  string `json:"data" bson:"data"`
+		Value          string `json:"v" bson:"v"`
+		Data           string `json:"data" bson:"data"`
+		GenderOfSender string `json:"genderOfSender" bson:"genderOfSender"`
 	}
 )
