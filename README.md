@@ -191,3 +191,4 @@ The following people have contributed to this project in various capacities:
 * [Yash Srivastav](https://github.com/yashsriv)
 * [Kunal Kapila](https://github.com/kunalapila)
 * [Vinayak Tantia](https://github.com/vtantia)
+* [Milind Luthra](https://github.com/milindl)
