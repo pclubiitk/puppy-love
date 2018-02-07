@@ -8,4 +8,6 @@
   </button>
 </div>
 
-<puppy-student *ngFor="let item of result" [student]="item" (select)="onSelect(item)"></puppy-student>
+<div fxLayoutAlign="center center" fxLayout="row wrap">
+  <puppy-student *ngFor="let item of result" [student]="item" (select)="onSelect(item)"></puppy-student>
+</div>

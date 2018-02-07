@@ -1,5 +1,8 @@
 <ng-container *ngIf="(user$ | async) as user; else loading;">
-  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-around center">
+  <div fxLayout="row"
+       fxLayout.lt-md="column"
+       fxLayoutAlign="space-around start"
+       fxLayoutAlign.lt-md="space-around center">
     <mat-card class="smallonly textonly-greeter">
       <h2>Hello, {{ user.name }}</h2>
     </mat-card>
@@ -26,10 +29,14 @@
 
     <mat-card class="main">
       <mat-card-content>
-        <puppy-search (select)="add($event)"
+        <puppy-search *ngIf="user.data.choices.length < 4"
+                      (select)="add($event)"
                       [students]="main.people"
                       *ngIf="!user.submitted">
         </puppy-search>
+        <div fxLayoutAlign="center center" *ngIf="user.data.choices.length >= 4">
+          <h3>You can only select 4 people.</h3>
+        </div>
         <!-- <choices [choices]="user.choices" (personRemoved)=""></choices> -->
         <!-- <mat-form-field class="demo-chip-list"> -->
         <!-- <mat-chip-list #chipList> -->
