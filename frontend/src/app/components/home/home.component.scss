@@ -30,6 +30,10 @@ mat-card-title {
   display: none;
 }
 
+.lovely-heart {
+  max-width: 50px;
+}
+
 @media screen and (max-width: 640px) {
   .smallonly {
     display: block;
@@ -40,5 +44,8 @@ mat-card-title {
   }
   .bigonly {
     display: none;
+  }
+  .textonly-greeter {
+    margin: 5px;
   }
 }
