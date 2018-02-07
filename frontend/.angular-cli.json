@@ -22,7 +22,9 @@
         "styles.scss",
         "../node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
       ],
-      "scripts": [],
+      "scripts": [
+        "sjcl.js"
+      ],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
