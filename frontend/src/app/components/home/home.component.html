@@ -27,7 +27,10 @@
 
     <mat-card class="main">
       <mat-card-content>
-        <puppy-search (select)="add($event)" [students]="main.people"></puppy-search>
+        <puppy-search (select)="add($event)"
+                      [students]="main.people"
+                      *ngIf="!user.submitted">
+        </puppy-search>
         <!-- <choices [choices]="user.choices" (personRemoved)=""></choices> -->
         <!-- <mat-form-field class="demo-chip-list"> -->
         <!-- <mat-chip-list #chipList> -->
@@ -43,22 +46,24 @@
         <!-- (matChipInputTokenEnd)="add($event)" /> -->
         <!-- </mat-chip-list> -->
         <!-- </mat-form-field> -->
+        <div fxLayout="row" fxLayoutAlign="center center" *ngIf="user.data.choices.length !== 0">
+            <h2>Your choices:</h2>
+          </div>
         <div fxLayout="row wrap" fxLayoutAlign="center center">
-          <h2 *ngIf="user.data.choices.length !== 0" class="smallonly">Your choices:</h2>
           <puppy-student *ngFor="let choice of user.data.choices" [student]="choice" (select)="remove(choice)"></puppy-student>
         </div>
-        <button mat-button (click)="onSave()">
+        <button mat-button (click)="onSave()" *ngIf="!user.submitted">
           <mat-icon>save</mat-icon>
           Save your choices!
         </button>
-        <button mat-button (click)="onSubmit()">
+        <button mat-button (click)="onSubmit()" *ngIf="!user.submitted">
           <mat-icon>sentiment_very_satisfied</mat-icon>
           Lock and submit!
         </button>
+        <hr>
         <div fxLayout="row" *ngIf="maleHearts(user).length !== 0">
           <h3>Hearts from people that the OA identifies as male:</h3>
         </div>
-        <hr>
         <div fxLayout="row" fxLayoutAlign="start center">
           <img class="lovely-heart" *ngFor="let h of maleHearts(user).slice(0, 9)" src="/assets/heart.png">
         </div>
