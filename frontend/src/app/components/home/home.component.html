@@ -29,12 +29,11 @@
 
     <mat-card class="main">
       <mat-card-content>
-        <puppy-search *ngIf="user.data.choices.length < 4"
+        <puppy-search *ngIf="user.data.choices.length < 4 && !user.submitted"
                       (select)="add($event)"
-                      [students]="main.people"
-                      *ngIf="!user.submitted">
+                      [students]="main.people">
         </puppy-search>
-        <div fxLayoutAlign="center center" *ngIf="user.data.choices.length >= 4">
+        <div fxLayoutAlign="center center" *ngIf="user.data.choices.length >= 4 && !user.submitted">
           <h3>You can only select 4 people.</h3>
         </div>
         <!-- <choices [choices]="user.choices" (personRemoved)=""></choices> -->
