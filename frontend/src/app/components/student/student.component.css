@@ -1,0 +1,31 @@
+.img {
+  background-size: cover;
+  flex-grow: 1;
+  min-width: 140px;
+  width: 20%;
+}
+
+.info {
+  flex-grow: 3;
+  padding: 2vmin;
+  width: 80%;
+}
+
+.name {
+  font-weight: 700;
+}
+
+@media only screen and (max-width: 600px) {
+  .container {
+    width: 80vw !important;
+  }
+}
+
+.container {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  cursor: pointer;
+  height: 140px;
+  margin: 2vmin;
+  /* padding: 1vmin; */
+  width: 400px;
+}

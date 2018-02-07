@@ -1,7 +1,8 @@
 <ng-container *ngIf="(user$ | async) as user; else loading;">
   <div fxLayout="row" fxLayoutAlign="space-around center">
     <mat-card class="profile">
-      <img mat-card-image [src]="user.image" alt="You?">
+      <!-- <img mat-card-image [src]="user.image" alt="You?"> -->
+      <div mat-card-image class="profile-pic"></div>
       <mat-card-title> Hi {{ user.name }} </mat-card-title>
       <mat-card-content>
         <button mat-button>
@@ -22,22 +23,29 @@
 
     <mat-card class="main">
       <mat-card-content>
-        <!-- <search (selected) [items]=""></search> -->
+        <puppy-search (select)="add($event)" [students]="main.people"></puppy-search>
         <!-- <choices [choices]="user.choices" (personRemoved)=""></choices> -->
-        <mat-form-field class="demo-chip-list">
-          <mat-chip-list #chipList>
-            <mat-chip *ngFor="let choice of user.data.choices" [selectable]="true"
-              [removable]="true" (remove)="remove(choice)">
-              {{ choice._id }}
-              <mat-icon matChipRemove>cancel</mat-icon>
-            </mat-chip>
-            <input placeholder="New Choice..."
-              [disabled]="user.data.choices.length > 4"
-              [matChipInputFor]="chipList"
-              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-              (matChipInputTokenEnd)="add($event)" />
-          </mat-chip-list>
-        </mat-form-field>
+        <!-- <mat-form-field class="demo-chip-list"> -->
+        <!-- <mat-chip-list #chipList> -->
+        <!-- <mat-chip *ngFor="let choice of user.data.choices" [selectable]="true" -->
+        <!-- [removable]="true" (remove)="remove(choice)"> -->
+        <!-- {{ choice._id }} -->
+        <!-- <mat-icon matChipRemove>cancel</mat-icon> -->
+        <!-- </mat-chip> -->
+        <!-- <input placeholder="New Choice..." -->
+        <!-- [disabled]="user.data.choices.length > 4" -->
+        <!-- [matChipInputFor]="chipList" -->
+        <!-- [matChipInputSeparatorKeyCodes]="separatorKeysCodes" -->
+        <!-- (matChipInputTokenEnd)="add($event)" /> -->
+        <!-- </mat-chip-list> -->
+        <!-- </mat-form-field> -->
+        <div fxLayout="row wrap" fxLayoutAlign="center center">
+          <puppy-student *ngFor="let choice of user.data.choices" [student]="choice" (select)="remove(choice)"></puppy-student>
+        </div>
+        <button mat-button (click)="onSave()">
+          <mat-icon>save</mat-icon>
+          Save your choices!
+        </button>
         <button mat-button (click)="onSubmit()">
           <mat-icon>sentiment_very_satisfied</mat-icon>
           Lock and submit!

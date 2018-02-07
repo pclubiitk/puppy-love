@@ -31,23 +31,34 @@ export class HomeComponent implements OnInit {
     return user.data.received.filter((x) => x.genderOfSender === '0');
   }
 
-  add(event: MatChipInputEvent): void {
-    const input = event.input;
-    const value = event.value;
-
+  add(event): void {
     const currentUser = {
       ...this.main.user$.value
     };
-    if ((value || '').trim()) {
-      currentUser.data.choices.push({ _id: value.trim(), name: 'Foobar', email: 'foobar' });
+
+    if (event._id !== currentUser._id && !currentUser.data.choices.some((x) => x._id === event._id)) {
+      currentUser.data.choices.push(event);
       this.main.user$.next(currentUser);
     }
-
-    // Reset the input value
-    if (input) {
-      input.value = '';
-    }
   }
+
+  // add(event: MatChipInputEvent): void {
+  //   const input = event.input;
+  //   const value = event.value;
+
+  //   const currentUser = {
+  //     ...this.main.user$.value
+  //   };
+  //   if ((value || '').trim()) {
+  //     currentUser.data.choices.push({ _id: value.trim(), name: 'Foobar', email: 'foobar' });
+  //     this.main.user$.next(currentUser);
+  //   }
+
+  //   // Reset the input value
+  //   if (input) {
+  //     input.value = '';
+  //   }
+  // }
 
   remove(fruit: any): void {
     const currentUser = {
@@ -73,5 +84,9 @@ export class HomeComponent implements OnInit {
       () => console.log('Successfully Submitted'),
       (error) => console.log('An error occurred: ' + error)
     );
+  }
+
+  onSave() {
+    this.main.save();
   }
 }

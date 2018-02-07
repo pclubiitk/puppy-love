@@ -1,0 +1,11 @@
+<div fxLayout="row" fxLayoutAlign="center center" class="search-grid">
+  <mat-icon class="search-icon">search</mat-icon>
+  <mat-form-field floatPlaceholder="never" fxFlex="">
+    <input #searchBox matInput placeholder="Name, Username or Roll" type="text" (keyup)="searchTerm(searchBox.value)">
+  </mat-form-field>
+  <button mat-icon-button (click)="searchTerm(searchBox.value='')" [disabled]="searchBox.value == ''">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<puppy-student *ngFor="let item of result" [student]="item" (select)="onSelect(item)"></puppy-student>

@@ -67,8 +67,13 @@ export class MainService {
   loggedIn = false;
 
   pubKeys: Map<string, string> = new Map();
+  people: Person[];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.http.get<Person[]>('/api/list/all').subscribe((res) => {
+      this.people = res;
+    });
+  }
 
   private getInfo(username:string, password: string) {
     const info = this.http.get<LoginData>('/api/users/data/info')
@@ -89,7 +94,7 @@ export class MainService {
               choices: data.choices || [],
               hearts: data.hearts || [],
               lastCheck: data.lastCheck || 0,
-              received: [],
+              received: data.received || [],
             }
           };
         }),
@@ -137,18 +142,25 @@ export class MainService {
     }
 
     // Send the declare values
-    const declre = this.http.post('/api/declare/choices', declarePayload)
-      .pipe(
-        tap(() => {
-          console.log('Saved declare values: ' + count);
-        }),
-      );
+    // const declre = this.http.post('/api/declare/choices', declarePayload)
+    //   .pipe(
+    //     tap(() => {
+    //       console.log('Saved declare values: ' + count);
+    //     }),
+    //   );
     // First send hearts
-    return this.http.post('/api/hearts/send/' + user._id, heartvalues)
-      .pipe (
-        tap(() => console.log('Saved hearts: ' + heartvalues.length)),
-        switchMap(() => declre)
-      );
+    // return this.http.post('/api/hearts/send/' + user._id, heartvalues)
+    //   .pipe (
+    //     tap(() => console.log('Saved hearts: ' + heartvalues.length)),
+    //     switchMap(() => declre)
+    //   );
+
+    return this.http.post('/api/users/data/submit/' + user._id, {
+      hearts: heartvalues,
+      tokens: declarePayload
+    }).pipe (
+      tap(() => console.log('Saved hearts: ' + heartvalues.length + ' and declare values: ' + count)),
+    );
 
   }
 
@@ -173,7 +185,7 @@ export class MainService {
             ...user
           };
           nuser.data.lastCheck = hearts.time;
-          const userhearts = [];
+          const userhearts = nuser.data.received;
           for(let vote of hearts.votes) {
             const attempt = user.crypto.decryptAsym(vote.v);
             if (!attempt) {
@@ -192,9 +204,9 @@ export class MainService {
   public submit() {
     return this.getPubKeys().pipe(
       switchMap((pub) => this.declareChoices(pub)),
-      switchMap(() => {
-        return this.http.post('/api/users/data/submit/' + this.user$.value._id, {});
-      }),
+      // switchMap(() => {
+      //   return this.http.post('/api/users/data/submit/' + this.user$.value._id, {});
+      // }),
       tap(() => this.save()),
       tap(() => {
         this.user$.next({
@@ -261,6 +273,7 @@ export class MainService {
   save() {
     const user = this.user$.value;
     const data = user.data;
+    console.log(data);
     const encData = user.crypto.encryptSym(Crypto.fromJson(data));
     this.http.post('/api/users/data/update/' + user._id, {
       data: encData,
