@@ -1,8 +1,15 @@
 import { Component, OnInit } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { MatChipInputEvent } from '@angular/material';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 
 import { MainService } from '../../services/main.service';
+
+function ImageURL(rollnum: string, userid: string) {
+    const iitkhome = `http://home.iitk.ac.in/~${ userid }/dp`;
+    const oaimage = `https://oa.cc.iitk.ac.in/Oa/Jsp/Photo/${ rollnum }_0.jpg`;
+    return `url("${ iitkhome }"), url("${ oaimage }")`;
+}
 
 @Component({
   selector: 'puppy-home',
@@ -16,11 +23,20 @@ export class HomeComponent implements OnInit {
 
   user$: any;
 
-  constructor(private main: MainService) {}
+    constructor(private main: MainService,
+                private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
     this.user$ = this.main.user$;
     this.doSubmit();
+  }
+
+  get url() {
+    const currentUser = {
+      ...this.main.user$.value
+    };
+    console.log(currentUser);
+    return this.sanitizer.bypassSecurityTrustStyle(ImageURL(currentUser._id, currentUser.email));
   }
 
   maleHearts(user) {
