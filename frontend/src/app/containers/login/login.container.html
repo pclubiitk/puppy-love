@@ -1,1 +1,5 @@
-<puppy-login (login)="onLogin($event)"></puppy-login>
+<puppy-login (login)="onLogin($event)" *ngIf="!loading"></puppy-login>
+<div fxLayoutAlign="center center" *ngIf="loading">
+  <mat-spinner></mat-spinner>
+</div>
+

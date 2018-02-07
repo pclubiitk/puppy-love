@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatChipInputEvent } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 
 import { MainService } from '../../services/main.service';
@@ -24,7 +25,8 @@ export class HomeComponent implements OnInit {
   user$: any;
 
     constructor(private main: MainService,
-                private sanitizer: DomSanitizer) {}
+                private sanitizer: DomSanitizer,
+                private snackbar: MatSnackBar) {}
 
   ngOnInit() {
     this.user$ = this.main.user$;
@@ -35,7 +37,6 @@ export class HomeComponent implements OnInit {
     const currentUser = {
       ...this.main.user$.value
     };
-    console.log(currentUser);
     return this.sanitizer.bypassSecurityTrustStyle(ImageURL(currentUser._id, currentUser.email));
   }
 
@@ -51,6 +52,10 @@ export class HomeComponent implements OnInit {
     const currentUser = {
       ...this.main.user$.value
     };
+
+    if (!event) {
+      return;
+    }
 
     if (event._id !== currentUser._id && !currentUser.data.choices.some((x) => x._id === event._id)) {
       currentUser.data.choices.push(event);
@@ -80,6 +85,11 @@ export class HomeComponent implements OnInit {
     const currentUser = {
       ...this.main.user$.value
     };
+
+    if (currentUser.submitted) {
+      return;
+    }
+
     const index = currentUser.data.choices.indexOf(fruit);
 
     if (index >= 0) {
@@ -91,18 +101,31 @@ export class HomeComponent implements OnInit {
   doSubmit() {
     const user = this.user$.value;
     if (user.submitted) {
-      this.onSubmit();
+      this.main.submit().subscribe(
+        () => console.log('Autosubmission.'),
+        (error) => this.snackbar.open('An error occurred: ' + error, '', { duration: 3000 })
+      );
     }
   }
 
   onSubmit() {
+    if(!window.confirm('This will finalize your choices, you cannot change them afterwards. Proceed?')) {
+      // If you've seen this, you can assume that you've understood all the code here.
+      return;
+    }
+    this.snackbar.open('Submitting, please wait...');
     this.main.submit().subscribe(
-      () => console.log('Successfully Submitted'),
-      (error) => console.log('An error occurred: ' + error)
+      () => this.snackbar.open('Submitted.', '', { duration: 3000 }),
+      (error) => this.snackbar.open('An error occurred: ' + error, '', { duration: 3000 })
     );
   }
 
   onSave() {
-    this.main.save();
+    this.snackbar.open('Saving your info, please wait...');
+    this.main.save().then(() => this.snackbar.open('Saved your info.', '', { duration: 3000 }));
+  }
+
+  onLogout() {
+    location.reload();
   }
 }
