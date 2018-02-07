@@ -1,6 +1,9 @@
 <ng-container *ngIf="(user$ | async) as user; else loading;">
-  <div fxLayout="row" fxLayoutAlign="space-around center">
-    <mat-card class="profile">
+  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-around center">
+    <mat-card class="smallonly">
+      <h2>Hello, {{ user.name }}</h2>
+    </mat-card>
+    <mat-card class="profile bigonly">
       <!-- <img mat-card-image [src]="user.image" alt="You?"> -->
       <div mat-card-image class="profile-pic" [style.background-image]="url">
       </div>
@@ -41,6 +44,7 @@
         <!-- </mat-chip-list> -->
         <!-- </mat-form-field> -->
         <div fxLayout="row wrap" fxLayoutAlign="center center">
+          <h2 *ngIf="user.data.choices.length !== 0">Your choices:</h2>
           <puppy-student *ngFor="let choice of user.data.choices" [student]="choice" (select)="remove(choice)"></puppy-student>
         </div>
         <button mat-button (click)="onSave()">
