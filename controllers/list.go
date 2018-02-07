@@ -21,15 +21,9 @@ type typeListAll struct {
 func ListAll(c *gin.Context) {
 	var results []typeListAll
 
-	_gender := c.Param("gender")
-	if _gender != "0" && _gender != "1" {
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-
 	// Fetch user
 	if err := Db.GetCollection("user").
-		Find(bson.M{"gender": _gender}).
+		Find(bson.M{}).
 		All(&results); err != nil {
 
 		c.AbortWithStatus(http.StatusNotFound)
@@ -41,19 +35,13 @@ func ListAll(c *gin.Context) {
 }
 
 func PubkeyList(c *gin.Context) {
-	_gender := c.Param("gender")
-	if _gender != "0" && _gender != "1" {
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-
 	var query [](struct {
 		Id string `json:"_id" bson:"_id"`
 		PK string `json:"pubKey" bson:"pubKey"`
 	})
 
 	if err := Db.GetCollection("user").
-		Find(bson.M{"gender": _gender, "dirty": false}).
+		Find(bson.M{"dirty": false}).
 		All(&query); err != nil {
 
 		c.AbortWithStatus(http.StatusNotFound)

@@ -35,8 +35,8 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 	// Listing users
 	list := r.Group("/list")
 	{
-		list.GET("/gender/:gender", controllers.ListAll)
-		list.GET("/pubkey/:gender", controllers.PubkeyList)
+		list.GET("/all", controllers.ListAll)
+		list.GET("/pubkey", controllers.PubkeyList)
 		list.GET("/declare", controllers.DeclareList)
 	}
 
