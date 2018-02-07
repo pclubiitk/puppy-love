@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/throw';
 import { of } from 'rxjs/observable/of';
+import 'rxjs/add/operator/toPromise';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 
 import { Crypto } from '../crypto';
@@ -230,7 +231,7 @@ export class MainService {
           // The backend returned an unsuccessful response code.
           // The response body may contain clues as to what went wrong,
           if (err.status === 202) {
-            return "";
+            return of('');
           } else if (err.status === 403) {
             return Observable.throw('It seems you entered a wrong password');
           } else if (err.status === 404) {
@@ -258,26 +259,26 @@ export class MainService {
           // The backend returned an unsuccessful response code.
           // The response body may contain clues as to what went wrong,
           if (err.status === 202) {
-            return 'Mail sent to your @iitk ID !';
+            return of('Mail sent to your @iitk ID !');
           } else if (err.status === 404) {
-            return 'Your information was not found in our database. Please send us a mail at pclubiitk@gmail.com';
+            return of('Your information was not found in our database. Please send us a mail at pclubiitk@gmail.com');
           } else if (err.status === 400) {
-            return 'You have already registered';
+            return of('You have already registered');
           }
         }
-        return 'There was an error. Let us know at pclubiitk@gmail.com';
+        return of('There was an error. Let us know at pclubiitk@gmail.com');
       })
     );
   }
 
-  save() {
+  save(): Promise<any> {
     const user = this.user$.value;
     const data = user.data;
     console.log(data);
     const encData = user.crypto.encryptSym(Crypto.fromJson(data));
-    this.http.post('/api/users/data/update/' + user._id, {
+    return this.http.post('/api/users/data/update/' + user._id, {
       data: encData,
-    }).subscribe();
+    }).toPromise();
   }
 
 }

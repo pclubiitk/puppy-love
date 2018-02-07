@@ -1,1 +1,9 @@
-<puppy-signup (signup)="signup($event)" (mail)="mail($event)"></puppy-signup>
+<puppy-signup
+  (signup)="signup($event)"
+  (mail)="mail($event)"
+  *ngIf="!loading">
+</puppy-signup>
+
+<div fxLayoutAlign="center center" *ngIf="loading">
+  <mat-spinner></mat-spinner>
+</div>

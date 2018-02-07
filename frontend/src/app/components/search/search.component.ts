@@ -93,5 +93,6 @@ export class SearchComponent implements OnInit {
   onSelect(event: any) {
     this.searchTerms.next('');
     this.select.emit(event);
+    (this.searchBox as any)._elementRef.nativeElement.value = '';
   }
 }

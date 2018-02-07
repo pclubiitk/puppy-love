@@ -13,7 +13,7 @@
           <mat-icon>{{ user.submitted ? 'check' : 'close' }}</mat-icon>
           {{ user.submitted ? 'Submitted!' : 'Not Submitted' }}
         </button>
-        <button mat-button>
+        <button mat-button (click)="onLogout()">
           <mat-icon>power_settings_new</mat-icon>
           Logout
         </button>
@@ -21,7 +21,6 @@
         <a mat-button routerLink="/about"> About the platform </a>
         <a mat-button href="https://github.com/pclubiitk/puppy-love"> Source Code </a>
         <a mat-button href="http://pclub.in"> pclub.in </a>
-        <a mat-button routerLink="/credits"> Credits </a>
       </mat-card-content>
     </mat-card>
 
@@ -46,8 +45,9 @@
         <!-- (matChipInputTokenEnd)="add($event)" /> -->
         <!-- </mat-chip-list> -->
         <!-- </mat-form-field> -->
-        <div fxLayout="row" fxLayoutAlign="center center" *ngIf="user.data.choices.length !== 0">
+        <div fxLayout="column" fxLayoutAlign="center center" *ngIf="user.data.choices.length !== 0">
             <h2>Your choices:</h2>
+            <div *ngIf="!user.submitted">(Click to remove)</div>
           </div>
         <div fxLayout="row wrap" fxLayoutAlign="center center">
           <puppy-student *ngFor="let choice of user.data.choices" [student]="choice" (select)="remove(choice)"></puppy-student>
@@ -60,7 +60,7 @@
           <mat-icon>sentiment_very_satisfied</mat-icon>
           Lock and submit!
         </button>
-        <hr>
+        <hr *ngIf="!user.submitted">
         <div fxLayout="row" *ngIf="maleHearts(user).length !== 0">
           <h3>Hearts from people that the OA identifies as male:</h3>
         </div>
@@ -72,6 +72,11 @@
         </div>
         <div fxLayout="row" fxLayoutAlign="start center">
           <img class="lovely-heart" *ngFor="let h of femaleHearts(user).slice(0, 9)" src="/assets/heart.png">
+        </div>
+        <div *ngIf="femaleHearts(user).length + maleHearts(user).length === 0"
+             fxLayout="column" fxLayoutAlign="center center">
+          <h3>Sorry, you haven't gotten any hearts (yet).</h3>
+          <blockquote>True love comes to those who wait.</blockquote>
         </div>
         <!-- <hearts [breakloop]="breakvoteloop"> </hearts> -->
       </mat-card-content>
