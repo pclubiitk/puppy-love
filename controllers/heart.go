@@ -117,21 +117,20 @@ func HeartGet(c *gin.Context) {
 		return
 	}
 
-	gen := c.Param("gen")
-
 	// Current time
 	ctime := uint64(time.Now().UnixNano() / 1000000)
 
 	type AnonymVote struct {
-		Value string `json:"v" bson:"v"`
+		Value          string `json:"v" bson:"v"`
+		GenderOfSender string `json:"genderOfSender" bson:"genderOfSender"`
 	}
 
 	votes := new([]AnonymVote)
 
 	// Fetch user
 	if err := Db.GetCollection("heart").
-		Find(bson.M{"time": bson.M{"$gt": ltime, "$lte": ctime},
-			"gender": gen}).All(votes); err != nil {
+		Find(bson.M{"time": bson.M{"$gt": ltime, "$lte": ctime}}).
+		All(votes); err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 		log.Print(err)
 		return

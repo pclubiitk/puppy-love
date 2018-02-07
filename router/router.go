@@ -47,7 +47,7 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 	// Hearts
 	hearts := r.Group("/hearts")
 	{
-		hearts.GET("/hearts/get/:time/:gen/:you", controllers.HeartGet)
+		hearts.GET("/hearts/get/:time/:you", controllers.HeartGet)
 		hearts.POST("/hearts/send/:you", controllers.GotHeart)
 	}
 
