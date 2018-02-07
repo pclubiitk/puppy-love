@@ -40,15 +40,10 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 		list.GET("/declare", controllers.DeclareList)
 	}
 
-	// Declare
-
-	r.POST("/declare/choices", controllers.DeclareStep)
-
 	// Hearts
 	hearts := r.Group("/hearts")
 	{
 		hearts.GET("/get/:time/:you", controllers.HeartGet)
-		hearts.POST("/send/:you", controllers.GotHeart)
 	}
 
 	// Session administration

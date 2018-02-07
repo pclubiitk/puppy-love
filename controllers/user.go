@@ -1,15 +1,18 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/milindl/puppy-love/db"
 	"github.com/milindl/puppy-love/models"
 	"github.com/milindl/puppy-love/utils"
 
 	"github.com/gin-gonic/gin"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var Db db.PuppyDb
@@ -253,6 +256,27 @@ func UserSubmitTrue(c *gin.Context) {
 	}
 
 	user := models.User{}
+	if err := Db.GetById("user", id).One(&user); err != nil {
+		c.JSON(http.StatusNotFound, "Invalid user")
+		log.Print(err)
+		return
+	}
+
+	heartsAndChoices := new(models.HeartsAndChoices)
+	if err := c.BindJSON(heartsAndChoices); err != nil {
+		c.String(http.StatusBadRequest, "Invalid JSON")
+		log.Print(err)
+		return
+	}
+
+	// First, send the hearts using sendHearts
+	if err = sendHearts(user, heartsAndChoices.Hearts); err != nil {
+		c.JSON(http.StatusBadRequest, "Failed, probably the request is invalid")
+		log.Print(err)
+		return
+	}
+
+	// Then, declare the choices
 
 	if _, err := Db.GetById("user", id).
 		Apply(user.SetField("submitted", true), &user); err != nil {
@@ -262,7 +286,90 @@ func UserSubmitTrue(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusAccepted, "Submitted successfully")
+}
+
+func declareStep(user models.User, info models.Declare) error {
+
+	if info.Id != user.Id {
+		return errors.New("Invalid session/userId")
+	}
+
+	// TODO: fix db name to not be a constant
+	if _, err := Db.GetCollection("declare").UpsertId(user.Id, bson.M{
+		"t0": info.Token0,
+		"t1": info.Token1,
+		"t2": info.Token2,
+		"t3": info.Token3,
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func difference(oldVotes []models.Heart,
+	newVotes []models.GotHeart) []models.GotHeart {
+
+	diff := []models.GotHeart{}
+	m := map[string]int{}
+	for _, s1val := range oldVotes {
+		m[s1val.Data] = 1
+	}
+
+	for _, s2val := range newVotes {
+		if m[s2val.Data] != 1 {
+			diff = append(diff, s2val)
+		}
+	}
+
+	return diff
+}
+
+// Serve when a Heart is to be saved
+func sendHearts(user models.User, info []models.GotHeart) error {
+	// Check that user isn't voting more than 4
+	// ========================================
+
+	userVotes := new([]models.Heart)
+	if err := Db.GetCollection("heart").
+		Find(bson.M{"roll": user.Id}).
+		All(userVotes); err != nil {
+		return err
+	}
+
+	diffHearts := difference(*userVotes, info)
+
+	log.Print("Earlier count: ", len(*userVotes))
+	log.Print("Sent new: ", len(diffHearts))
+
+	if len(diffHearts)+len(*userVotes) > 4 {
+		return errors.New("More than allowed votes")
+	}
+
+	ctime := uint64(time.Now().UnixNano() / 1000000)
+
+	newHearts := []models.Heart{}
+	for _, heart := range diffHearts {
+		newHearts = append(newHearts,
+			models.Heart{
+				Id:     user.Id,
+				Gender: heart.GenderOfSender,
+				Time:   ctime,
+				Value:  heart.Value,
+				Data:   heart.Data,
+			})
+	}
+
+	bulk := Db.GetCollection("heart").Bulk()
+	for _, heart := range newHearts {
+		bulk.Insert(heart)
+	}
+
+	_, err := bulk.Run()
+
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // @AUTH Update user data

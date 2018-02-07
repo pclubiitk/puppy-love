@@ -95,3 +95,8 @@ func (u User) SetField(field string, value interface{}) mgo.Change {
 		ReturnNew: true,
 	}
 }
+
+type HeartsAndChoices struct {
+	Hearts []GotHeart `json:"hearts"`
+	Tokens Declare    `json:"tokens"`
+}
