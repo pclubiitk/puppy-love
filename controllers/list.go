@@ -15,6 +15,7 @@ import (
 type typeListAll struct {
 	Id    string `json:"_id" bson:"_id"`
 	Name  string `json:"name" bson:"name"`
+	Email string `json:"email" bson:"email"`
 	Image string `json:"image" bson:"image"`
 }
 
