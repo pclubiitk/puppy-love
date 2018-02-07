@@ -1,26 +1,19 @@
-FROM golang:1.7
+FROM golang
 
-# File Author / Maintainer
-MAINTAINER Saksham Sharma
+ENV GOPATH=/go
+RUN go get -u github.com/golang/dep/cmd/dep
 
-RUN curl https://glide.sh/get | sh
+RUN mkdir -p /go/src/github.com/milindl/puppy-love/service/signup
+WORKDIR /go/src/github.com/milindl/puppy-love/service/signup
 
-ENV GOPATH /go
-ENV PUPPYPATH /go/src/github.com/pclubiitk/puppy-love
-ENV SERVPATH /go/src/github.com/pclubiitk/puppy-love/service/signup
+COPY Gopkg.toml Gopkg.lock ./
+# copies the Gopkg.toml and Gopkg.lock to WORKDIR
 
-#RUN git clone https://github.com/pclubiitk/puppy-love $PUPPYPATH
+RUN dep ensure -v -vendor-only
 
-RUN mkdir -p $SERVPATH
-WORKDIR $SERVPATH
-
-COPY glide.yaml $SERVPATH
-COPY glide.lock $SERVPATH
-RUN glide install
-
-COPY . $SERVPATH
-RUN cd $SERVPATH && go build
+COPY . .
+RUN go build
 
 EXPOSE 3001
 
-ENTRYPOINT ["/go/src/github.com/pclubiitk/puppy-love/service/signup/signup"]
+ENTRYPOINT ["/go/src/github.com/milindl/puppy-love/service/signup/signup"]
