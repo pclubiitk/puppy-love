@@ -25,3 +25,20 @@ mat-card-title {
 .main {
   width: 66.67vw;
 }
+
+.smallonly {
+  display: none;
+}
+
+@media screen and (max-width: 640px) {
+  .smallonly {
+    display: block;
+  }
+  .main {
+    display: block;
+    width: 90vw;
+  }
+  .bigonly {
+    display: none;
+  }
+}
