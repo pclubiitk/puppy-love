@@ -1,6 +1,6 @@
 <ng-container *ngIf="(user$ | async) as user; else loading;">
   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-around center">
-    <mat-card class="smallonly">
+    <mat-card class="smallonly textonly-greeter">
       <h2>Hello, {{ user.name }}</h2>
     </mat-card>
     <mat-card class="profile bigonly">
@@ -44,7 +44,7 @@
         <!-- </mat-chip-list> -->
         <!-- </mat-form-field> -->
         <div fxLayout="row wrap" fxLayoutAlign="center center">
-          <h2 *ngIf="user.data.choices.length !== 0">Your choices:</h2>
+          <h2 *ngIf="user.data.choices.length !== 0" class="smallonly">Your choices:</h2>
           <puppy-student *ngFor="let choice of user.data.choices" [student]="choice" (select)="remove(choice)"></puppy-student>
         </div>
         <button mat-button (click)="onSave()">
@@ -55,11 +55,18 @@
           <mat-icon>sentiment_very_satisfied</mat-icon>
           Lock and submit!
         </button>
-        <div fxLayout="row" fxLayoutAlign="center center">
-          <img *ngFor="let h of maleHearts(user)" src="/assets/heart.png">
+        <div fxLayout="row" *ngIf="maleHearts(user).length !== 0">
+          <h3>Hearts from people that the OA identifies as male:</h3>
         </div>
-        <div fxLayout="row" fxLayoutAlign="center center">
-          <img *ngFor="let h of femaleHearts(user)" src="/assets/heart.png">
+        <hr>
+        <div fxLayout="row" fxLayoutAlign="start center">
+          <img class="lovely-heart" *ngFor="let h of maleHearts(user).slice(0, 9)" src="/assets/heart.png">
+        </div>
+        <div fxLayout="row" *ngIf="femaleHearts(user).length !== 0">
+          <h3>Hearts from people that the OA identifies as female:</h3>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center">
+          <img class="lovely-heart" *ngFor="let h of femaleHearts(user).slice(0, 9)" src="/assets/heart.png">
         </div>
         <!-- <hearts [breakloop]="breakvoteloop"> </hearts> -->
       </mat-card-content>
