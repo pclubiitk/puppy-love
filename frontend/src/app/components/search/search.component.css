@@ -1,0 +1,78 @@
+.width-60 {
+  background-color: #fff;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  margin: 0 auto;
+  padding-top: 20px;
+  width: 60%;
+}
+
+@media (max-width: 600px) {
+  .width-60 {
+    width: 90%;
+  }
+}
+
+.search-options {
+  margin: 15px;
+  padding: 5px;
+}
+
+.mat-select-underline {
+  background-color: #fff !important;
+  color: #fff;
+}
+
+.text-area {
+  background-color: #fff;
+}
+
+.search-grid {
+  background-color: #eee;
+  width: 100%;
+}
+
+.search-grid button {
+  margin: 10px;
+}
+
+.search-icon {
+  margin: 18px;
+}
+
+mat-spinner {
+  margin: 10vh auto;
+}
+
+masonry {
+  margin: 0 auto;
+  width: 80%;
+}
+
+.fab {
+  bottom: 2%;
+  height: 2.8rem;
+  position: fixed;
+  right: 2%;
+  text-align: center;
+  width : 2.8rem;
+}
+
+.fab mat-icon {
+  height: 2.8rem;
+  width : 2.8rem;
+}
+
+.help {
+  height: 2.8rem;
+  position: fixed;
+  right: 2%;
+  top: 2%;
+  width : 2.8rem;
+}
+
+.result-count {
+  background-color: #eeeeee;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  margin: 10px;
+  padding: 10px;
+}
