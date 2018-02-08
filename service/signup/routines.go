@@ -71,7 +71,7 @@ func SignupService(
 }
 
 func MailerService(Db PuppyDb, mail_channel chan User) {
-
+	mailCounter := 0
 	auth := smtp.PlainAuth("", EmailUser, EmailPass,
 		EmailHost)
 
@@ -92,7 +92,9 @@ func MailerService(Db PuppyDb, mail_channel chan User) {
 			log.Println("ERROR: while mailing user ", u.Email, " ", u.Id)
 			log.Println(err)
 		} else {
+			mailCounter += 1
 			log.Println("Mailed " + u.Id)
+			log.Println("Mails sent since inception", mailCounter)
 		}
 	}
 }
