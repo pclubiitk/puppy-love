@@ -85,7 +85,7 @@ func MailerService(Db PuppyDb, mail_channel chan User) {
 			"Use this token while signing up, and don't share it with anyone.\n" +
 			"Token: " + u.AuthC + "\n" +
 			".\r\n")
-		err := smtp.SendMail(EmailHost+":587", auth,
+		err := smtp.SendMail(EmailHost+":"+EmailPort, auth,
 			EmailUser, to, msg)
 
 		if err != nil {
