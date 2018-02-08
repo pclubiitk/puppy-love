@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/milindl/puppy-love/utils"
+	"github.com/pclubiitk/puppy-love/utils"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

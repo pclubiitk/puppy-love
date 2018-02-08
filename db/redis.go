@@ -1,3 +1,4 @@
+// Note: Redis is not used anymore.
 package db
 
 import (
