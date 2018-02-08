@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/milindl/puppy-love/config"
-	"github.com/milindl/puppy-love/db"
-	"github.com/milindl/puppy-love/router"
-	"github.com/milindl/puppy-love/utils"
+	"github.com/pclubiitk/puppy-love/config"
+	"github.com/pclubiitk/puppy-love/db"
+	"github.com/pclubiitk/puppy-love/router"
+	"github.com/pclubiitk/puppy-love/utils"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"

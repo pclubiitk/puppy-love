@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/milindl/puppy-love/config"
-	"github.com/milindl/puppy-love/models"
+	"github.com/pclubiitk/puppy-love/config"
+	"github.com/pclubiitk/puppy-love/models"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
