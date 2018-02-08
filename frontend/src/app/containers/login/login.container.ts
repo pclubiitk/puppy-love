@@ -18,6 +18,7 @@ export class LoginComponent {
               private snackBar: MatSnackBar) {}
 
   onLogin(login: { roll: string, password: string }) {
+    this.loading = true;
     this.main.login(login.roll, login.password)
       .finally(() => this.loading = false)
       .subscribe(
