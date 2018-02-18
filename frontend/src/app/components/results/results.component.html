@@ -1,0 +1,144 @@
+<ng-container *ngIf="(user$ | async) as user; else loading;">
+  <div fxLayout="row"
+    fxLayout.lt-md="column"
+    fxLayoutAlign="space-around start"
+    fxLayoutAlign.lt-md="space-around center">
+    <mat-card class="smallonly textonly-greeter">
+      <h2>Hello, {{ user.name }}</h2>
+    </mat-card>
+    <mat-card class="profile bigonly">
+      <div mat-card-image class="profile-pic" [style.background-image]="url">
+      </div>
+      <mat-card-title> Hi {{ user.name }} </mat-card-title>
+      <mat-card-content>
+        <button mat-button (click)="onLogout()">
+          <mat-icon>power_settings_new</mat-icon>
+          Logout
+        </button>
+        <hr>
+        <a mat-button routerLink="/about"> About the platform </a>
+        <a mat-button href="https://github.com/pclubiitk/puppy-love"> Source Code </a>
+        <a mat-button href="http://pclub.in"> pclub.in </a>
+      </mat-card-content>
+    </mat-card>
+
+    <div fxLayout="column" fxLayoutAlign="start center">
+      <mat-card class="main">
+        <mat-card-content *ngIf="!matches">
+          <div fxLayoutAlign="center center">
+            <mat-spinner></mat-spinner>
+          </div>
+        </mat-card-content>
+        <mat-card-content *ngIf="matches">
+          <div fxLayout="column" fxLayoutAlign="center center" *ngIf="user.data.choices.length !== 0">
+            <h2>Your Matches:</h2>
+          </div>
+          <div fxLayout="row wrap" fxLayoutAlign="center center">
+            <puppy-student *ngFor="let match of matches" [student]="match"></puppy-student>
+          </div>
+          <div *ngIf="matches?.length === 0 && femaleHearts(user).length + maleHearts(user).length > 0"
+            fxLayout="column" fxLayoutAlign="center center">
+            <h3>Sorry, even though you received a lot of love, you didn't match with anyone.</h3>
+          </div>
+          <div *ngIf="matches?.length === 0 && femaleHearts(user).length + maleHearts(user).length === 0"
+            fxLayout="column" fxLayoutAlign="center center">
+            <h3>Sorry, you didn't match with anyone.</h3>
+            <blockquote>You waited, but love did not come.</blockquote>
+          </div>
+          <hr>
+          <div fxLayout="row" *ngIf="maleHearts(user).length !== 0">
+            <h3>Hearts from people that the OA identifies as male:</h3>
+          </div>
+          <div fxLayout="row" fxLayoutAlign="start center">
+            <img class="lovely-heart" *ngFor="let h of maleHearts(user).slice(0, 9)" src="/assets/heart.png">
+          </div>
+          <div fxLayout="row" *ngIf="femaleHearts(user).length !== 0">
+            <h3>Hearts from people that the OA identifies as female:</h3>
+          </div>
+          <div fxLayout="row" fxLayoutAlign="start center">
+            <img class="lovely-heart" *ngFor="let h of femaleHearts(user).slice(0, 9)" src="/assets/heart.png">
+          </div>
+          <div *ngIf="femaleHearts(user).length + maleHearts(user).length === 0"
+            fxLayout="column" fxLayoutAlign="center center">
+            <h3>Sorry, you haven't gotten any hearts.</h3>
+            <blockquote>True love comes to those who wait.</blockquote>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="main" *ngIf="stats">
+        <mat-card-title> Stats </mat-card-title>
+        <mat-card-content>
+          <div fxLayout="row wrap" fxLayoutAlign="center center">
+            <div class="chart">
+              <h2> Registrations </h2>
+              <ngx-charts-pie-chart [scheme]="colorScheme"
+                [results]="registrations"
+                [animations]="false"
+                [explodeSlices]="false"
+                [labels]="true"
+                [doughnut]="false">
+              </ngx-charts-pie-chart>
+            </div>
+            <div class="chart">
+              <h2> Female Registrations </h2>
+              <ngx-charts-pie-chart [scheme]="colorScheme"
+                [results]="fregs"
+                [animations]="false"
+                [explodeSlices]="false"
+                [labels]="true"
+                [doughnut]="false">
+              </ngx-charts-pie-chart>
+            </div>
+            <div class="chart">
+              <h2> Male Registrations </h2>
+              <ngx-charts-pie-chart [scheme]="colorScheme"
+                [results]="mregs"
+                [animations]="false"
+                [explodeSlices]="false"
+                [labels]="true"
+                [doughnut]="false">
+              </ngx-charts-pie-chart>
+            </div>
+            <div class="chart">
+              <h2> Hearts Transferred </h2>
+              <ngx-charts-pie-chart [scheme]="colorScheme"
+                [results]="hearts"
+                [animations]="false"
+                [explodeSlices]="false"
+                [labels]="true"
+                [doughnut]="false">
+              </ngx-charts-pie-chart>
+            </div>
+            <div class="chart">
+              <h2> Female Hearts </h2>
+              <ngx-charts-pie-chart [scheme]="colorScheme"
+                [results]="fhearts"
+                [animations]="false"
+                [explodeSlices]="false"
+                [labels]="true"
+                [doughnut]="false">
+              </ngx-charts-pie-chart>
+            </div>
+            <div class="chart">
+              <h2> Male Hearts </h2>
+              <ngx-charts-pie-chart [scheme]="colorScheme"
+                [results]="mhearts"
+                [animations]="false"
+                [explodeSlices]="false"
+                [labels]="true"
+                [doughnut]="false">
+              </ngx-charts-pie-chart>
+            </div>
+          </div>
+          <mat-card-actions>
+            <h4 style="text-align: center;"> Note: Males and Females refer to people identified as Male or Female by OA </h4>
+          </mat-card-actions>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #loading>
+  Loading
+</ng-template>

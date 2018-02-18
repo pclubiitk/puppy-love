@@ -5,6 +5,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -38,6 +40,7 @@ import { LoggedOutGuard } from './guards/logged-out.guard';
     BrowserAnimationsModule,
     HttpClientModule,
     ReactiveFormsModule,
+    NgxChartsModule,
 
     FlexLayoutModule,
     MatButtonModule,

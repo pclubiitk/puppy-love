@@ -6,6 +6,15 @@ services:
       networks:
         - mynet
 
+    results:
+      image: pclub/puppy-love:results
+      env_file:
+        - .backend.env
+      links:
+        - mongo
+      networks:
+        - mynet
+
     signup:
       image: pclub/puppy-love:signup
       env_file:

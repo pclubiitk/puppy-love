@@ -1,0 +1,69 @@
+[mat-button] {
+  width: 100%;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-card-title {
+  text-align: center;
+}
+
+.profile {
+  width: 20vw;
+}
+
+.profile-pic {
+  width: 20vw;
+  height: 20vw;
+  background-size: cover;
+  padding: 24px;
+  flex-grow: 1;
+}
+
+.main {
+  margin-bottom: 30px;
+  width: 66.67vw;
+}
+
+.smallonly {
+  display: none;
+}
+
+.lovely-heart {
+  max-width: 50px;
+}
+
+.chart {
+  border: 1px solid black;
+  width: 18vw;
+  height: 18vw;
+  padding: 10px;
+  margin: 10px;
+
+  h2 {
+    margin: 0;
+    text-align: center;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .smallonly {
+    display: block;
+  }
+  .main {
+    display: block;
+    width: 80vw;
+  }
+  .bigonly {
+    display: none;
+  }
+  .textonly-greeter {
+    margin: 5px;
+  }
+  .chart {
+    width: 63vw;
+    height: 63vw;
+  }
+}

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 @Component({
   template: `
-<puppy-home></puppy-home>
+<puppy-results></puppy-results>
 `,
   styles: [ '' ]
 })

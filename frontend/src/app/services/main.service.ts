@@ -10,6 +10,29 @@ import { catchError, map, switchMap, tap } from 'rxjs/operators';
 
 import { Crypto } from '../crypto';
 
+export interface Stats {
+  otherfemaleHearts: number;
+  y17femaleHearts: number;
+  y16femaleHearts: number;
+  y15femaleHearts: number;
+  y14femaleHearts: number;
+  othermaleHearts: number;
+  y17maleHearts: number;
+  y16maleHearts: number;
+  y15maleHearts: number;
+  y14maleHearts: number;
+  otherfemales: number;
+  y17females: number;
+  y16females: number;
+  y15females: number;
+  y14females: number;
+  othermales: number;
+  y17males: number;
+  y16males: number;
+  y15males: number;
+  y14males: number;
+}
+
 interface LoginData {
   _id: string;
   name: string;
@@ -19,6 +42,11 @@ interface LoginData {
   pubKey: string;
   data: sjcl.SjclCipherEncrypted;
   submitted: boolean;
+  matches: string;
+}
+
+interface MatchInfo {
+  _id: string;
   matches: string;
 }
 
@@ -65,6 +93,7 @@ interface User {
 export class MainService {
 
   user$: BehaviorSubject<User> = new BehaviorSubject(null);
+  matches$: BehaviorSubject<MatchInfo> = new BehaviorSubject(null);
   loggedIn = false;
 
   pubKeys: Map<string, string> = new Map();
@@ -142,20 +171,6 @@ export class MainService {
       declarePayload['t' + i] = '';
     }
 
-    // Send the declare values
-    // const declre = this.http.post('/api/declare/choices', declarePayload)
-    //   .pipe(
-    //     tap(() => {
-    //       console.log('Saved declare values: ' + count);
-    //     }),
-    //   );
-    // First send hearts
-    // return this.http.post('/api/hearts/send/' + user._id, heartvalues)
-    //   .pipe (
-    //     tap(() => console.log('Saved hearts: ' + heartvalues.length)),
-    //     switchMap(() => declre)
-    //   );
-
     return this.http.post('/api/users/data/submit/' + user._id, {
       hearts: heartvalues,
       tokens: declarePayload
@@ -205,9 +220,6 @@ export class MainService {
   public submit() {
     return this.getPubKeys().pipe(
       switchMap((pub) => this.declareChoices(pub)),
-      // switchMap(() => {
-      //   return this.http.post('/api/users/data/submit/' + this.user$.value._id, {});
-      // }),
       tap(() => this.save()),
       tap(() => {
         this.user$.next({
@@ -268,6 +280,26 @@ export class MainService {
         }
         return of('There was an error. Let us know at pclubiitk@gmail.com');
       })
+    );
+  }
+
+  public matches(): Observable<MatchInfo> {
+    const user = this.user$.value;
+    return this.http.get<MatchInfo>('/api/users/data/match/' + user._id).pipe(
+      tap(x => this.matches$.next(x)),
+      catchError((err) => {
+        console.error(err);
+        return Observable.throw('There was an error. Please try again.');
+      })
+    );
+  }
+
+  public stats(): Observable<Stats> {
+    return this.http.get<Stats>('/api/stats').pipe(
+      catchError((err) => {
+        console.error(err);
+        return Observable.throw('There was an error. Please try again.');
+      }),
     );
   }
 
