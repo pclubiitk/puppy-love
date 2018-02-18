@@ -1,24 +1,23 @@
-FROM golang:1.7
+FROM golang:alpine as builder
 
-# File Author / Maintainer
-MAINTAINER Saksham Sharma
+RUN apk --no-cache add openssl wget git
+ENV GOPATH=/go
+RUN go get -u github.com/golang/dep/cmd/dep
 
-RUN curl https://glide.sh/get | sh
+# copies the Gopkg.toml and Gopkg.lock to WORKDIR
+RUN mkdir -p /go/src/github.com/pclubiitk/puppy-love/service/results
+WORKDIR /go/src/github.com/pclubiitk/puppy-love/service/results
+COPY Gopkg.toml Gopkg.lock ./
 
-ENV GOPATH /go
-ENV PUPPYPATH /go/src/github.com/pclubiitk/puppy-love
-ENV SERVPATH /go/src/github.com/pclubiitk/puppy-love/service/results
+RUN dep ensure -v -vendor-only
 
-RUN mkdir -p $SERVPATH
-WORKDIR $SERVPATH
+COPY . .
+RUN go build
 
-COPY glide.yaml $SERVPATH
-COPY glide.lock $SERVPATH
-RUN glide install
+FROM alpine
+RUN mkdir -p /go/bin
+COPY --from=builder /go/src/github.com/pclubiitk/puppy-love/service/results/results /go/bin
 
-COPY . $SERVPATH
-RUN cd $SERVPATH && go build
-
+RUN apk --no-cache add ca-certificates
 EXPOSE 3001
-
-ENTRYPOINT ["/go/src/github.com/pclubiitk/puppy-love/service/results/results"]
+ENTRYPOINT ["/go/bin/results"]

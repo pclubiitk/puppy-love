@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"gopkg.in/mgo.v2/bson"
 	"log"
 	"os"
 	"sort"
 	"strings"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 type Declare struct {
@@ -95,9 +96,10 @@ func main() {
 	}
 
 	fmt.Println()
-	cnt := 0
 
 	var emails = []string{}
+	var maleMale, femaleFemale, crossGender int
+	var matches string
 
 	for i := range flat {
 		if i == 0 {
@@ -148,11 +150,21 @@ func main() {
 			//cnt = cnt + 1
 			//}
 
-			if u1.Gender == u2.Gender {
-				fmt.Println("SAME GENDER")
-				fmt.Println("ERROR")
-				continue
+			// if u1.Gender == u2.Gender {
+			// 	fmt.Println("SAME GENDER")
+			// 	fmt.Println("ERROR")
+			// 	continue
+			// }
+
+			if u1.Gender != u2.Gender {
+				crossGender++
+			} else if u1.Gender == "1" {
+				maleMale++
+			} else {
+				femaleFemale++
 			}
+
+			matches += fmt.Sprintf("%s(%s) <-> %s(%s)\n", u1.Name, u1.Id, u2.Name, u2.Id)
 
 			emails = append(emails, u1.Email)
 			emails = append(emails, u2.Email)
@@ -170,7 +182,8 @@ func main() {
 			}
 			if !b {
 				fmt.Println(u2.Name, "is not in matches of", u1.Name, ". Add?")
-				_, _ = fmt.Scanf("%s", &ans)
+				// _, _ = fmt.Scanf("%s", &ans)
+				ans = "y"
 				if ans == "y" {
 					fmt.Println("Adding", AddMatch(u2.Id, u1.Matches))
 
@@ -194,7 +207,8 @@ func main() {
 			}
 			if !b {
 				fmt.Println(u1.Name, "is not in matches of", u2.Name, ". Add?")
-				_, _ = fmt.Scanf("%s", &ans)
+				// _, _ = fmt.Scanf("%s", &ans)
+				ans = "y"
 				if ans == "y" {
 					fmt.Println("Adding", AddMatch(u1.Id, u2.Matches))
 
@@ -210,9 +224,14 @@ func main() {
 			fmt.Println("**********************************************")
 		}
 	}
-	fmt.Println("Total", cnt, "matches")
 	fmt.Println()
 	for _, mail := range emails {
 		fmt.Println(mail)
 	}
+	fmt.Println(matches)
+	fmt.Println("Total", maleMale+femaleFemale+crossGender, "matches")
+	fmt.Println("Male-Male matches: ", maleMale)
+	fmt.Println("Female-Female matches: ", femaleFemale)
+	fmt.Println("Male-Female matches: ", crossGender)
+	fmt.Println()
 }

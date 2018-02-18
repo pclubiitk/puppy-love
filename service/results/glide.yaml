@@ -1,5 +1,0 @@
-package: github.com/pclubiitk/puppy-love/service/signup
-import:
-- package: gopkg.in/mgo.v2
-  subpackages:
-  - bson

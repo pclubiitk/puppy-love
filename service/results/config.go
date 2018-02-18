@@ -5,7 +5,7 @@ import (
 )
 
 var CfgMgoUrl = "mongodb://0.0.0.0:27017/puppy"
-var CfgTable = "declare2"
+var CfgTable = "declare"
 
 func CfgInit() {
 	var port string
