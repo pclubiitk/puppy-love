@@ -231,7 +231,7 @@ export class MainService {
   }
 
   public login(username: string, _password: string) {
-    const password = Crypto.hash(_password);
+    const password = Crypto.hash(Crypto.hash(Crypto.hash(_password)));
     return this.http.post('/api/session/login', { username, password }).pipe(
       switchMap(() => this.getInfo(username, _password)),
       switchMap((user) => this.getHearts(user)),

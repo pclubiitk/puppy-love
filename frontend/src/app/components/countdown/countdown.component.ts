@@ -24,7 +24,7 @@ export class CountdownComponent implements OnInit {
   }
 
   updateCurrent() {
-    const eventdate = moment([2018, 1, 8]);
+    const eventdate = moment([2019, 1, 8]);
     const todaysdate = moment();
     const totalSeconds = eventdate.diff(todaysdate, 'seconds');
     const seconds = totalSeconds % 60;

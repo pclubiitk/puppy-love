@@ -49,7 +49,7 @@ export class SignupComponent {
     const crypto = new Crypto(password);
     // const crypto2 = new Crypto(ccpass);
 
-    const passHash = Crypto.hash(password);
+    const passHash = Crypto.hash(Crypto.hash(Crypto.hash(password)));
 
     crypto.newKey();
 
