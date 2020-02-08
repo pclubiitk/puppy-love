@@ -12,25 +12,25 @@ import { Crypto } from '../crypto';
 
 export interface Stats {
   otherfemaleHearts: number;
+  y18femaleHearts: number;
   y17femaleHearts: number;
   y16femaleHearts: number;
   y15femaleHearts: number;
-  y14femaleHearts: number;
   othermaleHearts: number;
+  y18maleHearts: number;
   y17maleHearts: number;
   y16maleHearts: number;
   y15maleHearts: number;
-  y14maleHearts: number;
   otherfemales: number;
+  y18females: number;
   y17females: number;
   y16females: number;
   y15females: number;
-  y14females: number;
   othermales: number;
+  y18males: number;
   y17males: number;
   y16males: number;
   y15males: number;
-  y14males: number;
 }
 
 interface LoginData {

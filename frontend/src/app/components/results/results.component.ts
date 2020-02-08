@@ -46,8 +46,8 @@ export class ResultsComponent implements OnInit {
 
   get registrations() {
     const stats = this.stats;
-    const totalMales = stats.othermales + stats.y14males + stats.y15males + stats.y16males + stats.y17males;
-    const totalFemales = stats.otherfemales + stats.y14females + stats.y15females + stats.y16females + stats.y17females;
+    const totalMales = stats.othermales + stats.y15males + stats.y16males + stats.y17males + stats.y18males;
+    const totalFemales = stats.otherfemales + stats.y15females + stats.y16females + stats.y17females + stats.y18females;
     return [{
       name: 'Males',
       value: totalMales,
@@ -59,8 +59,8 @@ export class ResultsComponent implements OnInit {
 
   get hearts() {
     const stats = this.stats;
-    const totalMaleHearts = stats.othermaleHearts + stats.y14maleHearts + stats.y15maleHearts + stats.y16maleHearts + stats.y17maleHearts;
-    const totalFemaleHearts = stats.otherfemaleHearts + stats.y14femaleHearts + stats.y15femaleHearts + stats.y16femaleHearts + stats.y17femaleHearts;
+    const totalMaleHearts = stats.othermaleHearts + stats.y15maleHearts + stats.y16maleHearts + stats.y17maleHearts + stats.y18maleHearts;
+    const totalFemaleHearts = stats.otherfemaleHearts + stats.y15femaleHearts + stats.y16femaleHearts + stats.y17femaleHearts + stats.y18femaleHearts;
     return [{
       name: 'Males',
       value: totalMaleHearts,
@@ -75,9 +75,6 @@ export class ResultsComponent implements OnInit {
       name: 'Others',
       value: stats.otherfemaleHearts,
     }, {
-      name: 'Y14',
-      value: stats.y14femaleHearts,
-    }, {
       name: 'Y15',
       value: stats.y15femaleHearts,
     }, {
@@ -86,6 +83,9 @@ export class ResultsComponent implements OnInit {
     }, {
       name: 'Y17',
       value: stats.y17femaleHearts,
+    }, {
+      name: 'Y18',
+      value: stats.y18femaleHearts,
     }].reverse();
 
   }
@@ -96,9 +96,6 @@ export class ResultsComponent implements OnInit {
       name: 'Others',
       value: stats.othermaleHearts,
     }, {
-      name: 'Y14',
-      value: stats.y14maleHearts,
-    }, {
       name: 'Y15',
       value: stats.y15maleHearts,
     }, {
@@ -107,6 +104,9 @@ export class ResultsComponent implements OnInit {
     }, {
       name: 'Y17',
       value: stats.y17maleHearts,
+    }, {
+      name: 'Y18',
+      value: stats.y18maleHearts,
     }].reverse();
   }
 
@@ -116,9 +116,6 @@ export class ResultsComponent implements OnInit {
       name: 'Others',
       value: stats.otherfemales,
     }, {
-      name: 'Y14',
-      value: stats.y14females,
-    }, {
       name: 'Y15',
       value: stats.y15females,
     }, {
@@ -127,6 +124,9 @@ export class ResultsComponent implements OnInit {
     }, {
       name: 'Y17',
       value: stats.y17females,
+    }, {
+      name: 'Y18',
+      value: stats.y18females,
     }].reverse();
 
   }
@@ -137,9 +137,6 @@ export class ResultsComponent implements OnInit {
       name: 'Others',
       value: stats.othermales,
     }, {
-      name: 'Y14',
-      value: stats.y14males,
-    }, {
       name: 'Y15',
       value: stats.y15males,
     }, {
@@ -148,6 +145,9 @@ export class ResultsComponent implements OnInit {
     }, {
       name: 'Y17',
       value: stats.y17males,
+    }, {
+      name: 'Y18',
+      value: stats.y18males,
     }].reverse();
   }
 
